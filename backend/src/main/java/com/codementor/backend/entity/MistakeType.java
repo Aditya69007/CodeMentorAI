@@ -1,0 +1,34 @@
+package com.codementor.backend.entity;
+
+public enum MistakeType {
+
+    SYNTAX_ERROR,
+
+    WRONG_DATA_STRUCTURE,
+
+    WRONG_ALGORITHM,
+
+    LOGIC_ERROR,
+
+    BOUNDARY_CONDITION,
+
+    EDGE_CASE_MISSED,
+
+    TIME_COMPLEXITY,
+
+    SPACE_COMPLEXITY,
+
+    INCORRECT_INITIALIZATION,
+
+    LOOP_ERROR,
+
+    RECURSION_ERROR,
+
+    BASE_CASE_ERROR,
+
+    NULL_HANDLING,
+
+    INPUT_OUTPUT_ERROR,
+
+    OTHER
+}

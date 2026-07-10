@@ -1,1 +1,2 @@
-DB_PASSWORD=Aditya@007
+backend/.env
+backend/src/main/resources/application-secrets.properties

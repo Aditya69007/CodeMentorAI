@@ -20,6 +20,22 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.CONFLICT, ex.getMessage());
     }
 
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleResourceNotFoundException(
+            ResourceNotFoundException exception) {
+
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("status", 404);
+        response.put("error", "Not Found");
+        response.put("message", exception.getMessage());
+        response.put("timestamp", LocalDateTime.now());
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(response);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidation(
             MethodArgumentNotValidException ex) {
