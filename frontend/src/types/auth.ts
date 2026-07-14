@@ -10,7 +10,18 @@ export interface RegisterRequest {
   password: string;
 }
 
-export interface AuthResponse {
+export type UserRole = "USER" | "ADMIN";
+
+export interface AuthUser {
+  userId: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: UserRole;
+  profilePicture: string | null;
+}
+
+export interface AuthResponse extends AuthUser {
   token: string;
   message: string;
 }

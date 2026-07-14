@@ -10,6 +10,7 @@ import com.codementor.backend.repository.ProblemRepository;
 import com.codementor.backend.repository.SubmissionRepository;
 import com.codementor.backend.repository.UserRepository;
 import com.codementor.backend.service.ProblemService;
+import com.codementor.backend.entity.ProblemExample;
 
 import lombok.RequiredArgsConstructor;
 
@@ -248,11 +249,11 @@ public class ProblemServiceImpl implements ProblemService {
     // CREATE PROBLEM
     // ==================================================
 
-    @Override
-    @Transactional
-    public ProblemResponse createProblem(
-            ProblemRequest request
-    ) {
+        @Override
+        @Transactional
+        public ProblemResponse createProblem(
+                ProblemRequest request
+        ) {
 
         if (
                 problemRepository.existsByTitle(
@@ -260,9 +261,9 @@ public class ProblemServiceImpl implements ProblemService {
                 )
         ) {
 
-            throw new ResourceAlreadyExistsException(
-                    "Problem with this title already exists."
-            );
+                throw new ResourceAlreadyExistsException(
+                        "Problem with this title already exists."
+                );
         }
 
 
@@ -317,13 +318,53 @@ public class ProblemServiceImpl implements ProblemService {
                         .build();
 
 
-        problem =
+        if (request.getExamples() != null) {
+
+                List<ProblemExample> examples =
+
+                        request
+                                .getExamples()
+
+                                .stream()
+
+                                .map(exampleRequest ->
+
+                                        ProblemExample
+                                                .builder()
+
+                                                .input(
+                                                        exampleRequest.getInput()
+                                                )
+
+                                                .output(
+                                                        exampleRequest.getOutput()
+                                                )
+
+                                                .explanation(
+                                                        exampleRequest.getExplanation()
+                                                )
+
+                                                .orderIndex(
+                                                        exampleRequest.getOrderIndex()
+                                                )
+
+                                                .problem(problem)
+
+                                                .build()
+                                )
+
+                                .toList();
+
+
+                problem.getExamples().addAll(examples);
+        }
+
+
+        Problem savedProblem =
                 problemRepository.save(problem);
 
-
-        return mapToResponse(problem);
-    }
-
+        return mapToResponse(savedProblem);
+        }
 
     // ==================================================
     // GET ALL PROBLEMS
@@ -455,17 +496,34 @@ public class ProblemServiceImpl implements ProblemService {
     // UPDATE PROBLEM
     // ==================================================
 
-    @Override
-    @Transactional
-    public ProblemResponse updateProblem(
+        @Override
+        @Transactional
+        public ProblemResponse updateProblem(
 
-            Long id,
+                Long id,
 
-            ProblemRequest request
-    ) {
+                ProblemRequest request
+        ) {
 
         Problem problem =
                 findProblemById(id);
+
+
+        if (
+                !problem.getTitle()
+                        .equalsIgnoreCase(
+                                request.getTitle()
+                        )
+                &&
+                problemRepository.existsByTitle(
+                        request.getTitle()
+                )
+        ) {
+
+                throw new ResourceAlreadyExistsException(
+                        "Problem with this title already exists."
+                );
+        }
 
 
         problem.setTitle(
@@ -508,23 +566,68 @@ public class ProblemServiceImpl implements ProblemService {
         );
 
 
-        if (request.getTags() != null) {
+        problem.setTags(
 
-            problem.setTags(
-                    new ArrayList<>(
-                            request.getTags()
-                    )
-            );
+                request.getTags() != null
+
+                        ? new ArrayList<>(
+                                request.getTags()
+                        )
+
+                        : new ArrayList<>()
+        );
+
+
+        problem.getExamples().clear();
+
+
+        if (request.getExamples() != null) {
+
+                List<ProblemExample> examples =
+
+                        request
+                                .getExamples()
+
+                                .stream()
+
+                                .map(exampleRequest ->
+
+                                        ProblemExample
+                                                .builder()
+
+                                                .input(
+                                                        exampleRequest.getInput()
+                                                )
+
+                                                .output(
+                                                        exampleRequest.getOutput()
+                                                )
+
+                                                .explanation(
+                                                        exampleRequest.getExplanation()
+                                                )
+
+                                                .orderIndex(
+                                                        exampleRequest.getOrderIndex()
+                                                )
+
+                                                .problem(problem)
+
+                                                .build()
+                                )
+
+                                .toList();
+
+
+                problem.getExamples().addAll(examples);
         }
 
 
-        problem =
+        Problem savedProblem =
                 problemRepository.save(problem);
 
-
-        return mapToResponse(problem);
-    }
-
+        return mapToResponse(savedProblem);
+        }
 
     // ==================================================
     // DELETE PROBLEM
@@ -692,4 +795,53 @@ public class ProblemServiceImpl implements ProblemService {
 
                 .build();
     }
+
+        @Override
+        @Transactional(readOnly = true)
+        public Page<ProblemResponse> getAdminProblems(
+
+                String title,
+
+                Difficulty difficulty,
+
+                Long topicId,
+
+                Boolean active,
+
+                int page,
+
+                int size
+        ) {
+
+        String searchTitle =
+                title == null
+                        ? ""
+                        : title.trim();
+
+
+        Pageable pageable =
+                PageRequest.of(
+                        page,
+                        size
+                );
+
+
+        return problemRepository
+                .findAdminProblems(
+
+                        searchTitle,
+
+                        difficulty,
+
+                        topicId,
+
+                        active,
+
+                        pageable
+                )
+
+                .map(
+                        this::mapToResponse
+                );
+        }
 }

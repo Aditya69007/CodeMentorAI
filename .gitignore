@@ -1,2 +1,6 @@
 backend/.env
+backend/src/main/resources/application-secrets.propertiesbackend/.env
+frontend/.env
+backend/.env
+frontend/.env
 backend/src/main/resources/application-secrets.properties

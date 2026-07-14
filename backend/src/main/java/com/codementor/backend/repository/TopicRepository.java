@@ -18,4 +18,6 @@ public interface TopicRepository
     boolean existsByNameIgnoreCase(String name);
 
     List<Topic> findByActiveTrueOrderByNameAsc();
+
+    List<Topic> findAllByOrderByCreatedAtDesc();
 }

@@ -14,3 +14,20 @@ export interface TopicProblem {
   difficulty: Difficulty;
   tags: string[];
 }
+
+export interface AdminTopic {
+  id: number;
+  name: string;
+  slug: string;
+  description: string | null;
+  active: boolean;
+  problemCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TopicRequest {
+  name: string;
+  slug: string;
+  description: string;
+}

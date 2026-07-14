@@ -3,6 +3,9 @@ import api from "./api";
 import type {
   SubmissionRequest,
   SubmissionResponse,
+  AdminSubmissionPage,
+  AdminSubmissionFilters,
+  AdminSubmissionDetails,
 } from "../types/submission";
 
 import type {
@@ -105,3 +108,44 @@ export const getMyProblemSubmissions = async (
 
   return response.data;
 };
+
+// ==========================================
+// GET ADMIN SUBMISSIONS
+// ==========================================
+
+export const getAdminSubmissions = async (
+  filters: AdminSubmissionFilters = {}
+): Promise<AdminSubmissionPage> => {
+
+  const response =
+    await api.get<AdminSubmissionPage>(
+      "/submissions/admin",
+      {
+        params: {
+          search: filters.search || undefined,
+          status: filters.status || undefined,
+          language: filters.language || undefined,
+          page: filters.page ?? 0,
+          size: filters.size ?? 10,
+        },
+      }
+    );
+
+  return response.data;
+};
+
+  // ==========================================
+  // GET ADMIN SUBMISSION DETAILS
+  // ==========================================
+
+  export const getAdminSubmissionDetails = async (
+    id: number
+  ): Promise<AdminSubmissionDetails> => {
+
+    const response =
+      await api.get<AdminSubmissionDetails>(
+        `/submissions/admin/${id}`
+      );
+
+    return response.data;
+  };

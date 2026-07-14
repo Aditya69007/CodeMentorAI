@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-
 @Service
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
@@ -23,17 +22,48 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public AuthResponse login(LoginRequest request) {
 
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Invalid email or password"));
+                .orElseThrow(() ->
+                        new RuntimeException("Invalid email or password")
+                );
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid email or password");
+        if (!passwordEncoder.matches(
+                request.getPassword(),
+                user.getPassword()
+        )) {
+
+            throw new RuntimeException(
+                    "Invalid email or password"
+            );
         }
 
-        String token = jwtService.generateToken(user.getEmail());
+        if (!Boolean.TRUE.equals(user.getEnabled())) {
+
+            throw new RuntimeException(
+                    "Your account is disabled"
+            );
+        }
+
+        String token =
+                jwtService.generateToken(user.getEmail());
 
         return AuthResponse.builder()
+
                 .token(token)
+
                 .message("Login Successful")
+
+                .userId(user.getId())
+
+                .firstName(user.getFirstName())
+
+                .lastName(user.getLastName())
+
+                .email(user.getEmail())
+
+                .role(user.getRole())
+
+                .profilePicture(user.getProfilePicture())
+
                 .build();
     }
 }

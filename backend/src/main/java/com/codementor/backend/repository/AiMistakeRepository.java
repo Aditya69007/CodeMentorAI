@@ -12,6 +12,8 @@ import java.util.List;
 public interface AiMistakeRepository
         extends JpaRepository<AiMistake, Long> {
 
+        void deleteByUserId(Long userId);
+
         @Query("""
                 SELECT
                 m.mistakeType,
@@ -75,5 +77,70 @@ public interface AiMistakeRepository
     List<AiMistake> findBySubmissionIdOrderByCreatedAtAsc(
         Long submissionId
     );
+
+    long countByUserId(Long userId);
+
+        @Query("""
+                SELECT
+                m.problem.topic.id,
+                COUNT(m)
+                FROM AiMistake m
+                WHERE m.user.id = :userId
+                AND m.problem.topic IS NOT NULL
+                GROUP BY m.problem.topic.id
+                """)
+        List<Object[]> findMistakeCountByTopicForUser(
+                @Param("userId") Long userId
+        );
+
+        // =========================================================
+        // ADMIN AI ANALYTICS
+        // =========================================================
+
+        @Query("""
+                SELECT m.mistakeType, COUNT(m)
+                FROM AiMistake m
+                GROUP BY m.mistakeType
+                ORDER BY COUNT(m) DESC
+                """)
+        List<Object[]> findGlobalMistakeTypeDistribution();
+
+
+        @Query("""
+                SELECT m.severity, COUNT(m)
+                FROM AiMistake m
+                GROUP BY m.severity
+                ORDER BY COUNT(m) DESC
+                """)
+        List<Object[]> findGlobalSeverityDistribution();
+
+
+        @Query("""
+                SELECT m.concept, COUNT(m)
+                FROM AiMistake m
+                GROUP BY m.concept
+                ORDER BY COUNT(m) DESC
+                """)
+        List<Object[]> findGlobalConceptDistribution();
+
+
+        @Query("""
+                SELECT COUNT(DISTINCT m.user.id)
+                FROM AiMistake m
+                """)
+        long countDistinctUsersWithMistakes();
+
+        @Query("""
+                SELECT
+                m.problem.topic.id,
+                COUNT(m)
+                FROM AiMistake m
+                WHERE m.user.id = :userId
+                AND m.problem.topic IS NOT NULL
+                GROUP BY m.problem.topic.id
+                """)
+        List<Object[]> findDeveloperSkillMistakeStatsByUserId(
+                @Param("userId") Long userId
+        );
 
 }

@@ -1,48 +1,307 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import {
+  Route,
+  Routes,
+} from "react-router-dom";
 
+import AdminTopicsPage from "./pages/admin/AdminTopicsPage";
+import AdminProblemsPage from "./pages/admin/AdminProblemsPage";
+import AdminEditProblemPage from "./pages/admin/AdminEditProblemPage";
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
+import AdminLayout from "./components/admin/layout/AdminLayout";
+import AdminUsersPage from "./pages/admin/AdminUsersPage";
 import ProblemsPage from "./pages/user/ProblemsPage";
 import ProblemSolvePage from "./pages/user/ProblemSolvePage";
 import MistakeMemoryPage from "./pages/user/MistakeMemoryPage";
-import ProtectedRoute from "./routes/ProtectedRoute";
-import AppLayout from "./components/layout/AppLayout";
 import TopicsPage from "./pages/user/TopicsPage";
 import TopicProblemsPage from "./pages/user/TopicProblemsPage";
+import AdminUserDetailsPage from "./pages/admin/AdminUserDetailsPage";
+import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
+import AdminCreateProblemPage from "./pages/admin/AdminCreateProblemPage";
+import AdminSubmissionsPage from "./pages/admin/AdminSubmissionsPage";
+
+import UserRoute from "./routes/UserRoute";
+import AdminRoute from "./routes/AdminRoute";
+import RoleBasedRedirect from "./routes/RoleBasedRedirect";
+
+import AppLayout from "./components/layout/AppLayout";
+
+import GrowthReportPage
+  from "./pages/user/GrowthReportPage";
+
+import AdminAiAnalyticsPage
+  from "./pages/admin/AdminAiAnalyticsPage";
+
+import AdminPlatformAnalyticsPage
+  from "./pages/admin/AdminPlatformAnalyticsPage";
+
+import DeveloperSkillGraphPage
+  from "./pages/DeveloperSkillGraphPage";
+
+import PersonalizedLearningPlanPage
+  from "./components/ai/PersonalizedLearningPlanPage";
+
+import PersonalizedRevisionPlanPage
+  from "./pages/user/PersonalizedRevisionPlanPage";
+
+import PersonalizedInterviewPage
+  from "./pages/user/PersonalizedInterviewPage";
+
+import UserDashboardPage
+  from "./pages/user/UserDashboardPage";
+
 
 export default function App() {
+
   return (
+
     <Routes>
-      <Route path="/" element={<Navigate to="/problems" replace />} />
 
-      <Route path="/login" element={<LoginPage />} />
 
-      <Route path="/register" element={<RegisterPage />} />
+      {/* ==========================================
+          ROOT REDIRECT
+      ========================================== */}
 
-      <Route element={<ProtectedRoute />}>
+      <Route
+        path="/"
+        element={<RoleBasedRedirect />}
+      />
+
+
+      {/* ==========================================
+          PUBLIC ROUTES
+      ========================================== */}
+
+      <Route
+        path="/login"
+        element={<LoginPage />}
+      />
+
+      <Route
+        path="/register"
+        element={<RegisterPage />}
+      />
+
+
+      {/* ==========================================
+          USER PLATFORM
+      ========================================== */}
+
+      <Route element={<UserRoute />}>
+
+
+        {/* ==========================================
+            FULL-SCREEN CODING WORKSPACE
+
+            IMPORTANT:
+            This route is intentionally outside
+            AppLayout.
+
+            Therefore ProblemSolvePage will NOT
+            display the platform sidebar.
+        ========================================== */}
+
+        <Route
+          path="/problems/:id"
+          element={<ProblemSolvePage />}
+        />
+
+
+        {/* ==========================================
+            USER PLATFORM WITH SIDEBAR
+        ========================================== */}
+
         <Route element={<AppLayout />}>
-          <Route path="/problems" element={<ProblemsPage />} />
+
+
+          {/* DASHBOARD */}
+
           <Route
-            path="/mistake-memory"
-            element={<MistakeMemoryPage />}
+            path="/dashboard"
+            element={<UserDashboardPage />}
           />
+
+
+          {/* PROBLEMS */}
+
           <Route
-            path="/problems/:id"
-            element={<ProblemSolvePage />}
+            path="/problems"
+            element={<ProblemsPage />}
           />
+
+
+          {/* TOPICS */}
+
           <Route
             path="/topics"
             element={<TopicsPage />}
           />
 
+
           <Route
             path="/topics/:slug"
             element={<TopicProblemsPage />}
           />
+
+
+          {/* MISTAKE MEMORY */}
+
+          <Route
+            path="/mistake-memory"
+            element={<MistakeMemoryPage />}
+          />
+
+
+          {/* DEVELOPER SKILLS */}
+
+          <Route
+            path="/developer-skills"
+            element={<DeveloperSkillGraphPage />}
+          />
+
+
+          {/* PERSONALIZED LEARNING PLAN */}
+
+          <Route
+            path="/learning-plan"
+            element={<PersonalizedLearningPlanPage />}
+          />
+
+
+          {/* PERSONALIZED REVISION PLAN */}
+
+          <Route
+            path="/revision-plan"
+            element={<PersonalizedRevisionPlanPage />}
+          />
+
+
+          {/* GROWTH REPORT */}
+
+          <Route
+            path="/growth-report"
+            element={<GrowthReportPage />}
+          />
+
+
+          {/* PERSONALIZED INTERVIEW */}
+
+          <Route
+            path="/interview"
+            element={<PersonalizedInterviewPage />}
+          />
+
+
         </Route>
+
       </Route>
 
-      <Route path="*" element={<Navigate to="/problems" replace />} />
+
+      {/* ==========================================
+          ADMIN PLATFORM
+      ========================================== */}
+
+      <Route element={<AdminRoute />}>
+
+
+        <Route element={<AdminLayout />}>
+
+
+          {/* PLATFORM ANALYTICS */}
+
+          <Route
+            path="/admin/analytics"
+            element={<AdminPlatformAnalyticsPage />}
+          />
+
+
+          {/* AI ANALYTICS */}
+
+          <Route
+            path="/admin/ai-analytics"
+            element={<AdminAiAnalyticsPage />}
+          />
+
+
+          {/* TOPICS */}
+
+          <Route
+            path="/admin/topics"
+            element={<AdminTopicsPage />}
+          />
+
+
+          {/* PROBLEMS */}
+
+          <Route
+            path="/admin/problems"
+            element={<AdminProblemsPage />}
+          />
+
+
+          {/* ADMIN DASHBOARD */}
+
+          <Route
+            path="/admin/dashboard"
+            element={<AdminDashboardPage />}
+          />
+
+
+          {/* USERS */}
+
+          <Route
+            path="/admin/users"
+            element={<AdminUsersPage />}
+          />
+
+
+          <Route
+            path="/admin/users/:userId"
+            element={<AdminUserDetailsPage />}
+          />
+
+
+          {/* CREATE PROBLEM */}
+
+          <Route
+            path="/admin/problems/create"
+            element={<AdminCreateProblemPage />}
+          />
+
+
+          {/* EDIT PROBLEM */}
+
+          <Route
+            path="/admin/problems/:problemId/edit"
+            element={<AdminEditProblemPage />}
+          />
+
+
+          {/* SUBMISSIONS */}
+
+          <Route
+            path="/admin/submissions"
+            element={<AdminSubmissionsPage />}
+          />
+
+
+        </Route>
+
+      </Route>
+
+
+      {/* ==========================================
+          FALLBACK
+      ========================================== */}
+
+      <Route
+        path="*"
+        element={<RoleBasedRedirect />}
+      />
+
+
     </Routes>
+
   );
+
 }

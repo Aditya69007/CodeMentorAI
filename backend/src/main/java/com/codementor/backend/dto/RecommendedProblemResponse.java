@@ -19,4 +19,6 @@ public class RecommendedProblemResponse {
     private Difficulty difficulty;
 
     private Boolean solved;
+
+    private String reason;
 }

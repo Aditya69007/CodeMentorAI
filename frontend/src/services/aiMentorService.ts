@@ -1,5 +1,5 @@
 import api from "./api";
-
+import axios from "axios";
 
 import type {
   AiMentorResponse,
@@ -9,6 +9,10 @@ import type {
   AiMentorHintResponse,
   PastMistakeRecallResponse,
 } from "../types/aiMentor";
+
+import type {
+  SolutionEvolutionAttempt,
+} from "../types/solutionEvolution";
 
 // ANALYZE SUBMISSION
 
@@ -29,14 +33,32 @@ export const analyzeSubmission = async (
 
 export const getAnalysis = async (
   submissionId: number
-): Promise<AiMentorResponse> => {
+): Promise<AiMentorResponse | null> => {
 
-  const response =
-    await api.get<AiMentorResponse>(
-      `/ai-mentor/analysis/${submissionId}`
-    );
+  try {
 
-  return response.data;
+    const response =
+      await api.get<AiMentorResponse>(
+        `/ai-mentor/analysis/${submissionId}`
+      );
+
+    return response.data;
+
+  } catch (error: unknown) {
+
+    if (
+      axios.isAxiosError(error) &&
+      error.response?.status === 404
+    ) {
+
+      return null;
+
+    }
+
+    throw error;
+
+  }
+
 };
 
 
@@ -88,18 +110,6 @@ export const getProgressiveHint = async (
   return response.data;
 };
 
-export const getProgressiveHints = async (
-  submissionId: number
-): Promise<AiMentorHintResponse[]> => {
-
-  const response =
-    await api.get<AiMentorHintResponse[]>(
-      `/ai-mentor/hints/${submissionId}`
-    );
-
-  return response.data;
-};
-
 // GET PAST MISTAKE RECALL
 
 export const getPastMistakeRecall = async (
@@ -113,3 +123,127 @@ export const getPastMistakeRecall = async (
 
   return response.data;
 };
+
+// ==========================================
+// GET SOLUTION EVOLUTION TIMELINE
+// ==========================================
+
+export const getSolutionEvolution = async (
+  problemId: number
+): Promise<SolutionEvolutionAttempt[]> => {
+
+  try {
+
+    const response =
+      await api.get<SolutionEvolutionAttempt[]>(
+        `/ai-mentor/solution-evolution/${problemId}`
+      );
+
+    return response.data;
+
+    } catch (error: unknown) {
+
+      if (
+        axios.isAxiosError(error) &&
+        error.response?.status === 404
+      ) {
+        return [];
+      }
+
+      throw error;
+    }
+};
+
+export interface RecommendedLearningProblem {
+  id: number;
+  title: string;
+  difficulty: string;
+  solved: boolean;
+  reason: string;
+}
+
+export interface PersonalizedLearningPlanResponse {
+  overallReadinessScore: number;
+  learningLevel: string;
+  weakConcepts: string[];
+  revisionPriorities: string[];
+  strengths: string[];
+  recommendedProblems: RecommendedLearningProblem[];
+  hintDependencyScore: number;
+  independentSolveRate: number;
+  recommendedAction: string;
+  message: string;
+}
+
+export const getMyPersonalizedLearningPlan =
+  async (): Promise<PersonalizedLearningPlanResponse> => {
+
+    const response =
+      await api.get<PersonalizedLearningPlanResponse>(
+        "/ai-mentor/learning-plan/me"
+      );
+
+    return response.data;
+  };
+
+export interface PersonalizedRevisionPlanResponse {
+  revisionScore: number;
+  revisionLevel: string;
+  urgentConcepts: string[];
+  improvingConcepts: string[];
+  masteredConcepts: string[];
+  revisionProblems: {
+    id: number;
+    title: string;
+    difficulty: string;
+    solved: boolean;
+    reason?: string;
+  }[];
+  recommendedAction: string;
+  message: string;
+}
+
+export const getMyPersonalizedRevisionPlan =
+  async (): Promise<PersonalizedRevisionPlanResponse> => {
+
+    const response =
+      await api.get<PersonalizedRevisionPlanResponse>(
+        "/ai-mentor/revision-plan/me"
+      );
+
+    return response.data;
+  };
+
+export interface GrowthReportResponse {
+  overallGrowthScore: number;
+  developerLevel: string;
+  hintDependencyScore: number;
+  independentSolveRate: number;
+  totalCompletedIndependentSessions: number;
+  independentlySolvedProblems: number;
+
+  conceptGrowth: {
+    concept: string;
+    totalMistakes: number;
+    acceptedSubmissions: number;
+    growthStatus: string;
+    message: string;
+  }[];
+
+  recurringMistakes: string[];
+  achievements: string[];
+
+  growthSummary: string;
+  recommendedNextAction: string;
+}
+
+export const getMyGrowthReport =
+  async (): Promise<GrowthReportResponse> => {
+
+    const response =
+      await api.get<GrowthReportResponse>(
+        "/ai-mentor/growth-report/me"
+      );
+
+    return response.data;
+  };

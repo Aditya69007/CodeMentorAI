@@ -3,7 +3,11 @@ package com.codementor.backend.controller;
 import com.codementor.backend.dto.SubmissionRequest;
 import com.codementor.backend.dto.SubmissionResponse;
 import com.codementor.backend.service.SubmissionService;
-
+import com.codementor.backend.dto.AdminSubmissionDetailsResponse;
+import com.codementor.backend.dto.AdminSubmissionResponse;
+import org.springframework.security.access.prepost.PreAuthorize;
+import com.codementor.backend.entity.Language;
+import com.codementor.backend.entity.SubmissionStatus;
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
@@ -106,6 +110,52 @@ public class SubmissionController {
         );
     }
 
+        // ==================================================
+        // GET ALL SUBMISSIONS - ADMIN ONLY
+        // ==================================================
+        // ==================================================
+        // FILTER SUBMISSIONS - ADMIN ONLY
+        // ==================================================
+
+        @PreAuthorize("hasRole('ADMIN')")
+        @GetMapping("/admin")
+        public ResponseEntity<Page<AdminSubmissionResponse>>
+        filterSubmissionsForAdmin(
+
+                @RequestParam(defaultValue = "")
+                String search,
+
+                @RequestParam(required = false)
+                SubmissionStatus status,
+
+                @RequestParam(required = false)
+                Language language,
+
+                @RequestParam(defaultValue = "0")
+                int page,
+
+                @RequestParam(defaultValue = "10")
+                int size
+        ) {
+
+        return ResponseEntity.ok(
+
+                submissionService
+                        .filterSubmissionsForAdmin(
+
+                                search,
+
+                                status,
+
+                                language,
+
+                                page,
+
+                                size
+                        )
+        );
+        }
+
 
     // ==================================================
     // GET SUBMISSION BY ID
@@ -129,4 +179,16 @@ public class SubmissionController {
 
         );
     }
+
+        @GetMapping("/admin/{id}")
+        public ResponseEntity<AdminSubmissionDetailsResponse>
+        getSubmissionDetailsForAdmin(
+                @PathVariable Long id
+        ) {
+
+        return ResponseEntity.ok(
+                submissionService
+                        .getSubmissionDetailsForAdmin(id)
+        );
+        }
 }

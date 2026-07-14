@@ -10,10 +10,16 @@ import com.codementor.backend.dto.DeveloperMistakeProfileResponse;
 import com.codementor.backend.dto.RecurringMistakeResponse;
 import com.codementor.backend.dto.PastMistakeRecallResponse;
 import com.codementor.backend.dto.PracticeRecommendationResponse;
+import com.codementor.backend.dto.SolutionEvolutionResponse;
 import java.util.List;
 import com.codementor.backend.dto.ConceptGrowthResponse;
-
-
+import com.codementor.backend.dto.DeveloperSkillResponse;
+import com.codementor.backend.dto.HintDependencyScoreResponse;
+import com.codementor.backend.dto.PersonalizedLearningPlanResponse;
+import com.codementor.backend.dto.PersonalizedRevisionPlanResponse;
+import com.codementor.backend.dto.AdaptiveMentorProfileResponse;
+import com.codementor.backend.dto.GrowthReportResponse;
+import com.codementor.backend.dto.PersonalizedInterviewProfileResponse;
 
 
 public interface AiMentorService {
@@ -80,4 +86,33 @@ public interface AiMentorService {
         String userEmail
     );
 
+    List<DeveloperSkillResponse> getMyDeveloperSkillGraph(
+                String userEmail
+        );
+     
+        List<SolutionEvolutionResponse> getSolutionEvolution(
+                Long problemId,
+                String userEmail
+        );
+        HintDependencyScoreResponse getMyHintDependencyScore(
+                String userEmail
+        );
+
+        PersonalizedLearningPlanResponse getMyPersonalizedLearningPlan(
+                String userEmail
+        );
+
+        AdaptiveMentorProfileResponse getMyAdaptiveMentorProfile(
+                String userEmail
+        );
+
+        PersonalizedRevisionPlanResponse getMyPersonalizedRevisionPlan(
+                String userEmail
+        );
+
+        GrowthReportResponse getMyGrowthReport(String userEmail);
+
+        PersonalizedInterviewProfileResponse getMyPersonalizedInterviewProfile(
+                String userEmail
+        );
 }

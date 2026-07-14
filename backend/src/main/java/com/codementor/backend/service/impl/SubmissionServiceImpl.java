@@ -1,15 +1,11 @@
 package com.codementor.backend.service.impl;
 
-import com.codementor.backend.dto.ExecutionResult;
-import com.codementor.backend.dto.SubmissionRequest;
-import com.codementor.backend.dto.SubmissionResponse;
+import com.codementor.backend.dto.*;
 import com.codementor.backend.entity.*;
 import com.codementor.backend.exception.ResourceNotFoundException;
 import com.codementor.backend.execution.CodeExecutionService;
-import com.codementor.backend.repository.ProblemRepository;
-import com.codementor.backend.repository.SubmissionRepository;
-import com.codementor.backend.repository.TestCaseRepository;
-import com.codementor.backend.repository.UserRepository;
+import com.codementor.backend.repository.*;
+import com.codementor.backend.service.IndependentSolveSessionService;
 import com.codementor.backend.service.SubmissionService;
 
 import lombok.RequiredArgsConstructor;
@@ -18,20 +14,31 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.codementor.backend.service.IndependentSolveSessionService;
 
 import java.util.List;
 
+
 @Service
 @RequiredArgsConstructor
-public class SubmissionServiceImpl implements SubmissionService {
+public class SubmissionServiceImpl
+        implements SubmissionService {
+
 
     private final SubmissionRepository submissionRepository;
+
     private final UserRepository userRepository;
+
     private final ProblemRepository problemRepository;
+
     private final TestCaseRepository testCaseRepository;
+
     private final CodeExecutionService codeExecutionService;
+
+    private final IndependentSolveSessionService independentSolveSessionService;
 
 
     // ==================================================
@@ -41,51 +48,64 @@ public class SubmissionServiceImpl implements SubmissionService {
     @Override
     public SubmissionResponse createSubmission(
             SubmissionRequest request,
-            String userEmail) {
+            String userEmail
+    ) {
 
-        // Find logged-in user
-        User user = userRepository
-                .findByEmail(userEmail)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "User not found"
+        User user =
+                userRepository
+                        .findByEmail(userEmail)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "User not found"
+                                )
+                        );
+
+
+        Problem problem =
+                problemRepository
+                        .findById(request.getProblemId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Problem not found with id: "
+                                                + request.getProblemId()
+                                )
+                        );
+
+
+        Submission submission =
+                Submission
+                        .builder()
+
+                        .sourceCode(
+                                request.getSourceCode()
                         )
-                );
 
-
-        // Find problem
-        Problem problem = problemRepository
-                .findById(request.getProblemId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Problem not found with id: "
-                                        + request.getProblemId()
+                        .language(
+                                request.getLanguage()
                         )
-                );
+
+                        .status(
+                                SubmissionStatus.PENDING
+                        )
+
+                        .user(user)
+
+                        .problem(problem)
+
+                        .build();
 
 
-        // Create submission
-        Submission submission = Submission.builder()
-                .sourceCode(request.getSourceCode())
-                .language(request.getLanguage())
-                .status(SubmissionStatus.PENDING)
-                .user(user)
-                .problem(problem)
-                .build();
+        submission =
+                submissionRepository.save(submission);
 
 
-        // Save pending submission
-        submission = submissionRepository.save(submission);
-
-
-        // Get all test cases
         List<TestCase> testCases =
-                testCaseRepository.findByProblemId(
-                        problem.getId()
-                );
+                testCaseRepository
+                        .findByProblemId(
+                                problem.getId()
+                        );
 
 
-        // Check test cases
         if (testCases.isEmpty()) {
 
             throw new ResourceNotFoundException(
@@ -95,76 +115,97 @@ public class SubmissionServiceImpl implements SubmissionService {
         }
 
 
-        // Change status to RUNNING
         submission.setStatus(
                 SubmissionStatus.RUNNING
         );
 
+
         submissionRepository.save(submission);
 
 
-        // Execute code
         ExecutionResult result =
                 codeExecutionService.execute(
+
                         submission.getSourceCode(),
+
                         submission.getLanguage(),
+
                         testCases
                 );
 
 
-        // Store execution result
         submission.setStatus(
                 result.getStatus()
         );
+
 
         submission.setExecutionTime(
                 result.getExecutionTime()
         );
 
+
         submission.setMemoryUsed(
                 result.getMemoryUsed()
         );
+
 
         submission.setOutput(
                 result.getOutput()
         );
 
+
         submission.setErrorMessage(
                 result.getErrorMessage()
         );
+
 
         submission.setPassedTestCases(
                 result.getPassedTestCases()
         );
 
+
         submission.setTotalTestCases(
                 result.getTotalTestCases()
         );
+
 
         submission.setFailedOnHiddenTest(
                 result.getFailedOnHiddenTest()
         );
 
 
-        // Save final result
         submission =
                 submissionRepository.save(submission);
 
 
-        // Return DTO
+        // ==================================================
+        // TRACK INDEPENDENT SOLVE SESSION SUBMISSION
+        // ==================================================
+
+        independentSolveSessionService
+                .recordSubmission(
+                        submission,
+                        userEmail
+                );
+
+
         return mapToResponse(submission);
-    }
+        }
+
 
 
     // ==================================================
-    // GET SUBMISSION BY ID
+    // GET USER SUBMISSION BY ID
     // ==================================================
 
     @Override
     @Transactional(readOnly = true)
     public SubmissionResponse getSubmissionById(
+
             Long id,
-            String userEmail) {
+
+            String userEmail
+    ) {
 
         Submission submission =
                 submissionRepository
@@ -177,7 +218,6 @@ public class SubmissionServiceImpl implements SubmissionService {
                         );
 
 
-        // User can only access their own submission
         if (!submission
                 .getUser()
                 .getEmail()
@@ -194,65 +234,85 @@ public class SubmissionServiceImpl implements SubmissionService {
     }
 
 
+
     // ==================================================
-    // GET ALL LOGGED-IN USER SUBMISSIONS
+    // GET MY SUBMISSIONS
     // ==================================================
 
     @Override
     @Transactional(readOnly = true)
     public Page<SubmissionResponse> getMySubmissions(
+
             String userEmail,
+
             int page,
-            int size) {
 
-        User user = userRepository
-                .findByEmail(userEmail)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "User not found"
-                        )
+            int size
+    ) {
+
+        User user =
+                userRepository
+                        .findByEmail(userEmail)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "User not found"
+                                )
+                        );
+
+
+        Pageable pageable =
+                PageRequest.of(
+
+                        page,
+
+                        size,
+
+                        Sort.by("createdAt")
+                                .descending()
                 );
-
-
-        Pageable pageable = PageRequest.of(
-                page,
-                size,
-                Sort.by("createdAt").descending()
-        );
 
 
         return submissionRepository
                 .findByUserId(
+
                         user.getId(),
+
                         pageable
                 )
+
                 .map(this::mapToResponse);
     }
 
 
+
     // ==================================================
-    // GET LOGGED-IN USER SUBMISSIONS FOR ONE PROBLEM
+    // GET MY SUBMISSIONS FOR ONE PROBLEM
     // ==================================================
 
     @Override
     @Transactional(readOnly = true)
-    public Page<SubmissionResponse> getMyProblemSubmissions(
+    public Page<SubmissionResponse>
+    getMyProblemSubmissions(
+
             Long problemId,
+
             String userEmail,
+
             int page,
-            int size) {
 
-        // Find logged-in user
-        User user = userRepository
-                .findByEmail(userEmail)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "User not found"
-                        )
-                );
+            int size
+    ) {
+
+        User user =
+                userRepository
+                        .findByEmail(userEmail)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "User not found"
+                                )
+                        );
 
 
-        // Check whether problem exists
         if (!problemRepository.existsById(problemId)) {
 
             throw new ResourceNotFoundException(
@@ -262,33 +322,128 @@ public class SubmissionServiceImpl implements SubmissionService {
         }
 
 
-        // Create pagination
-        Pageable pageable = PageRequest.of(
-                page,
-                size,
-                Sort.by("createdAt").descending()
-        );
+        Pageable pageable =
+                PageRequest.of(
+
+                        page,
+
+                        size,
+
+                        Sort.by("createdAt")
+                                .descending()
+                );
 
 
-        // Get submissions using User ID + Problem ID
         return submissionRepository
                 .findByUserIdAndProblemId(
+
                         user.getId(),
+
                         problemId,
+
                         pageable
                 )
+
                 .map(this::mapToResponse);
     }
 
 
+
     // ==================================================
-    // CONVERT SUBMISSION ENTITY → RESPONSE DTO
+    // FILTER SUBMISSIONS - ADMIN
+    // ==================================================
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<AdminSubmissionResponse>
+    filterSubmissionsForAdmin(
+
+            String search,
+
+            SubmissionStatus status,
+
+            Language language,
+
+            int page,
+
+            int size
+    ) {
+
+        Pageable pageable =
+                PageRequest.of(
+
+                        page,
+
+                        size,
+
+                        Sort.by(
+                                Sort.Direction.DESC,
+                                "createdAt"
+                        )
+                );
+
+
+        String normalizedSearch =
+                search == null
+                        ? ""
+                        : search.trim();
+
+
+        return submissionRepository
+                .filterAdminSubmissions(
+
+                        normalizedSearch,
+
+                        status,
+
+                        language,
+
+                        pageable
+                )
+
+                .map(this::mapToAdminResponse);
+    }
+
+
+
+    // ==================================================
+    // GET SUBMISSION DETAILS - ADMIN
+    // ==================================================
+
+    @Override
+    @Transactional(readOnly = true)
+    public AdminSubmissionDetailsResponse
+    getSubmissionDetailsForAdmin(
+            Long id
+    ) {
+
+        Submission submission =
+                submissionRepository
+                        .findById(id)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Submission not found."
+                                )
+                        );
+
+
+        return mapToAdminSubmissionDetailsResponse(
+                submission
+        );
+    }
+
+
+
+    // ==================================================
+    // MAP USER SUBMISSION RESPONSE
     // ==================================================
 
     private SubmissionResponse mapToResponse(
-            Submission submission) {
+            Submission submission
+    ) {
 
-        return SubmissionResponse.builder()
+        return SubmissionResponse
+                .builder()
 
                 .id(
                         submission.getId()
@@ -305,6 +460,7 @@ public class SubmissionServiceImpl implements SubmissionService {
                                 .getProblem()
                                 .getTitle()
                 )
+
                 .sourceCode(
                         submission.getSourceCode()
                 )
@@ -339,6 +495,183 @@ public class SubmissionServiceImpl implements SubmissionService {
 
                 .totalTestCases(
                         submission.getTotalTestCases()
+                )
+
+                .failedOnHiddenTest(
+                        submission.getFailedOnHiddenTest()
+                )
+
+                .createdAt(
+                        submission.getCreatedAt()
+                )
+
+                .build();
+    }
+
+
+
+    // ==================================================
+    // MAP ADMIN SUBMISSION LIST RESPONSE
+    // ==================================================
+
+    private AdminSubmissionResponse mapToAdminResponse(
+            Submission submission
+    ) {
+
+        User user =
+                submission.getUser();
+
+
+        return AdminSubmissionResponse
+                .builder()
+
+                .id(
+                        submission.getId()
+                )
+
+                .userId(
+                        user.getId()
+                )
+
+                .userName(
+                        user.getFirstName()
+                                + " "
+                                + user.getLastName()
+                )
+
+                .userEmail(
+                        user.getEmail()
+                )
+
+                .problemId(
+                        submission
+                                .getProblem()
+                                .getId()
+                )
+
+                .problemTitle(
+                        submission
+                                .getProblem()
+                                .getTitle()
+                )
+
+                .language(
+                        submission.getLanguage()
+                )
+
+                .status(
+                        submission.getStatus()
+                )
+
+                .passedTestCases(
+                        submission.getPassedTestCases()
+                )
+
+                .totalTestCases(
+                        submission.getTotalTestCases()
+                )
+
+                .executionTime(
+                        submission.getExecutionTime()
+                )
+
+                .memoryUsed(
+                        submission.getMemoryUsed()
+                )
+
+                .failedOnHiddenTest(
+                        submission.getFailedOnHiddenTest()
+                )
+
+                .createdAt(
+                        submission.getCreatedAt()
+                )
+
+                .build();
+    }
+
+
+
+    // ==================================================
+    // MAP ADMIN SUBMISSION DETAILS RESPONSE
+    // ==================================================
+
+    private AdminSubmissionDetailsResponse
+    mapToAdminSubmissionDetailsResponse(
+            Submission submission
+    ) {
+
+        User user =
+                submission.getUser();
+
+
+        return AdminSubmissionDetailsResponse
+                .builder()
+
+                .id(
+                        submission.getId()
+                )
+
+                .userId(
+                        user.getId()
+                )
+
+                .userName(
+                        user.getFirstName()
+                                + " "
+                                + user.getLastName()
+                )
+
+                .userEmail(
+                        user.getEmail()
+                )
+
+                .problemId(
+                        submission
+                                .getProblem()
+                                .getId()
+                )
+
+                .problemTitle(
+                        submission
+                                .getProblem()
+                                .getTitle()
+                )
+
+                .sourceCode(
+                        submission.getSourceCode()
+                )
+
+                .output(
+                        submission.getOutput()
+                )
+
+                .errorMessage(
+                        submission.getErrorMessage()
+                )
+
+                .language(
+                        submission.getLanguage()
+                )
+
+                .status(
+                        submission.getStatus()
+                )
+
+                .passedTestCases(
+                        submission.getPassedTestCases()
+                )
+
+                .totalTestCases(
+                        submission.getTotalTestCases()
+                )
+
+                .executionTime(
+                        submission.getExecutionTime()
+                )
+
+                .memoryUsed(
+                        submission.getMemoryUsed()
                 )
 
                 .failedOnHiddenTest(

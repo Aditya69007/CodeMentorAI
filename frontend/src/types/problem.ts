@@ -23,6 +23,14 @@ export interface Problem {
   active: boolean;
 }
 
+/* ADD THIS */
+export interface ProblemProgress {
+  totalProblems: number;
+  solvedProblems: number;
+  unsolvedProblems: number;
+  solvedPercentage: number;
+}
+
 export interface ProblemPage {
   content: Problem[];
   totalPages: number;
@@ -31,4 +39,24 @@ export interface ProblemPage {
   number: number;
   first: boolean;
   last: boolean;
+}
+
+export interface ProblemExampleRequest {
+  input: string;
+  output: string;
+  explanation: string;
+  orderIndex: number;
+}
+
+export interface ProblemRequest {
+  title: string;
+  description: string;
+  difficulty: Difficulty;
+  constraints: string;
+  inputFormat: string;
+  outputFormat: string;
+  sampleInput: string;
+  sampleOutput: string;
+  tags: string[];
+  examples: ProblemExampleRequest[];
 }

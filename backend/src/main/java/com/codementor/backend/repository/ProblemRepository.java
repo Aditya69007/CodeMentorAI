@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import com.codementor.backend.entity.Difficulty;
 
 import java.util.Optional;
 import java.util.List;
@@ -16,6 +17,8 @@ public interface ProblemRepository
         extends JpaRepository<Problem, Long> {
 
     boolean existsByTitle(String title);
+
+    long countByTopicId(Long topicId);
 
     long countByTopicIdAndActiveTrue(Long topicId);
 
@@ -130,4 +133,52 @@ public interface ProblemRepository
         List<Problem> findByTopicNameIgnoreCaseAndActiveTrue(
                 String topicName
         );
+        
+        long countByDifficulty(Difficulty difficulty);
+
+        @Query("""
+                SELECT p
+                FROM Problem p
+                WHERE
+                (
+                :title = ''
+                OR LOWER(p.title)
+                LIKE LOWER(CONCAT('%', :title, '%'))
+                )
+
+                AND
+                (
+                :difficulty IS NULL
+                OR p.difficulty = :difficulty
+                )
+
+                AND
+                (
+                :topicId IS NULL
+                OR p.topic.id = :topicId
+                )
+
+                AND
+                (
+                :active IS NULL
+                OR p.active = :active
+                )
+                """)
+        Page<Problem> findAdminProblems(
+
+                @Param("title")
+                String title,
+
+                @Param("difficulty")
+                Difficulty difficulty,
+
+                @Param("topicId")
+                Long topicId,
+
+                @Param("active")
+                Boolean active,
+
+                Pageable pageable
+        );
+
 }

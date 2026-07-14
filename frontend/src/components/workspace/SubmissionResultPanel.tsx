@@ -10,6 +10,7 @@ import {
   FiCheckCircle,
   FiClock,
   FiCpu,
+  FiLock,
   FiPlay,
   FiSend,
   FiUser,
@@ -28,11 +29,9 @@ import type {
 
 import {
   analyzeSubmission,
-  getAnalysis,
   getChatHistory,
   getPastMistakeRecall,
   getProgressiveHint,
-  getProgressiveHints,
   sendChatMessage,
 } from "../../services/aiMentorService";
 
@@ -40,6 +39,7 @@ import {
 interface Props {
   result: SubmissionResponse | null;
   error: string;
+  independentModeActive: boolean;
 
   onUseCode: (
     sourceCode: string,
@@ -57,9 +57,10 @@ interface ChatMessage {
 export default function SubmissionResultPanel({
   result,
   error,
+  independentModeActive,
   onUseCode,
 }: Props) {
-
+  
   // ==========================================
   // AI STATE
   // ==========================================
@@ -133,56 +134,43 @@ export default function SubmissionResultPanel({
 
   useEffect(() => {
 
-    if (!result?.id) {
+    if (
+      !result?.id ||
+      independentModeActive
+    ) {
       return;
     }
-
 
     let cancelled = false;
 
 
-    const loadExistingAiData = async () => {
+  const loadExistingAiData = async () => {
 
-      try {
+    // ==========================================
+    // RESET DATA FROM PREVIOUS SUBMISSION
+    // ==========================================
 
-          const [
-            analysis,
-            savedMessages,
-            savedHints,
-            recall,
-          ] = await Promise.all([
-            getAnalysis(result.id),
-            getChatHistory(result.id),
-            getProgressiveHints(result.id),
-            getPastMistakeRecall(result.id),
-          ]);
+    setAiAnalysis(null);
+
+    setPastMistakeRecall(null);
+
+    setChatMessages([]);
+
+    setHintResponses({});
+
+    setAiError("");
 
 
-        if (cancelled) {
-          return;
-        }
+    // ==========================================
+    // LOAD CHAT HISTORY
+    // ==========================================
 
-          const savedHintResponses =
-            savedHints.reduce<Record<number, string>>(
-              (accumulator, hint) => {
+    try {
 
-                accumulator[hint.level] =
-                  hint.response;
+      const savedMessages =
+        await getChatHistory(result.id);
 
-                return accumulator;
-
-              },
-              {}
-            );
-          
-        
-            setHintResponses(savedHintResponses);
-
-        setAiAnalysis(
-          analysis
-        );
-
-        setPastMistakeRecall(recall);
+      if (!cancelled) {
 
         setChatMessages(
 
@@ -202,17 +190,48 @@ export default function SubmissionResultPanel({
 
         );
 
+      }
 
-      } catch (error) {
+    } catch {
 
-        console.log(
-          "No existing AI analysis for this submission.",
-          error
+      if (!cancelled) {
+
+        setChatMessages([]);
+
+      }
+
+    }
+
+
+    // ==========================================
+    // LOAD PAST MISTAKE RECALL
+    // ==========================================
+
+    try {
+
+      const recall =
+        await getPastMistakeRecall(
+          result.id
+        );
+
+      if (!cancelled) {
+
+        setPastMistakeRecall(
+          recall
         );
 
       }
 
-    };
+    } catch {
+
+      if (!cancelled) {
+
+        setPastMistakeRecall(null);
+      }
+
+    }
+
+  };
 
 
     loadExistingAiData();
@@ -224,8 +243,10 @@ export default function SubmissionResultPanel({
 
     };
 
-  }, [result?.id]);
-
+  }, [
+    result?.id,
+    independentModeActive,
+  ]);
 
   // ==========================================
   // AUTO SCROLL CHAT
@@ -260,7 +281,8 @@ export default function SubmissionResultPanel({
 
     if (
       !result?.id ||
-      aiLoading
+      aiLoading ||
+      independentModeActive
     ) {
       return;
     }
@@ -555,119 +577,114 @@ export default function SubmissionResultPanel({
     <div className="h-full overflow-y-auto p-5">
 
 
-      {/* =====================================
-          RESULT HEADER
-      ===================================== */}
+    {/* =====================================
+        RESULT HEADER
+    ===================================== */}
 
-      <div className="flex flex-wrap items-start justify-between gap-4">
+    <div className="flex flex-wrap items-start justify-between gap-4">
 
-        <div className="flex items-center gap-3">
+      {/* LEFT SIDE: STATUS */}
 
-          {
-            accepted
-              ? (
+      <div className="flex items-center gap-3">
 
-                <FiCheckCircle
-                  size={25}
-                  className="text-emerald-500"
-                />
+        {
+          accepted
+            ? (
+              <FiCheckCircle
+                size={25}
+                className="text-emerald-500"
+              />
+            )
+            : (
+              <FiXCircle
+                size={25}
+                className="text-red-500"
+              />
+            )
+        }
 
-              )
-              : (
+        <div>
 
-                <FiXCircle
-                  size={25}
-                  className="text-red-500"
-                />
-
-              )
-          }
-
-
-          <div>
-
-            <h2
-              className={`text-xl font-bold ${
-                accepted
-                  ? "text-emerald-500"
-                  : "text-red-500"
-              }`}
-            >
-
-              {
-                result.status.replaceAll(
-                  "_",
-                  " "
-                )
-              }
-
-            </h2>
-
-
+          <h2
+            className={`text-xl font-bold ${
+              accepted
+                ? "text-emerald-500"
+                : "text-red-500"
+            }`}
+          >
             {
-              result.id && (
-
-                <p className="app-text-muted mt-1 text-xs">
-
-                  Submission #{result.id}
-
-                </p>
-
+              result.status.replaceAll(
+                "_",
+                " "
               )
             }
-
-          </div>
+          </h2>
 
         </div>
 
+      </div>
 
-        {
-          !accepted &&
-          result.id &&
-          !aiAnalysis && (
 
-            <button
+      {/* RIGHT SIDE: AI BUTTON */}
 
-              onClick={
-                handleAskAi
-              }
+      {
+        !accepted &&
+        result.id &&
+        !aiAnalysis && (
 
-              disabled={
-                aiLoading
-              }
+          <button
 
-              className="
-                flex
-                items-center
-                gap-2
-                rounded-md
-                bg-violet-600
-                px-4
-                py-2
-                text-sm
-                font-semibold
-                text-white
-                hover:bg-violet-500
-                disabled:cursor-not-allowed
-                disabled:opacity-50
-              "
+            type="button"
 
-            >
+            onClick={
+              handleAskAi
+            }
 
-              <FiZap />
+            disabled={
+              aiLoading ||
+              independentModeActive
+            }
 
-              {
-                aiLoading
+            className="
+              flex
+              shrink-0
+              items-center
+              gap-2
+              rounded-md
+              bg-violet-600
+              px-4
+              py-2
+              text-sm
+              font-semibold
+              text-white
+              transition
+              hover:bg-violet-500
+              disabled:cursor-not-allowed
+              disabled:opacity-50
+            "
+
+          >
+
+            {
+              independentModeActive
+                ? <FiLock />
+                : <FiZap />
+            }
+
+            {
+              independentModeActive
+                ? "AI Locked"
+                : aiLoading
                   ? "Analyzing..."
                   : "Ask AI Mentor"
-              }
+            }
 
-            </button>
+          </button>
 
-          )
-        }
+        )
+      }
 
-      </div>
+    </div>
 
 
       {/* =====================================

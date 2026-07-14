@@ -63,4 +63,19 @@ public interface ProblemService {
 
                 Pageable pageable
         );
+
+        Page<ProblemResponse> getAdminProblems(
+
+                String title,
+
+                Difficulty difficulty,
+
+                Long topicId,
+
+                Boolean active,
+
+                int page,
+
+                int size
+        );
 }

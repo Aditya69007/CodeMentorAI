@@ -4,6 +4,8 @@ import type {
   Difficulty,
   Problem,
   ProblemPage,
+  ProblemProgress,
+  ProblemRequest,
 } from "../types/problem";
 
 
@@ -21,6 +23,36 @@ export const getAllProblems = async (): Promise<Problem[]> => {
   return response.data;
 };
 
+export const createProblem = async (
+  request: ProblemRequest
+): Promise<Problem> => {
+  const response = await api.post<Problem>(
+    "/problems",
+    request
+  );
+
+  return response.data;
+};
+
+
+export const updateProblem = async (
+  id: number,
+  request: ProblemRequest
+): Promise<Problem> => {
+  const response = await api.put<Problem>(
+    `/problems/${id}`,
+    request
+  );
+
+  return response.data;
+};
+
+
+export const deleteProblem = async (
+  id: number
+): Promise<void> => {
+  await api.delete(`/problems/${id}`);
+};
 
 export const getProblemById = async (
   id: number
@@ -106,13 +138,16 @@ export const filterMyProblems = async (
   return response.data;
 };
 
-export const getMyProblemProgress = async () => {
-  const response = await api.get(
-    "/problems/progress/me"
-  );
+export const getMyProblemProgress =
+  async (): Promise<ProblemProgress> => {
 
-  return response.data;
-};
+    const response =
+      await api.get<ProblemProgress>(
+        "/problems/progress/me"
+      );
+
+    return response.data;
+  };
 
 
 export const getMySolvedProblemIds = async (): Promise<number[]> => {
@@ -122,3 +157,4 @@ export const getMySolvedProblemIds = async (): Promise<number[]> => {
 
   return response.data;
 };
+

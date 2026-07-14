@@ -152,3 +152,36 @@ button:disabled {
 ::selection {
   background-color: rgba(37, 99, 235, 0.3);
 }
+
+/* ==================================================
+   ADMIN FORM INPUTS
+================================================== */
+
+.admin-input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background-color: var(--surface-secondary);
+  padding: 0.75rem 0.875rem;
+  color: var(--text-primary);
+  outline: none;
+
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    background-color 150ms ease;
+}
+
+.admin-input::placeholder {
+  color: var(--text-muted);
+}
+
+.admin-input:hover {
+  border-color: var(--text-muted);
+}
+
+.admin-input:focus {
+  border-color: var(--accent);
+  background-color: var(--surface);
+  box-shadow: 0 0 0 3px rgb(59 130 246 / 0.12);
+}
