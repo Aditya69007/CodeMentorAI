@@ -263,7 +263,40 @@ export default function ProblemsPage() {
             Practice coding problems
 
           </h1>
+          
+          <div className="mt-6 flex gap-3">
 
+              <button
+                  onClick={() => navigate("/problems")}
+                  className="
+                      rounded-xl
+                      bg-blue-600
+                      px-6
+                      py-3
+                      font-semibold
+                      text-white
+                  "
+              >
+                  Problems
+              </button>
+
+              <button
+                  onClick={() => navigate("/topics")}
+                  className="
+                      rounded-xl
+                      border
+                      app-border
+                      px-6
+                      py-3
+                      font-semibold
+                      transition
+                      hover:border-blue-500
+                  "
+              >
+                  Topic Library
+              </button>
+
+          </div>
 
           <p className="app-text-secondary mt-3 max-w-2xl text-sm leading-6 sm:text-base">
 

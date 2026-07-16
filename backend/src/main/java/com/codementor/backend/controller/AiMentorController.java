@@ -13,6 +13,7 @@ import com.codementor.backend.dto.RecurringMistakeResponse;
 import com.codementor.backend.dto.ConceptGrowthResponse;
 import com.codementor.backend.dto.PracticeRecommendationResponse;
 import com.codementor.backend.dto.SolutionEvolutionResponse;
+import com.codementor.backend.exception.ResourceNotFoundException;
 import com.codementor.backend.dto.HintDependencyScoreResponse;
 import com.codementor.backend.dto.AdaptiveMentorProfileResponse;
 import lombok.RequiredArgsConstructor;
@@ -54,19 +55,27 @@ public class AiMentorController {
 
     // GET EXISTING ANALYSIS
 
-    @GetMapping("/analysis/{submissionId}")
-    public ResponseEntity<AiMentorResponse> getAnalysis(
-            @PathVariable Long submissionId,
-            Authentication authentication) {
+        @GetMapping("/analysis/{submissionId}")
+        public ResponseEntity<AiMentorResponse> getAnalysis(
+                @PathVariable Long submissionId,
+                Authentication authentication) {
 
-        return ResponseEntity.ok(
-                aiMentorService.getAnalysis(
-                        submissionId,
-                        authentication.getName()
-                )
-        );
-    }
+        try {
 
+                AiMentorResponse analysis =
+                        aiMentorService.getAnalysis(
+                                submissionId,
+                                authentication.getName()
+                        );
+
+                return ResponseEntity.ok(analysis);
+
+        } catch (ResourceNotFoundException exception) {
+
+                return ResponseEntity.noContent().build();
+
+        }
+        }
 
     // SEND CHAT MESSAGE
 

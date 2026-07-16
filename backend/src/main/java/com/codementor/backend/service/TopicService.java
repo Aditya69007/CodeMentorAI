@@ -1,6 +1,7 @@
 package com.codementor.backend.service;
 
 import com.codementor.backend.dto.TopicProblemResponse;
+import com.codementor.backend.dto.TopicProgressResponse;
 import com.codementor.backend.dto.TopicRequest;
 import com.codementor.backend.dto.TopicResponse;
 
@@ -34,5 +35,10 @@ public interface TopicService {
         AdminTopicResponse toggleTopicStatus(Long id);
 
         void deleteTopic(Long id);
+
+        TopicProgressResponse getTopicProgress(
+                String slug,
+                String userEmail
+        );
 
 }

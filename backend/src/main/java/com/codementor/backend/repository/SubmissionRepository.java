@@ -259,4 +259,81 @@ public interface SubmissionRepository
                 LocalDateTime startDate,
                 LocalDateTime endDate
         );
+
+        @Query("""
+        SELECT COUNT(DISTINCT s.problem.id)
+        FROM Submission s
+        WHERE s.user.id = :userId
+        AND s.problem.topic.id = :topicId
+        """)
+        long countAttemptedProblemsByTopic(
+                @Param("userId") Long userId,
+                @Param("topicId") Long topicId
+        );
+
+        @Query("""
+        SELECT COUNT(s)
+        FROM Submission s
+        WHERE s.user.id = :userId
+        AND s.problem.topic.id = :topicId
+        """)
+        long countTotalAttemptsByTopic(
+                @Param("userId") Long userId,
+                @Param("topicId") Long topicId
+        );
+
+        @Query("""
+        SELECT COUNT(s)
+        FROM Submission s
+        WHERE s.user.id = :userId
+        AND s.problem.topic.id = :topicId
+        AND s.status =
+        com.codementor.backend.entity.SubmissionStatus.ACCEPTED
+        """)
+        long countAcceptedSubmissionsByTopic(
+                @Param("userId") Long userId,
+                @Param("topicId") Long topicId
+        );
+
+        @Query("""
+        SELECT COUNT(DISTINCT s.problem.id)
+        FROM Submission s
+        WHERE s.user.id = :userId
+        AND s.problem.topic.id = :topicId
+        AND s.status =
+        com.codementor.backend.entity.SubmissionStatus.ACCEPTED
+        """)
+        long countSolvedProblemsByTopic(
+                @Param("userId") Long userId,
+                @Param("topicId") Long topicId
+        );
+
+        @Query("""
+        SELECT DISTINCT s.problem.id
+        FROM Submission s
+        WHERE s.user.id = :userId
+        """)
+        List<Long> findAttemptedProblemIdsByUserId(
+                @Param("userId") Long userId
+        );
+
+        @Query("""
+        SELECT COUNT(s)
+        FROM Submission s
+        WHERE s.problem.id = :problemId
+        """)
+        long countTotalSubmissionsByProblem(
+                @Param("problemId") Long problemId
+        );
+
+        @Query("""
+        SELECT COUNT(s)
+        FROM Submission s
+        WHERE s.problem.id = :problemId
+        AND s.status =
+        com.codementor.backend.entity.SubmissionStatus.ACCEPTED
+        """)
+        long countAcceptedSubmissionsByProblem(
+                @Param("problemId") Long problemId
+        );
 }

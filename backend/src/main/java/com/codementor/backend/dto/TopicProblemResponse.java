@@ -22,4 +22,15 @@ public class TopicProblemResponse {
     private Difficulty difficulty;
 
     private List<String> tags;
+
+    private boolean solved;
+
+    private boolean attempted;
+
+    private long attempts;
+
+    private String latestStatus;
+
+    private double acceptanceRate;
+
 }

@@ -645,12 +645,11 @@ public class AiMentorServiceImpl implements AiMentorService {
                         aiAnalysis
                 );
 
-
-        String aiResponse =
-                geminiService.analyzeCode(prompt);
-
-
         try {
+
+                String aiResponse =
+                                geminiService.analyzeCode(prompt);
+
 
             AiMistakeDetectionResponse detectionResponse =
                     objectMapper.readValue(
@@ -723,11 +722,12 @@ public class AiMentorServiceImpl implements AiMentorService {
 
         } catch (Exception exception) {
 
-            throw new RuntimeException(
-                    "Failed to detect submission mistakes: "
-                            + exception.getMessage(),
-                    exception
-            );
+                System.err.println(
+                        "Mistake detection skipped for submission "
+                                + submission.getId()
+                                + ": "
+                                + exception.getMessage()
+                );
         }
     }
 

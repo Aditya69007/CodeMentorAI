@@ -35,32 +35,21 @@ export const getAnalysis = async (
   submissionId: number
 ): Promise<AiMentorResponse | null> => {
 
-  try {
+  const response =
+    await api.get<AiMentorResponse>(
+      `/ai-mentor/analysis/${submissionId}`
+    );
 
-    const response =
-      await api.get<AiMentorResponse>(
-        `/ai-mentor/analysis/${submissionId}`
-      );
 
-    return response.data;
+  if (response.status === 204) {
 
-  } catch (error: unknown) {
-
-    if (
-      axios.isAxiosError(error) &&
-      error.response?.status === 404
-    ) {
-
-      return null;
-
-    }
-
-    throw error;
+    return null;
 
   }
 
-};
 
+  return response.data;
+};
 
 // SEND FOLLOW-UP CHAT MESSAGE
 

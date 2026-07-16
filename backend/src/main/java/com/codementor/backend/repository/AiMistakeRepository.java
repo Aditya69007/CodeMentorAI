@@ -143,4 +143,35 @@ public interface AiMistakeRepository
                 @Param("userId") Long userId
         );
 
+        @Query("""
+        SELECT COUNT(m)
+        FROM AiMistake m
+        WHERE m.user.id = :userId
+        AND m.problem.topic.id = :topicId
+        """)
+        long countByUserAndTopic(
+                @Param("userId") Long userId,
+                @Param("topicId") Long topicId
+        );
+
+        @Query("""
+                SELECT
+                m.concept,
+                COUNT(m)
+                FROM AiMistake m
+                WHERE m.user.id = :userId
+                AND m.problem.topic.id = :topicId
+                AND m.concept IS NOT NULL
+                GROUP BY m.concept
+                ORDER BY COUNT(m) DESC
+                """)
+        List<Object[]> findConceptMistakeStatsByTopic(
+
+                @Param("userId")
+                Long userId,
+
+                @Param("topicId")
+                Long topicId
+
+        );
 }

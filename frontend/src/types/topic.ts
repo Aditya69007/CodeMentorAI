@@ -13,6 +13,10 @@ export interface TopicProblem {
   title: string;
   difficulty: Difficulty;
   tags: string[];
+  solved?: boolean;
+  attempted?: boolean;
+  acceptanceRate?: number;
+  attempts?: number;
 }
 
 export interface AdminTopic {

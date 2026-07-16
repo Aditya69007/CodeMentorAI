@@ -169,11 +169,27 @@ api.interceptors.response.use(
     }
 
 
-    // ==================================================
-    // NOT FOUND
-    // ==================================================
+  // ==================================================
+  // NOT FOUND
+  // ==================================================
 
-    if (status === 404) {
+  if (status === 404) {
+
+    const requestUrl =
+      error.config?.url ?? "";
+
+
+    // A new submission normally has no AI analysis
+    // until the user clicks "Ask AI Mentor".
+    // Therefore this 404 is expected.
+
+    const isMissingAiAnalysis =
+      requestUrl.startsWith(
+        "/ai-mentor/analysis/"
+      );
+
+
+    if (!isMissingAiAnalysis) {
 
       console.warn(
         "API resource not found:",
@@ -183,6 +199,7 @@ api.interceptors.response.use(
 
     }
 
+  }
 
     // ==================================================
     // SERVER ERROR

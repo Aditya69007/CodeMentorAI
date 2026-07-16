@@ -113,3 +113,58 @@ export const deleteTopic =
       `/topics/admin/${id}`
     );
   };
+
+export interface TopicProgress {
+
+  topicId: number;
+
+  topicName: string;
+
+  topicSlug: string;
+
+  totalProblems: number;
+
+  solvedProblems: number;
+
+  attemptedProblems: number;
+
+  totalAttempts: number;
+
+  acceptedSubmissions: number;
+
+  aiMistakes: number;
+
+  acceptanceRate: number;
+
+  masteryPercentage: number;
+
+  level: string;
+
+  weakConcepts?: string[];
+
+  strongConcepts?: string[];
+
+  recommendedProblemTitle?: string;
+
+  recommendedProblemId?: number;
+
+  recommendedDifficulty?: string;
+
+  recommendationReason?: string;
+
+  estimatedLearningGain?: number;
+
+}
+
+export const getTopicProgress = async (
+  slug: string
+): Promise<TopicProgress> => {
+
+  const response =
+    await api.get<TopicProgress>(
+      `/learning/topics/${slug}`
+    );
+
+  return response.data;
+
+};

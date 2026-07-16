@@ -1,6 +1,7 @@
 package com.codementor.backend.controller;
 
 import com.codementor.backend.dto.TopicProblemResponse;
+import com.codementor.backend.dto.TopicProgressResponse;
 import com.codementor.backend.dto.TopicResponse;
 
 import com.codementor.backend.service.TopicService;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.codementor.backend.dto.AdminTopicResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
@@ -127,5 +129,17 @@ public class TopicController {
         );
     }
 
+        @GetMapping("/{slug}/progress")
+        public ResponseEntity<TopicProgressResponse> getTopicProgress(
+                @PathVariable String slug,
+                Authentication authentication
+        ) {
 
+        return ResponseEntity.ok(
+                topicService.getTopicProgress(
+                        slug,
+                        authentication.getName()
+                )
+        );
+        }
 }

@@ -29,6 +29,7 @@ import type {
 
 import {
   analyzeSubmission,
+  getAnalysis,
   getChatHistory,
   getPastMistakeRecall,
   getProgressiveHint,
@@ -160,6 +161,31 @@ export default function SubmissionResultPanel({
 
     setAiError("");
 
+
+  // ==========================================
+  // LOAD SAVED AI ANALYSIS
+  // ==========================================
+
+  try {
+
+    const savedAnalysis =
+      await getAnalysis(result.id);
+
+    if (!cancelled) {
+
+      setAiAnalysis(savedAnalysis);
+
+    }
+
+  } catch {
+
+    if (!cancelled) {
+
+      setAiAnalysis(null);
+
+    }
+
+  }
 
     // ==========================================
     // LOAD CHAT HISTORY

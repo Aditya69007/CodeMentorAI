@@ -1,6 +1,7 @@
 package com.codementor.backend.service.impl;
 
 import com.codementor.backend.dto.TopicProblemResponse;
+import com.codementor.backend.dto.TopicProgressResponse;
 import com.codementor.backend.dto.TopicRequest;
 import com.codementor.backend.dto.TopicResponse;
 
@@ -8,12 +9,13 @@ import com.codementor.backend.entity.Problem;
 import com.codementor.backend.entity.Topic;
 
 import com.codementor.backend.exception.ResourceNotFoundException;
-
+import com.codementor.backend.repository.AiMistakeRepository;
 import com.codementor.backend.repository.ProblemRepository;
+import com.codementor.backend.repository.SubmissionRepository;
 import com.codementor.backend.repository.TopicRepository;
-
+import com.codementor.backend.repository.UserRepository;
 import com.codementor.backend.service.TopicService;
-
+import com.codementor.backend.service.LearningAnalyticsService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
@@ -30,6 +32,14 @@ public class TopicServiceImpl
                 private final TopicRepository topicRepository;
                 
                 private final ProblemRepository problemRepository;
+
+                private final SubmissionRepository submissionRepository;
+
+                private final AiMistakeRepository aiMistakeRepository;
+
+                private final UserRepository userRepository;
+
+                private final LearningAnalyticsService learningAnalyticsService;
                 
                 
                 @Override
@@ -68,25 +78,42 @@ public class TopicServiceImpl
     }
 
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<TopicProblemResponse>
-    getProblemsByTopicSlug(
-            String slug) {
+        @Override
+        @Transactional(readOnly = true)
+        public List<TopicProblemResponse> getProblemsByTopicSlug(
+                String slug
+        ) {
 
         Topic topic =
                 getActiveTopicBySlug(slug);
 
+        // TODO: Replace this with logged-in user's ID from Spring Security
+        Long userId = 1L;
+
+        List<Long> solvedProblemIds =
+                submissionRepository.findSolvedProblemIdsByUserId(
+                        userId
+                );
+
+        List<Long> attemptedProblemIds =
+                submissionRepository.findAttemptedProblemIdsByUserId(
+                        userId
+                );
 
         return problemRepository
                 .findByTopicIdAndActiveTrueOrderByDifficultyAscTitleAsc(
                         topic.getId()
                 )
                 .stream()
-                .map(this::mapToTopicProblemResponse)
+                .map(problem ->
+                        mapToTopicProblemResponse(
+                                problem,
+                                solvedProblemIds,
+                                attemptedProblemIds
+                        )
+                )
                 .toList();
-    }
-
+        }
 
     private Topic getActiveTopicBySlug(
             String slug) {
@@ -183,31 +210,51 @@ public class TopicServiceImpl
     }
 
 
-    private TopicProblemResponse
-    mapToTopicProblemResponse(
-            Problem problem) {
+        private TopicProblemResponse mapToTopicProblemResponse(
+                Problem problem,
+                List<Long> solvedProblemIds,
+                List<Long> attemptedProblemIds
+        ) {
 
-        return TopicProblemResponse
-                .builder()
-
-                .id(
+        long total =
+                submissionRepository.countTotalSubmissionsByProblem(
                         problem.getId()
+                );
+
+        long accepted =
+                submissionRepository.countAcceptedSubmissionsByProblem(
+                        problem.getId()
+                );
+
+        double acceptance =
+                total == 0
+                        ? 0
+                        : (accepted * 100.0) / total;
+
+        return TopicProblemResponse.builder()
+
+                .id(problem.getId())
+
+                .title(problem.getTitle())
+
+                .difficulty(problem.getDifficulty())
+
+                .tags(problem.getTags())
+
+                .solved(
+                        solvedProblemIds.contains(problem.getId())
                 )
 
-                .title(
-                        problem.getTitle()
+                .attempted(
+                        attemptedProblemIds.contains(problem.getId())
                 )
 
-                .difficulty(
-                        problem.getDifficulty()
-                )
-
-                .tags(
-                        problem.getTags()
+                .acceptanceRate(
+                        Math.round(acceptance * 10.0) / 10.0
                 )
 
                 .build();
-    }
+        }
 
         @Override
         @Transactional
@@ -403,5 +450,17 @@ public class TopicServiceImpl
 
 
         topicRepository.delete(topic);
+        }
+
+        @Override
+        @Transactional(readOnly = true)
+        public TopicProgressResponse getTopicProgress(
+                String slug,
+                String userEmail
+        ) {
+        return learningAnalyticsService.getTopicProgress(
+                slug,
+                userEmail
+        );
         }
 }
