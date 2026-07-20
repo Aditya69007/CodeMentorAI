@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.codementor.backend.entity.Role;
+import com.codementor.backend.entity.AuthProvider;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +32,7 @@ public class UserServiceImpl implements UserService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
-                .provider("LOCAL")
+                .provider(AuthProvider.LOCAL)
                 .enabled(true)
                 .build();
 

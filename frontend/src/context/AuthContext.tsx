@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import { loginUser } from "../services/authService";
 import type { AuthUser } from "../types/auth";
@@ -35,6 +35,59 @@ export function AuthProvider({
       return null;
     }
   });
+
+
+  useEffect(() => {
+
+    const syncAuth = () => {
+
+      const storedToken =
+        localStorage.getItem(TOKEN_STORAGE_KEY);
+
+      const storedUser =
+        localStorage.getItem(USER_STORAGE_KEY);
+
+      setToken(storedToken);
+
+      if (storedUser) {
+
+        try {
+
+          setUser(
+            JSON.parse(storedUser)
+          );
+
+        } catch {
+
+          setUser(null);
+
+        }
+
+      } else {
+
+        setUser(null);
+
+      }
+
+    };
+
+    syncAuth();
+
+    window.addEventListener(
+      "storage",
+      syncAuth
+    );
+
+    return () => {
+
+      window.removeEventListener(
+        "storage",
+        syncAuth
+      );
+
+    };
+
+  }, []);
 
   const login = async (
     email: string,

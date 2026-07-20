@@ -40,22 +40,24 @@ export default function TopicProblemList({
 
   return (
 
-    <div
-      className="
-        rounded-2xl
-        border
-        app-border
-        app-surface
-        overflow-hidden
-      "
-    >
+
+      <div
+        className="
+          rounded-2xl
+          border
+          app-border
+          app-surface
+          overflow-x-auto
+        "
+      >
 
       {/* Header */}
 
       <div
         className="
+          min-w-[640px]
           grid
-          grid-cols-[20px_1fr_80px_70px_40px]
+          grid-cols-[20px_1fr_90px_80px_40px]
           gap-4
           border-b
           app-border

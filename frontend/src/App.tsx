@@ -8,6 +8,7 @@ import AdminProblemsPage from "./pages/admin/AdminProblemsPage";
 import AdminEditProblemPage from "./pages/admin/AdminEditProblemPage";
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
+import OAuthSuccess from "./pages/auth/OAuthSuccess";
 import AdminLayout from "./components/admin/layout/AdminLayout";
 import AdminUsersPage from "./pages/admin/AdminUsersPage";
 import ProblemsPage from "./pages/user/ProblemsPage";
@@ -82,6 +83,10 @@ export default function App() {
         element={<RegisterPage />}
       />
 
+      <Route
+          path="/oauth-success"
+          element={<OAuthSuccess />}
+      />
 
       {/* ==========================================
           USER PLATFORM

@@ -9,8 +9,6 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -27,23 +25,20 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtFilter;
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+
 
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration configuration
     ) throws Exception {
-
         return configuration.getAuthenticationManager();
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(
-            HttpSecurity http
-    ) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http)
+            throws Exception {
 
         http
 
@@ -61,57 +56,50 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
-                        // ==========================================
-                        // PUBLIC ROUTES
-                        // ==========================================
-
                         .requestMatchers(
                                 "/api/v1/auth/**",
+                                "/oauth2/**",
+                                "/login/**",
+                                "/login/oauth2/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
-                        )
-                        .permitAll()
-
-                        // ==========================================
-                        // ADMIN ROUTES
-                        // ==========================================
+                        ).permitAll()
 
                         .requestMatchers("/api/admin/**")
                         .hasRole("ADMIN")
 
-                        // ==========================================
-                        // ALL OTHER ROUTES
-                        // ==========================================
-
                         .anyRequest()
                         .authenticated()
+                )
+
+                .oauth2Login(oauth -> oauth
+
+                        .userInfoEndpoint(userInfo ->
+                                userInfo.userService(customOAuth2UserService)
+                        )
+
+                        .successHandler(oAuth2AuthenticationSuccessHandler)
                 )
 
                 .exceptionHandling(ex -> ex
 
                         .authenticationEntryPoint(authenticationEntryPoint)
 
-                        .accessDeniedHandler(
-                                (request, response, exception) -> {
+                        .accessDeniedHandler((request, response, exception) -> {
 
-                                    response.setStatus(
-                                            HttpStatus.FORBIDDEN.value()
-                                    );
+                            response.setStatus(HttpStatus.FORBIDDEN.value());
 
-                                    response.setContentType(
-                                            "application/json"
-                                    );
+                            response.setContentType("application/json");
 
-                                    response.getWriter().write("""
-                                            {
-                                              "error": "Forbidden",
-                                              "message": "You do not have permission to access this resource",
-                                              "status": 403
-                                            }
-                                            """);
-                                }
-                        )
+                            response.getWriter().write("""
+                                    {
+                                      "error":"Forbidden",
+                                      "message":"You do not have permission to access this resource",
+                                      "status":403
+                                    }
+                                    """);
+                        })
                 )
 
                 .addFilterBefore(

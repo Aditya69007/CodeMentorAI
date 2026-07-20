@@ -15,7 +15,7 @@ export default function TopicSidebar({
 }: TopicSidebarProps) {
 return (
 
-  <aside className="sticky top-5">
+  <aside className="lg:sticky lg:top-5 self-start">
 
     <div className="rounded-3xl border app-border app-surface p-5">
 
@@ -40,7 +40,14 @@ return (
 
           </p>
 
-          <h3 className="text-2xl font-bold">
+          <h3
+            className="
+              text-xl
+              lg:text-2xl
+              font-bold
+              break-words
+            "
+          >
 
             {progress.recommendedProblemTitle}
 
@@ -115,7 +122,7 @@ return (
 
       {/* Stats */}
 
-      <div className="mt-5 grid grid-cols-2 gap-4">
+      <div className="mt-5 grid grid-cols-2 gap-3">
 
         <div className="rounded-xl bg-white/5 p-3 text-center">
 

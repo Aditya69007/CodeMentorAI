@@ -14,7 +14,6 @@ import {
   FiAward,
   FiBookOpen,
   FiCode,
-  FiLoader,
   FiRefreshCw,
   FiTarget,
   FiTrendingUp,
@@ -52,6 +51,7 @@ import type {
   InterviewSessionResponse,
 } from "../../services/personalizedInterviewService";
 
+import PageLoader from "../../components/ui/PageLoader";
 
 // =====================================================
 // COMPONENT
@@ -285,32 +285,14 @@ export default function UserDashboardPage() {
   // LOADING
   // =====================================================
 
-  if (loading) {
-
-    return (
-
-      <main className="flex min-h-[calc(100vh-64px)] items-center justify-center">
-
-        <div className="text-center">
-
-          <FiLoader
-            className="mx-auto animate-spin text-blue-500"
-            size={34}
-          />
-
-          <p className="app-text-secondary mt-4">
-
-            Building your developer dashboard...
-
-          </p>
-
-        </div>
-
-      </main>
-
-    );
-
-  }
+if (loading) {
+  return (
+    <PageLoader
+      title="Loading Dashboard..."
+      subtitle="Preparing your developer insights..."
+    />
+  );
+}
 
 
   // =====================================================

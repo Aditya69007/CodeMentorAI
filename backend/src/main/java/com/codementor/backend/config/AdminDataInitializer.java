@@ -1,5 +1,6 @@
 package com.codementor.backend.config;
 
+import com.codementor.backend.entity.AuthProvider;
 import com.codementor.backend.entity.Role;
 import com.codementor.backend.entity.User;
 import com.codementor.backend.repository.UserRepository;
@@ -58,7 +59,7 @@ public class AdminDataInitializer implements CommandLineRunner {
                 .email(adminEmail)
                 .password(passwordEncoder.encode(adminPassword))
                 .role(Role.ADMIN)
-                .provider("LOCAL")
+                .provider(AuthProvider.LOCAL)
                 .enabled(true)
                 .build();
 

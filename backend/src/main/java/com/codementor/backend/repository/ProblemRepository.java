@@ -180,4 +180,36 @@ public interface ProblemRepository
                 Pageable pageable
         );
 
+        @Query("""
+        SELECT DISTINCT p
+        FROM Problem p
+        LEFT JOIN p.tags t
+        WHERE p.active = true
+        AND (
+        LOWER(p.topic.name) = LOWER(:concept)
+        OR LOWER(t) LIKE LOWER(CONCAT('%', :concept, '%'))
+        )
+        """)
+        List<Problem> findByConcept(@Param("concept") String concept);
+
+        @Query("""
+        SELECT DISTINCT p
+        FROM Problem p
+        LEFT JOIN p.tags t
+        WHERE p.active = true
+        AND (
+                LOWER(p.topic.name) IN :keywords
+                OR LOWER(t) IN :keywords
+                OR LOWER(p.title) LIKE LOWER(CONCAT('%', :searchText, '%'))
+        )
+        """)
+        List<Problem> findRecommendationCandidates(
+
+                @Param("keywords")
+                List<String> keywords,
+
+                @Param("searchText")
+                String searchText
+        );
+
 }

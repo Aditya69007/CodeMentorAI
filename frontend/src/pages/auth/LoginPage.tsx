@@ -40,6 +40,13 @@ export default function LoginPage() {
     }
   };
 
+  const handleGoogleLogin = () => {
+
+    window.location.href =
+      "http://localhost:8080/oauth2/authorization/google";
+
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4">
 
@@ -115,6 +122,34 @@ export default function LoginPage() {
             className="w-full rounded-lg bg-blue-600 py-3 font-semibold text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? "Logging in..." : "Login"}
+          </button>
+
+          <div className="my-4 flex items-center">
+
+            <div className="h-px flex-1 bg-slate-700"></div>
+
+            <span className="mx-3 text-sm text-slate-400">
+              OR
+            </span>
+
+            <div className="h-px flex-1 bg-slate-700"></div>
+
+          </div>
+
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            className="flex w-full items-center justify-center gap-3 rounded-lg border border-slate-700 bg-slate-800 py-3 font-medium text-white transition hover:bg-slate-700"
+          >
+
+            <img
+              src="https://www.svgrepo.com/show/475656/google-color.svg"
+              alt="Google"
+              className="h-5 w-5"
+            />
+
+            Continue with Google
+
           </button>
 
         </form>

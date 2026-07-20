@@ -23,6 +23,7 @@ import com.codementor.backend.entity.AiAnalysis;
 import com.codementor.backend.entity.AiChatMessage;
 import com.codementor.backend.entity.AiMistake;
 import com.codementor.backend.entity.AiProgressiveHint;
+import com.codementor.backend.entity.Difficulty;
 import com.codementor.backend.entity.Submission;
 import com.codementor.backend.entity.SubmissionStatus;
 import com.codementor.backend.exception.ResourceNotFoundException;
@@ -50,6 +51,7 @@ import com.codementor.backend.service.AdaptiveMentorService;
 
 
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -181,9 +183,11 @@ public class AiMentorServiceImpl implements AiMentorService {
                                 )
 
                                 .conceptToStudy(
-                                        json
-                                                .path("conceptToStudy")
-                                                .asText()
+                                        ConceptNormalizer.normalize(
+                                                json
+                                                        .path("conceptToStudy")
+                                                        .asText()
+                                        )
                                 )
 
                                 .build();
@@ -1301,11 +1305,13 @@ public class AiMentorServiceImpl implements AiMentorService {
                 mistakes
                         .stream()
                         .collect(
-                                java.util.stream.Collectors.groupingBy(
-                                        AiMistake::getConcept
+                                Collectors.groupingBy(
+                                        mistake ->
+                                                ConceptNormalizer.normalize(
+                                                        mistake.getConcept()
+                                                )
                                 )
                         );
-
 
         List<ConceptGrowthResponse> growthResponses =
                 new java.util.ArrayList<>();
@@ -1823,7 +1829,7 @@ public class AiMentorServiceImpl implements AiMentorService {
 
         List<PracticeRecommendationResponse> recommendations =
                 new ArrayList<>();
-
+        Set<Long> alreadyRecommendedProblemIds = new HashSet<>();
 
         // =========================================================
         // PROCESS EVERY WEAK / IMPROVING CONCEPT
@@ -1911,10 +1917,9 @@ public class AiMentorServiceImpl implements AiMentorService {
                 // =====================================================
                 // FIND REAL PROBLEMS BELONGING TO THIS CONCEPT
                 // =====================================================
-
                 List<Problem> conceptProblems =
                         problemRepository
-                                .findByTopicNameIgnoreCaseAndActiveTrue(
+                                .findByConcept(
                                         growth.getConcept()
                                 );
 
@@ -1931,27 +1936,60 @@ public class AiMentorServiceImpl implements AiMentorService {
                         conceptProblems
                                 .stream()
 
+                                // Never recommend inactive problems
+                                .filter(Problem::getActive)
+
+                                // Never recommend already solved problems
+                                .filter(problem ->
+                                        !solvedProblemIds.contains(problem.getId())
+                                )
+
+                                // Easy -> Medium -> Hard
                                 .sorted(
                                         Comparator
-
-                                                .comparing(
+                                                .comparingInt(
                                                         (Problem problem) ->
-                                                                solvedProblemIds.contains(
-                                                                        problem.getId()
+                                                                calculateRecommendationScore(
+                                                                        problem,
+                                                                        growth
                                                                 )
                                                 )
-
-                                                .thenComparing(
-                                                        Problem::getDifficulty
-                                                )
-
+                                                .reversed()
                                                 .thenComparing(
                                                         Problem::getTitle
                                                 )
                                 )
 
                                 .toList();
+                if (orderedProblems.isEmpty()) {
 
+                orderedProblems =
+                        problemRepository.findAll()
+
+                                .stream()
+
+                                .filter(Problem::getActive)
+
+                                .filter(problem ->
+                                        !solvedProblemIds.contains(problem.getId())
+                                )
+
+                                .sorted(
+                                        Comparator
+                                                .comparingInt(
+                                                        (Problem problem) ->
+                                                                calculateRecommendationScore(
+                                                                        problem,
+                                                                        growth
+                                                                )
+                                                )
+                                                .reversed()
+                                                .thenComparing(
+                                                        Problem::getTitle
+                                                )
+                                )
+                                .toList();
+                }
 
                 // =====================================================
                 // CONVERT PROBLEMS INTO RESPONSE DTO
@@ -1961,8 +1999,14 @@ public class AiMentorServiceImpl implements AiMentorService {
                         orderedProblems
                                 .stream()
 
-                                .limit(recommendedProblemCount)
-
+                                // Prevent duplicate recommendations
+                                .filter(problem ->
+                                        alreadyRecommendedProblemIds.add(problem.getId())
+                                )
+                                .limit(Math.min(
+                                        recommendedProblemCount,
+                                        orderedProblems.size()
+                                ))
                                 .map(problem ->
 
                                         RecommendedProblemResponse
@@ -2805,9 +2849,9 @@ public class AiMentorServiceImpl implements AiMentorService {
                 Use exactly this JSON structure:
 
                 {
-                  "explanation": "clear explanation of the mistake",
-                  "hint": "a useful hint for the student",
-                  "conceptToStudy": "main programming concept"
+                "explanation": "clear explanation of the mistake",
+                "hint": "a useful hint for the student",
+                "conceptToStudy": "Stack"
                 }
                 """
                 .formatted(
@@ -4923,4 +4967,71 @@ private String buildProgressiveHintPrompt(
                 .build();
         }
 
+        private int getDifficultyOrder(Difficulty difficulty) {
+        return switch (difficulty) {
+                case EASY -> 1;
+                case MEDIUM -> 2;
+                case HARD -> 3;
+        };
+        }
+
+        private int calculateRecommendationScore(
+                Problem problem,
+                ConceptGrowthResponse growth
+        ) {
+
+        int score = 0;
+
+        // ==========================================
+        // Difficulty Preference
+        // ==========================================
+
+        switch (growth.getGrowthStatus()) {
+
+                case "REPEATING" -> {
+                if (problem.getDifficulty() == Difficulty.EASY) {
+                        score += 30;
+                } else if (problem.getDifficulty() == Difficulty.MEDIUM) {
+                        score += 15;
+                }
+                }
+
+                case "IMPROVING" -> {
+                if (problem.getDifficulty() == Difficulty.MEDIUM) {
+                        score += 30;
+                } else if (problem.getDifficulty() == Difficulty.EASY) {
+                        score += 15;
+                }
+                }
+
+                case "MASTERED" -> {
+                if (problem.getDifficulty() == Difficulty.HARD) {
+                        score += 30;
+                } else if (problem.getDifficulty() == Difficulty.MEDIUM) {
+                        score += 15;
+                }
+                }
+        }
+
+        // ==========================================
+        // Active Problems
+        // ==========================================
+
+        if (problem.getActive()) {
+                score += 10;
+        }
+
+        // ==========================================
+        // Topic Match
+        // ==========================================
+
+        if (problem.getTopic() != null
+                && problem.getTopic().getName() != null
+                && problem.getTopic().getName().equalsIgnoreCase(growth.getConcept())) {
+
+                score += 50;
+        }
+
+        return score;
+        }
 }

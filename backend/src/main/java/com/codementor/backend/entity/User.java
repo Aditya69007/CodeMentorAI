@@ -6,6 +6,8 @@ import lombok.*;
 import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import com.codementor.backend.entity.AuthProvider;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -35,13 +37,25 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String provider;
+    @Builder.Default
+    private AuthProvider provider = AuthProvider.LOCAL;
 
     @Column(unique = true)
     private String leetcodeUsername;
 
     private String profilePicture;
+
+    @Column(unique = true)
+    private String providerId;
+
+    @Builder.Default
+    private Boolean emailVerified = false;
+
+    private String passwordResetToken;
+
+    private LocalDateTime passwordResetTokenExpiry;
 
     @Column(nullable = false)
     @Builder.Default

@@ -150,7 +150,15 @@ export default function TopicProblemsPage() {
             onBack={() => navigate("/topics")}
           />
 
-          <div className="mt-8 grid gap-6 xl:grid-cols-[280px_1fr]">
+          <div
+            className="
+              mt-8
+              grid
+              gap-6
+              grid-cols-1
+              lg:grid-cols-[320px_1fr]
+            "
+          >
 
             <TopicSidebar
               progress={progress}
