@@ -1,55 +1,101 @@
-# 🚀 CodeMentorAI - BACKEND DOCUMENTATION
+# 🚀 CodeMentorAI — BACKEND DOCUMENTATION
 
 > Complete backend architecture documentation.
-
-This document describes every backend module, service, repository,
-controller, entity and AI pipeline.
 
 ---
 
 # BACKEND OVERVIEW
 
-Framework
+| Item | Value |
+|------|-------|
+| Framework | Spring Boot |
+| Language | Java 21 |
+| Database | PostgreSQL |
+| ORM | Spring Data JPA / Hibernate |
+| Authentication | Spring Security + JWT + Google OAuth |
+| AI | Google Gemini |
+| Architecture | Clean Layered Architecture |
+| Current Status | 🟡 Release Candidate (RC) |
 
-Spring Boot
+---
 
-Language
+# BACKEND VISION
 
-Java
+The backend is no longer only an API server.
 
-Database
+It is the **Developer Intelligence Engine**.
+
+Every service contributes to building one unified **Developer Identity**.
+
+```
+Developer Identity
+
+↓
+
+GitHub
+
+LeetCode
+
+CodeMentorAI
+
+↓
+
+AI Intelligence
+
+↓
+
+Portfolio
+
+Resume
+
+Recruiter Dashboard
+
+Growth
+
+Interview
+
+Mentor
+```
+
+---
+
+# ARCHITECTURE
+
+```
+REST Controller
+
+↓
+
+Service Layer
+
+↓
+
+Repository Layer
+
+↓
 
 PostgreSQL
 
-ORM
+↓
 
-Spring Data JPA / Hibernate
-
-Authentication
-
-Spring Security + JWT
-
-Architecture
-
-Controller
+AI Services
 
 ↓
 
-Service
+Gemini
+```
 
-↓
+Business logic always belongs inside Services.
 
-Repository
+Controllers remain thin.
 
-↓
-
-Database
+Repositories contain only persistence logic.
 
 ---
 
 # PACKAGE STRUCTURE
 
-backend/src/main/java/com/codementor/backend/
+backend/
 
 controller/
 
@@ -75,23 +121,11 @@ ai/
 
 util/
 
----
+integration/
 
-# DESIGN PRINCIPLES
+github/
 
-• Layered Architecture
-
-• DTO-based API
-
-• Repository Pattern
-
-• Dependency Injection
-
-• Transactional Services
-
-• REST APIs
-
-• Separation of Concerns
+leetcode/
 
 ---
 
@@ -99,826 +133,59 @@ util/
 
 ## Authentication
 
-Status
-
-✅ COMPLETE
-
-Responsibilities
-
-- Register
-- Login
-- JWT generation
-- JWT validation
-- Role authorization
-- USER role
-- ADMIN role
-
-Main Components
-
-AuthController
-
-AuthService
-
-JwtService
-
-JwtFilter
-
-SecurityConfig
-
----
-
-## User Module
-
-Status
-
-✅ COMPLETE
-
-Responsibilities
-
-- User profile
-- Role management
-- Statistics
-- Account lookup
-
-Repositories
-
-UserRepository
-
----
-
-## Topic Module
-
-Status
-
-✅ COMPLETE
-
-Responsibilities
-
-- Topic CRUD
-- Topic listing
-- Topic Progress
-- Topic Problems
-- Learning Analytics
-
-Controllers
-
-TopicController
-
-LearningAnalyticsController
-
-Services
-
-TopicService
-
-LearningAnalyticsService
-
-Repositories
-
-TopicRepository
-
-ProblemRepository
-
-SubmissionRepository
-
-AiMistakeRepository
-
----
-
-## Problem Module
-
-Status
-
-✅ COMPLETE
-
-Responsibilities
-
-- CRUD
-- Filtering
-- Search
-- Difficulty
-- Topic mapping
-- Tags
-- Hidden test cases
-
-Entities
-
-Problem
-
-ProblemExample
-
-TestCase
-
-Repositories
-
-ProblemRepository
-
-TestCaseRepository
-
----
-
-## Submission Module
-
-Status
-
-✅ COMPLETE
-
-Responsibilities
-
-- Run Code
-- Submit Code
-- Judge Results
-- Save History
-- Execution Metrics
-
-Submission Status
-
-PENDING
-
-RUNNING
-
-ACCEPTED
-
-WRONG_ANSWER
-
-TIME_LIMIT_EXCEEDED
-
-RUNTIME_ERROR
-
-COMPILATION_ERROR
-
-Repositories
-
-SubmissionRepository
-
----
-
-# AI MODULES
-
-## AI Mentor
-
-Status
-
-✅ COMPLETE
-
-Responsibilities
-
-Submission Analysis
-
-Hint Generation
-
-Concept Detection
-
-Follow-up Chat
-
-Progressive Hints
-
-AI Explanation
-
-Gemini Integration
-
-Main Service
-
-AiMentorServiceImpl
-
----
-
-## Progressive Hint System
-
-Status
-
-✅ COMPLETE
-
-Levels
-
-Level 1
-
-Concept Hint
-
-Level 2
-
-Algorithm Hint
-
-Level 3
-
-Approach Hint
-
-Level 4
-
-Pseudo-code Guidance
-
-Persistence
-
-AiProgressiveHint
-
----
-
-## AI Chat
-
-Status
-
-✅ COMPLETE
-
-Features
-
-Persistent conversation
-
-Submission context
-
-Adaptive context
-
-Learning history
-
-Repositories
-
-AiChatMessageRepository
-
----
-
-## AI Mistake Memory
-
-Status
-
-✅ COMPLETE
-
-Responsibilities
-
-Detect mistakes
-
-Store mistakes
-
-Prevent duplicates
-
-Recurring mistakes
-
-Past recall
-
-Developer profile
-
-Growth tracking
-
-Repositories
-
-AiMistakeRepository
-
-Entity
-
-AiMistake
-
----
-
-## Adaptive Mentor
-
-Status
-
-✅ COMPLETE
-
-Responsibilities
-
-Personalized learning context
-
-Adaptive prompts
-
-Adaptive hints
-
-Adaptive chat
-
-Learning history integration
-
----
-
-## Learning Analytics
-
-Status
-
-✅ COMPLETE
-
-Responsibilities
-
-Topic mastery
-
-Acceptance rate
-
-Solved problems
-
-Attempted problems
-
-AI mistakes
-
-Recommendation engine
-
-Weak concepts
-
-Strong concepts
-
-Estimated learning gain
-
-Recommendation reason
-
-Main Service
-
-LearningAnalyticsServiceImpl
-
----
-
-## Developer Skill Graph
-
-Status
-
-✅ COMPLETE
-
-Calculates
-
-Acceptance Rate
-
-Skill Score
-
-Topic Score
-
-Mistake Score
-
-Skill Level
-
-Outputs
-
-MASTERED
-
-STRONG
-
-DEVELOPING
-
-NEEDS_PRACTICE
-
----
-
-## Concept Growth
-
-Status
-
-✅ COMPLETE
-
-Tracks
-
-Repeated mistakes
-
-Recovered concepts
-
-Improving concepts
-
-Mastered concepts
-
----
-
-## Practice Recommendation
-
-Status
-
-✅ COMPLETE
-
-Generates
-
-Priority
-
-Recommended Problems
-
-Reason
-
-Concept
-
-Growth Status
-
----
-
-## Personalized Learning Plan
-
-Status
-
-✅ COMPLETE
-
-Calculates
-
-Overall Readiness
-
-Learning Level
-
-Weak Concepts
-
-Strengths
-
-Revision Priorities
-
-Independent Solve Rate
-
-Hint Dependency
-
-Recommended Action
-
----
-
-## Hint Dependency Score
-
-Status
-
-✅ COMPLETE (Backend)
-
-Tracks
-
-Problems with hints
-
-Hint frequency
-
-Hint strength
-
-Dependency Score
-
-Dependency Level
-
----
-
-## Solution Evolution Timeline
-
-Status
-
-✅ COMPLETE (Backend)
-
-Tracks
-
-First Attempt
-
-Improved
-
-Regressed
-
-Solved
-
-Status Changed
-
-No Change
-
-Passed Test Changes
-
-AI History
-
----
-
-## Independent Solve Mode
-
-Status
-
-🟡
-
-Completed
-
-Session Tracking
-
-AI Lock
-
-Persistence
-
-Remaining
-
-Rewards
-
-Frontend Polish
-
----
-
-# ADMIN MODULES
-
-Status
-
-✅ COMPLETE
+✅ Complete
 
 Includes
 
-Admin Dashboard
-
-Problem Management
-
-Topic Management
-
-Submission Management
-
-AI Analytics
-
-Platform Analytics
-
-Charts
-
-Distributions
-
----
-
-# DATABASE ENTITIES
-
-Core
-
-User
-
-Topic
-
-Problem
-
-ProblemExample
-
-TestCase
-
-Submission
-
-AI
-
-AiAnalysis
-
-AiMistake
-
-AiChatMessage
-
-AiProgressiveHint
-
-Learning
-
-IndependentSolveSession
-
----
-
-# CURRENT BACKEND COMPLETION
-
-Authentication
-
-✅
-
-Problems
-
-✅
-
-Execution
-
-✅
-
-AI Mentor
-
-✅
-
-Adaptive Mentor
-
-✅
-
-Mistake Memory
-
-✅
-
-Learning Analytics
-
-✅
-
-Skill Graph
-
-✅
-
-Practice Recommendation
-
-✅
-
-Personalized Learning Plan
-
-✅
-
-Hint Dependency Backend
-
-✅
-
-Solution Evolution Backend
-
-✅
-
-Admin Platform
-
-✅
-
-Overall Backend Progress
-
-≈95%
-
----
-
-# REMAINING BACKEND WORK
-
-Production validation
-
-Logging improvements
-
-Rate limiting
-
-Global monitoring
-
-Gemini retry strategy
-
-Performance optimization
-
-Security audit
-
-Deployment configuration
-
----
-
-# DEVELOPMENT RULES
-
-Never duplicate services.
-
-Never duplicate repositories.
-
-Never duplicate controllers.
-
-Always reuse existing DTOs.
-
-Always extend existing APIs before creating new ones.
-
-Maintain layered architecture.
-
-Use constructor injection.
-
-Keep business logic inside Services.
-
-Repositories should contain only data-access logic.
-
-Controllers should remain thin.
-
-All new AI features must integrate with existing AI Mentor architecture instead of creating parallel systems.
-
-
-# 🚀 CodeMentorAI - BACKEND DOCUMENTATION
-
-> Complete backend architecture documentation.
-
----
-
-# BACKEND OVERVIEW
-
-Framework
-
-Spring Boot
-
-Language
-
-Java
-
-Database
-
-PostgreSQL
-
-ORM
-
-Spring Data JPA / Hibernate
-
-Authentication
-
-Spring Security + JWT
-
-Architecture
-
-Controller
-
-↓
-
-Service
-
-↓
-
-Repository
-
-↓
-
-Database
-
-Status
-
-🟡 Release Candidate (RC)
-
----
-
-# PACKAGE STRUCTURE
-
-backend/src/main/java/com/codementor/backend/
-
-controller/
-
-service/
-
-service/impl/
-
-repository/
-
-entity/
-
-dto/
-
-config/
-
-security/
-
-exception/
-
-execution/
-
-ai/
-
-util/
-
----
-
-# DESIGN PRINCIPLES
-
-- Layered Architecture
-- Clean Architecture
-- SOLID Principles
-- DTO-based APIs
-- Repository Pattern
-- Dependency Injection
-- Transactional Services
-- Separation of Concerns
-- Thin Controllers
-- Business Logic inside Services
-
----
-
-# CORE MODULES
-
-## Authentication
-
-✅ COMPLETE
-
-Includes
-
-- Register
-- Login
 - JWT Authentication
-- JWT Validation
-- Role-based Security
-- USER
-- ADMIN
-
----
-
-## User Module
-
-✅ COMPLETE
-
-Includes
-
+- Google OAuth
 - User Profile
-- Statistics
 - Role Management
 
 ---
 
-## Topic Module
+## User Module
 
-✅ COMPLETE
+✅ Complete
 
 Includes
 
-- CRUD
-- Progress
-- Analytics
-- Topic Problems
-- Recommendations
+- Profile
+- Update Profile
+- Current User
+- Account Management
+
+Future
+
+- Connected Accounts
+- Developer Identity
 
 ---
 
 ## Problem Module
 
-✅ COMPLETE
+✅ Complete
 
 Includes
 
 - CRUD
 - Search
-- Filtering
 - Difficulty
 - Tags
-- Hidden Test Cases
-- Topic Mapping
+- Test Cases
 
 ---
 
 ## Submission Module
 
-✅ COMPLETE
+✅ Complete
 
 Includes
 
-- Run Code
-- Submit Code
+- Code Execution
+- Submission History
 - Judge
 - Metrics
-- History
-
-Supported Results
-
-- Accepted
-- Wrong Answer
-- Runtime Error
-- Compilation Error
-- Time Limit Exceeded
 
 ---
 
@@ -926,163 +193,181 @@ Supported Results
 
 ## AI Mentor
 
-✅ COMPLETE
+✅ Complete
 
-- AI Analysis
-- AI Explanation
-- AI Chat
+Includes
+
+- Analysis
+- Explanation
+- Chat
 - Progressive Hints
-- Adaptive Responses
-- Concept Detection
 
 ---
 
-## Progressive Hint System
+## AI Learning Intelligence
 
-✅ COMPLETE
-
-Levels
-
-- Concept
-- Algorithm
-- Approach
-- Pseudocode
-
-Persistent storage enabled.
-
----
-
-## AI Chat
-
-✅ COMPLETE
-
-Includes
-
-- Persistent Conversations
-- Submission Context
-- Learning Context
-- Adaptive Prompts
-
----
-
-## AI Mistake Memory
-
-✅ COMPLETE
-
-Includes
-
-- Mistake Detection
-- Persistence
-- Recurring Mistakes
-- Recall
-- Growth Tracking
-
----
-
-## Learning Intelligence
-
-✅ COMPLETE
+✅ Complete
 
 Includes
 
 - Growth Report
+- Developer Skill Graph
 - Learning Plan
 - Revision Plan
 - Practice Recommendation
-- Developer Skill Graph
-- Adaptive Mentor
 - Concept Growth
+- Adaptive Mentor
+- Interview Profile
 
 ---
 
-## Personalized Interview
+# DEVELOPER IDENTITY
 
-✅ COMPLETE
+🚀 New Core Architecture
 
-Includes
+Developer Identity becomes the heart of CodeMentorAI.
 
-- Adaptive Questions
-- AI Evaluation
-- Interview History
-- Final Assessment
-- Feedback
-- Score
+Future data sources
 
----
+- User Profile
+- GitHub
+- LeetCode
+- Projects
+- AI Growth
+- Interview
+- Skills
+- Resume
+- Portfolio
 
-## Solution Evolution
-
-✅ COMPLETE
-
-Includes
-
-- Timeline
-- Attempt Comparison
-- Regression Detection
-- Improvement Tracking
-- AI Insights
+Every backend module should extend this identity.
 
 ---
 
-## Independent Solve Mode
+# GITHUB INTEGRATION
 
-✅ COMPLETE
+🟡 Planned
 
-Includes
+Future package
 
-- Session Tracking
-- AI Lock
-- Completion Tracking
-- History
+```
+integration/github/
+```
 
----
+Responsibilities
 
-## Developer Activity
+- GitHub Profile
+- Repositories
+- Languages
+- Stars
+- Pinned Projects
+- Profile URL
 
-✅ COMPLETE
+Future endpoints
 
-Includes
+```
+GET /api/v1/github/profile
 
-- Daily Activity
-- Contribution Calendar
-- Progress History
+POST /api/v1/github/connect
 
----
+PUT /api/v1/github/refresh
+```
 
-# ADMIN MODULES
+GitHub data improves
 
-✅ COMPLETE
-
-Includes
-
-- Dashboard
-- Users
-- Problems
-- Topics
-- Submissions
-- Platform Analytics
-- AI Analytics
+- Portfolio
+- Resume
+- Recruiter Dashboard
+- AI Mentor
 
 ---
 
-# DATABASE
+# LEETCODE INTEGRATION
 
-Status
+🟡 Planned
 
-✅ COMPLETE
+Future package
 
-Entities
+```
+integration/leetcode/
+```
 
-- User
-- Topic
-- Problem
-- TestCase
-- Submission
-- AiAnalysis
-- AiMistake
-- AiChatMessage
-- AiProgressiveHint
-- IndependentSolveSession
+Responsibilities
+
+- Problems Solved
+- Acceptance Rate
+- Contest Rating
+- Topic Distribution
+- Progress
+
+Future endpoints
+
+```
+GET /api/v1/leetcode/profile
+
+POST /api/v1/leetcode/connect
+
+PUT /api/v1/leetcode/refresh
+```
+
+LeetCode data improves
+
+- AI Mentor
+- Growth Report
+- Interview
+- Portfolio
+- Resume
+
+---
+
+# PORTFOLIO MODULE
+
+🟡 In Progress
+
+Current
+
+- User Profile
+- Growth Report
+- Developer Skills
+
+Future
+
+- Dynamic Projects
+- GitHub
+- LeetCode
+- Public Portfolio
+
+---
+
+# RESUME ENGINE
+
+🟡 Planned
+
+Resume should not store duplicate data.
+
+Resume will be generated from
+
+- Profile
+- GitHub
+- LeetCode
+- Projects
+- Skills
+- Growth Report
+- Achievements
+
+---
+
+# RECRUITER PLATFORM
+
+🟡 Planned
+
+Future modules
+
+- Recruiter Dashboard
+- Candidate AI Analysis
+- Interview Readiness
+- Skill Graph
+- GitHub Summary
+- LeetCode Summary
 
 ---
 
@@ -1100,7 +385,7 @@ Topics
 
 ✅
 
-Execution
+Submissions
 
 ✅
 
@@ -1116,36 +401,66 @@ Interview
 
 ✅
 
-Independent Solve
+Portfolio APIs
 
-✅
+🟡
 
-Developer Activity
+Developer Identity
 
-✅
+🟡
 
-Admin Platform
+GitHub Integration
 
-✅
+❌
 
-Overall Backend Progress
+LeetCode Integration
+
+❌
+
+Overall Progress
 
 🚀 ~98%
 
 ---
 
-# REMAINING BACKEND WORK
+# VERSION 2 ROADMAP
 
-Production only
+Phase 1
 
-- Logging
-- Monitoring
-- Rate Limiting
-- Performance Optimization
-- Security Audit
-- Production Configuration
+Developer Identity
 
-No major feature development is planned before Version 1.0 release.
+- GitHub
+- LeetCode
+- Dynamic Projects
+
+Phase 2
+
+AI Intelligence
+
+- Cross-platform AI Analysis
+- Unified Developer Profile
+
+Phase 3
+
+Portfolio
+
+- Public Portfolio
+- Dynamic Portfolio
+
+Phase 4
+
+Resume
+
+- AI Resume
+- ATS Resume
+- PDF Export
+
+Phase 5
+
+Recruiter Platform
+
+- Candidate Insights
+- AI Hiring Dashboard
 
 ---
 
@@ -1153,32 +468,34 @@ No major feature development is planned before Version 1.0 release.
 
 Always
 
-- Reuse Services
-- Reuse Controllers
+- Reuse existing Services
+- Extend existing Controllers
 - Reuse DTOs
-- Preserve Architecture
-- Keep Controllers Thin
-- Keep Logic inside Services
+- Preserve layered architecture
+- Keep business logic inside Services
 
 Never
 
-- Duplicate Controllers
-- Duplicate Services
-- Duplicate Repositories
 - Duplicate APIs
-- Rewrite completed modules
+- Duplicate Services
+- Duplicate Controllers
+- Duplicate Repositories
+- Create parallel implementations
 
 ---
 
-# RELEASE STATUS
+# FINAL PRINCIPLE
 
-Current Phase
+Every backend feature must answer one question:
 
-🟡 Release Candidate (RC)
+"Does this improve the Developer Identity?"
 
-Focus
+If YES
 
-- Production Polish
-- Testing
-- Documentation
-- Deployment
+Implement it.
+
+If NO
+
+Reconsider the feature.
+
+Developer Identity is now the central backend architecture of CodeMentorAI.

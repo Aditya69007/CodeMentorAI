@@ -20,6 +20,9 @@ import AdminUserDetailsPage from "./pages/admin/AdminUserDetailsPage";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import AdminCreateProblemPage from "./pages/admin/AdminCreateProblemPage";
 import AdminSubmissionsPage from "./pages/admin/AdminSubmissionsPage";
+import ProfilePage from "./pages/account/ProfilePage";
+import SettingsPage from "./pages/account/SettingsPage";
+import PortfolioPage from "./pages/portfolio/PortfolioPage";
 
 import UserRoute from "./routes/UserRoute";
 import AdminRoute from "./routes/AdminRoute";
@@ -196,6 +199,23 @@ export default function App() {
             element={<PersonalizedInterviewPage />}
           />
 
+          {/* ACCOUNT */}
+
+          <Route
+            path="/account/profile"
+            element={<ProfilePage />}
+          />
+
+          <Route
+            path="/account/settings"
+            element={<SettingsPage />}
+          />
+
+          {/* PORTFOLIO */}
+          <Route
+              path="/portfolio"
+              element={<PortfolioPage />}
+          />
 
         </Route>
 

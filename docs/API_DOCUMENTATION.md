@@ -1,16 +1,37 @@
-# 🌐 CodeMentorAI - API DOCUMENTATION
+# 🌐 CodeMentorAI — API DOCUMENTATION
 
 > Complete REST API Reference
 
 ---
 
-# BASE URL
+# API OVERVIEW
 
-```
-/api/v1
-```
+| Item | Value |
+|------|-------|
+| Base URL | `/api/v1` |
+| Authentication | JWT Bearer Token |
+| Response Format | JSON |
+| Current Status | 🟡 Release Candidate (RC) |
 
-Architecture
+---
+
+# API VISION
+
+The REST API is the communication layer of the **Developer Identity Platform**.
+
+Every API should either:
+
+- Manage Developer Identity
+- Improve AI Intelligence
+- Enhance Learning Analytics
+- Support Portfolio & Resume
+- Provide Recruiter Insights
+
+Future integrations (GitHub & LeetCode) will extend the existing architecture instead of creating separate systems.
+
+---
+
+# API ARCHITECTURE
 
 ```
 React
@@ -21,19 +42,31 @@ Axios
 
 ↓
 
-Spring Boot REST API
+REST API
 
 ↓
 
-Service Layer
+Controllers
 
 ↓
 
-Repository
+Services
+
+↓
+
+Repositories
 
 ↓
 
 PostgreSQL
+
+↓
+
+AI Services
+
+↓
+
+Gemini
 ```
 
 ---
@@ -56,11 +89,20 @@ Endpoints
 POST /auth/register
 
 POST /auth/login
+
+GET /auth/me
+```
+
+OAuth
+
+```
+GET /oauth2/authorization/google
 ```
 
 Authentication
 
-JWT Bearer Token
+- JWT
+- Google OAuth
 
 ---
 
@@ -80,6 +122,14 @@ Endpoints
 
 ```
 GET /users/me
+
+PUT /users/me
+```
+
+Future
+
+```
+GET /users/profile
 ```
 
 ---
@@ -184,7 +234,7 @@ DELETE /{testCaseId}
 
 ---
 
-# ⚡ CODE EXECUTION
+# ⚡ EXECUTION
 
 Status
 
@@ -286,50 +336,11 @@ GET /ai-mentor/skills/me
 GET /ai-mentor/adaptive-profile/me
 
 GET /ai-mentor/interview-profile/me
-```
 
----
-
-# 📈 SOLUTION EVOLUTION
-
-Status
-
-✅ COMPLETE
-
-Endpoints
-
-```
 GET /ai-mentor/solution-evolution/{problemId}
-```
 
-Returns
-
-- Timeline
-- Attempt History
-- Improvement
-- Regression
-- AI Insights
-
----
-
-# 💡 HINT DEPENDENCY
-
-Status
-
-✅ COMPLETE
-
-Endpoints
-
-```
 GET /ai-mentor/hint-dependency/me
 ```
-
-Returns
-
-- Dependency Score
-- Dependency Level
-- Usage Statistics
-- Recommendation
 
 ---
 
@@ -481,7 +492,7 @@ GET /platform-analytics
 
 ---
 
-# 📈 ADMIN AI ANALYTICS
+# 📈 AI ANALYTICS
 
 Status
 
@@ -501,11 +512,104 @@ GET /admin
 
 ---
 
+# 🚧 VERSION 2 APIs (Planned)
+
+These APIs are part of the Developer Identity Platform roadmap and are **not yet implemented**.
+
+## GitHub
+
+```
+POST /github/connect
+
+GET /github/profile
+
+PUT /github/refresh
+```
+
+Purpose
+
+- Connect GitHub account
+- Synchronize repositories
+- Fetch languages
+- Fetch stars
+- Fetch pinned projects
+
+---
+
+## LeetCode
+
+```
+POST /leetcode/connect
+
+GET /leetcode/profile
+
+PUT /leetcode/refresh
+```
+
+Purpose
+
+- Connect LeetCode username
+- Synchronize solved problems
+- Synchronize contest rating
+- Synchronize topic statistics
+
+---
+
+## Portfolio
+
+```
+GET /portfolio/me
+
+PUT /portfolio/me
+```
+
+Purpose
+
+- Developer Portfolio
+- Featured Projects
+- Public Profile
+
+---
+
+## Resume
+
+```
+POST /resume/generate
+
+GET /resume/me
+
+GET /resume/download
+```
+
+Purpose
+
+- AI Resume
+- ATS Resume
+- PDF Export
+
+---
+
+## Recruiter
+
+```
+GET /recruiter/candidate/{id}
+
+GET /recruiter/summary/{id}
+```
+
+Purpose
+
+- AI Candidate Summary
+- Skill Analysis
+- Growth Timeline
+
+---
+
 # 📦 RESPONSE FORMAT
 
-Every endpoint returns a consistent JSON response using appropriate HTTP status codes.
+Every endpoint returns JSON with standard HTTP status codes.
 
-Supported Status Codes
+Supported
 
 ```
 200 OK
@@ -535,13 +639,44 @@ Authorization
 Bearer <JWT>
 ```
 
+Google OAuth endpoints are handled through Spring Security OAuth.
+
 ---
 
-# 📋 DEVELOPMENT RULES
+# API DEVELOPMENT RULES
 
-- Never duplicate APIs.
-- Extend existing endpoints whenever possible.
-- Keep controllers thin.
-- Keep business logic inside services.
+Always
+
+- Extend existing APIs before creating new ones.
+- Keep Controllers thin.
+- Keep business logic inside Services.
 - Preserve backward compatibility.
-- Update this document whenever new endpoints are added.
+- Reuse DTOs whenever possible.
+- Keep REST naming consistent.
+
+Never
+
+- Duplicate endpoints.
+- Create parallel APIs.
+- Expose database entities directly.
+- Break existing API contracts.
+
+---
+
+# FINAL PRINCIPLE
+
+Every new endpoint must answer one question:
+
+**"Does this strengthen the Developer Identity?"**
+
+If YES
+
+Implement it.
+
+If NO
+
+Reconsider the API.
+
+The REST API is no longer only a coding platform API.
+
+It is the communication layer of the CodeMentorAI Developer Identity Platform.

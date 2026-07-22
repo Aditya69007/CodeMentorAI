@@ -76,4 +76,17 @@ public class User {
     public void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+    private String githubUsername;
+
+    @Builder.Default
+    private Boolean githubConnected = false;
+
+    @Builder.Default
+    private Boolean leetcodeConnected = false;
+
+    private LocalDateTime githubLastSyncedAt;
+
+    private LocalDateTime leetcodeLastSyncedAt;
+
 }

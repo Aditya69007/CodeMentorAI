@@ -1,191 +1,224 @@
-# 🗄️ CodeMentorAI - DATABASE DOCUMENTATION
+# 🗄️ CodeMentorAI — DATABASE DOCUMENTATION
 
-> Complete database schema documentation.
-
-Database
-
-PostgreSQL
-
-ORM
-
-Spring Data JPA / Hibernate
-
-Status
-
-Production Ready
+> Complete database architecture documentation.
 
 ---
 
 # DATABASE OVERVIEW
 
-The database is organized into five logical areas:
-
-1. Authentication
-2. Coding Platform
-3. AI Mentor
-4. Learning Intelligence
-5. Independent Solve Mode
+| Item | Value |
+|------|-------|
+| Database | PostgreSQL |
+| ORM | Spring Data JPA / Hibernate |
+| Status | 🟡 Release Candidate (RC) |
 
 ---
 
-# TABLES
+# DATABASE VISION
+
+The database is no longer only responsible for storing coding platform data.
+
+It is the persistent storage layer for the **Developer Identity Platform**.
+
+Every table should contribute toward building one unified Developer Identity.
+
+---
+
+# DATABASE ARCHITECTURE
+
+```
+Developer Identity
+
+│
+
+├── User
+
+├── GitHub Profile
+
+├── LeetCode Profile
+
+├── Projects
+
+├── Portfolio
+
+├── Resume
+
+├── AI Analytics
+
+├── Learning Analytics
+
+└── Interview Analytics
+```
+
+The database should evolve around Developer Identity rather than isolated modules.
+
+---
+
+# LOGICAL MODULES
+
+The database is organized into the following logical domains.
+
+## Authentication
+
+- User
+- Roles
+- OAuth Providers
+
+---
+
+## Coding Platform
+
+- Topics
+- Problems
+- Test Cases
+- Submissions
+
+---
+
+## AI Intelligence
+
+- AI Analysis
+- AI Mistakes
+- AI Chat
+- Progressive Hints
+
+---
+
+## Learning Intelligence
+
+- Growth
+- Learning Plans
+- Revision Plans
+- Independent Solve Sessions
+
+---
+
+## Developer Identity
+
+Future
+
+- GitHub Profile
+- GitHub Repository
+- LeetCode Profile
+- Connected Accounts
+- Portfolio
+- Resume Metadata
+
+---
+
+# CURRENT TABLES
 
 ## User
 
 Purpose
 
-Stores registered developers.
-
-Primary Key
-
-id
+Stores platform users.
 
 Main Fields
 
+- id
 - firstName
 - lastName
 - email
 - password
 - role
+- provider
+- profilePicture
+- enabled
 - createdAt
 
 Relationships
 
+```
 User
-│
-├── Submission (1:N)
-├── AiMistake (1:N)
-├── AiAnalysis (indirect through Submission)
-├── AiChatMessage (indirect)
-├── AiProgressiveHint (indirect)
-└── IndependentSolveSession (1:N)
+
+├── Submission
+
+├── AiMistake
+
+├── IndependentSolveSession
+
+└── Future
+
+    ├── GitHubProfile
+
+    ├── LeetCodeProfile
+
+    ├── Portfolio
+
+    └── Resume
+```
 
 ---
 
 ## Topic
 
-Purpose
-
-Represents a learning topic.
+Stores learning topics.
 
 Examples
 
-Array
-
-Stack
-
-Queue
-
-Tree
-
-Graph
-
-Dynamic Programming
-
-Relationships
-
-Topic
-│
-└── Problem (1:N)
+- Arrays
+- Graph
+- DP
+- Tree
+- Stack
+- Queue
 
 ---
 
 ## Problem
 
-Purpose
-
 Stores coding questions.
-
-Main Fields
-
-- title
-- description
-- difficulty
-- topic
-- tags
-- constraints
-- inputFormat
-- outputFormat
-- sampleInput
-- sampleOutput
-- active
 
 Relationships
 
+```
+Topic
+
+↓
+
 Problem
-│
-├── Topic (N:1)
-├── ProblemExample (1:N)
-├── TestCase (1:N)
-├── Submission (1:N)
-└── AiMistake (1:N)
+
+↓
+
+Examples
+
+↓
+
+Test Cases
+
+↓
+
+Submissions
+```
 
 ---
 
 ## ProblemExample
 
-Purpose
-
-Visible examples shown to users.
-
-Relationships
-
-Problem
-│
-└── ProblemExample
+Stores visible examples.
 
 ---
 
 ## TestCase
 
-Purpose
-
 Stores hidden and public judge test cases.
-
-Main Fields
-
-- input
-- expectedOutput
-- hidden
-
-Relationships
-
-Problem
-│
-└── TestCase
 
 ---
 
 ## Submission
 
-Purpose
-
 Stores every code submission.
 
-Main Fields
+Contains
 
-- sourceCode
-- language
-- status
-- executionTime
-- memoryUsed
-- output
-- errorMessage
-- passedTestCases
-- totalTestCases
-- failedOnHiddenTest
-- createdAt
-
-Relationships
-
-Submission
-│
-├── User
-├── Problem
-├── AiAnalysis
-├── AiMistake
-├── AiProgressiveHint
-└── AiChatMessage
+- Language
+- Status
+- Execution Time
+- Memory
+- Source Code
+- Output
+- Hidden Test Results
 
 ---
 
@@ -193,85 +226,38 @@ Submission
 
 ## AiAnalysis
 
-Purpose
+Stores Gemini responses.
 
-Stores Gemini analysis.
+Includes
 
-Contains
-
-Explanation
-
-Hint
-
-Concept To Study
-
-Relationship
-
-Submission (1:1)
+- Analysis
+- Explanation
+- Recommendations
 
 ---
 
 ## AiMistake
 
-Purpose
+Stores recurring AI-detected mistakes.
 
-Stores AI detected mistakes.
+Includes
 
-Fields
-
-Mistake Type
-
-Concept
-
-Description
-
-Severity
-
-Relationships
-
-Submission
-
-Problem
-
-User
+- Mistake Type
+- Severity
+- Concept
+- Description
 
 ---
 
 ## AiChatMessage
 
-Purpose
-
-Stores AI chat history.
-
-Fields
-
-Role
-
-Message
-
-CreatedAt
-
-Relationship
-
-Submission
+Stores AI conversation history.
 
 ---
 
 ## AiProgressiveHint
 
-Purpose
-
-Stores generated progressive hints.
-
-Fields
-
-Hint Level
-
-Response
-
-Relationship
-
-Submission
+Stores progressive hints.
 
 ---
 
@@ -279,69 +265,185 @@ Submission
 
 ## IndependentSolveSession
 
-Purpose
-
-Tracks solving without AI.
-
-Fields
-
-Active
-
-SolvedIndependently
-
-StartedAt
-
-CompletedAt
-
-Relationship
-
-User
-
-Problem
+Tracks solving problems without AI assistance.
 
 ---
 
-# ENTITY RELATIONSHIP SUMMARY
+# FUTURE TABLES
 
+## GitHubProfile
+
+Status
+
+🚧 Planned
+
+Purpose
+
+Store synchronized GitHub information.
+
+Example fields
+
+- username
+- profileUrl
+- avatarUrl
+- bio
+- followers
+- following
+- publicRepos
+- totalStars
+- languages
+- lastSyncedAt
+
+Relationship
+
+```
 User
 
 ↓
 
-Submission
+GitHubProfile
+```
+
+---
+
+## GitHubRepository
+
+Status
+
+🚧 Planned
+
+Purpose
+
+Store synchronized repositories.
+
+Example fields
+
+- repositoryName
+- description
+- language
+- stars
+- forks
+- topics
+- repositoryUrl
+
+Relationship
+
+```
+GitHubProfile
 
 ↓
 
-Problem
+GitHubRepository
+```
+
+---
+
+## LeetCodeProfile
+
+Status
+
+🚧 Planned
+
+Purpose
+
+Store synchronized LeetCode statistics.
+
+Example fields
+
+- username
+- totalSolved
+- easySolved
+- mediumSolved
+- hardSolved
+- acceptanceRate
+- contestRating
+- contestRanking
+- profileUrl
+- lastSyncedAt
+
+Relationship
+
+```
+User
 
 ↓
 
-Topic
+LeetCodeProfile
+```
 
-Submission
+---
 
-↓
+## Portfolio
 
-AiAnalysis
+Status
 
-↓
+🚧 Planned
 
-AiMistake
+Purpose
 
-↓
+Store user portfolio preferences.
 
-AiChatMessage
+Examples
 
-↓
+- Featured Projects
+- Visibility
+- Public URL
+- Theme
 
-AiProgressiveHint
+---
+
+## ResumeMetadata
+
+Status
+
+🚧 Planned
+
+Purpose
+
+Store resume generation preferences.
+
+Examples
+
+- Resume Template
+- Resume Theme
+- Last Generated
+- Export Format
+
+Resume content should NOT duplicate existing database data.
+
+---
+
+# ENTITY RELATIONSHIPS
+
+```
+User
+
+│
+
+├── Submission
+
+├── AiMistake
+
+├── IndependentSolveSession
+
+├── GitHubProfile
+
+│       └── GitHubRepository
+
+├── LeetCodeProfile
+
+├── Portfolio
+
+└── ResumeMetadata
+```
 
 ---
 
 # DATABASE FEATURES
 
-Implemented
+Current
 
-✅ User Authentication
+✅ Authentication
 
 ✅ Problems
 
@@ -349,74 +451,121 @@ Implemented
 
 ✅ Test Cases
 
-✅ Hidden Test Cases
-
 ✅ Submissions
 
-✅ AI Analysis
-
-✅ AI Mistakes
+✅ AI Mentor
 
 ✅ AI Chat
 
+✅ AI Mistake Memory
+
 ✅ Progressive Hints
 
-✅ Learning Analytics
+✅ Independent Solve
 
-✅ Topic Analytics
+Future
 
-✅ Independent Solve Sessions
+🚧 GitHub Integration
+
+🚧 LeetCode Integration
+
+🚧 Portfolio
+
+🚧 Resume
+
+🚧 Recruiter Platform
 
 ---
 
 # INDEXING STRATEGY
 
-Indexed Fields
+Current
 
-User.email
+- User.email
+- Topic.slug
+- Problem.title
+- Submission.user_id
+- Submission.problem_id
+- Submission.createdAt
+- AiMistake.user_id
+- AiChatMessage.submission_id
 
-Topic.slug
+Future
 
-Problem.title
-
-Submission.user_id
-
-Submission.problem_id
-
-Submission.createdAt
-
-AiMistake.user_id
-
-AiMistake.problem_id
-
-AiChatMessage.submission_id
+- GitHubProfile.username
+- GitHubRepository.language
+- GitHubRepository.stars
+- LeetCodeProfile.username
 
 ---
 
-# FUTURE DATABASE WORK
+# FUTURE DATABASE ROADMAP
 
-Production indexes
+Phase 1
 
-Performance tuning
+Developer Identity
 
-Query optimization
+- GitHub Profile
+- GitHub Repositories
+- LeetCode Profile
 
-Partitioning (if needed)
+Phase 2
 
-Database backup strategy
+Portfolio
 
-Migration versioning
+- Featured Projects
+- Public Portfolio
+
+Phase 3
+
+Resume
+
+- Resume Metadata
+- Export History
+
+Phase 4
+
+Recruiter Platform
+
+- Candidate Insights
+- Recruiter Notes
 
 ---
 
-# RULES
+# DATABASE RULES
 
-Never delete production data.
+Always
 
-Always use Flyway/Liquibase for future migrations (recommended).
+- Maintain normalization.
+- Preserve referential integrity.
+- Reuse existing entities whenever possible.
+- Prefer extending tables over duplication.
+- Use Flyway or Liquibase for all schema changes.
+- Keep Developer Identity as the central data model.
 
-Keep relationships normalized.
+Never
 
-Avoid duplicate data.
+- Duplicate user information.
+- Store derived AI data unnecessarily.
+- Delete production data without migrations.
+- Break backward compatibility.
 
-Maintain referential integrity.
+---
+
+# FINAL PRINCIPLE
+
+Every new table must answer one question:
+
+**"Does this strengthen the Developer Identity?"**
+
+If YES
+
+Create it.
+
+If NO
+
+Reconsider the schema.
+
+The database is no longer just a coding platform database.
+
+It is the foundation of the CodeMentorAI Developer Identity Platform.

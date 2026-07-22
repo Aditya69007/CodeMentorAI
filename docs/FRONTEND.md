@@ -1,4 +1,4 @@
-# 🎨 CodeMentorAI - FRONTEND DOCUMENTATION
+# 🎨 CodeMentorAI — FRONTEND DOCUMENTATION
 
 > Complete frontend architecture documentation.
 
@@ -6,59 +6,85 @@
 
 # FRONTEND OVERVIEW
 
-Framework
+| Item | Value |
+|------|-------|
+| Framework | React |
+| Build Tool | Vite |
+| Language | TypeScript |
+| Styling | Tailwind CSS |
+| Routing | React Router DOM |
+| HTTP Client | Axios |
+| Architecture | Component-Based |
+| Current Status | 🟡 Release Candidate (RC) |
 
-React
+---
 
-Build Tool
+# FRONTEND VISION
 
-Vite
+The frontend is no longer just a collection of pages.
 
-Language
+It is the presentation layer of the **Developer Identity Platform**.
 
-TypeScript
+Every screen should contribute to one unified Developer Identity.
 
-Styling
+```
+Developer Identity
 
-Tailwind CSS
+↓
 
-HTTP Client
+Profile
 
-Axios
+Portfolio
 
-Routing
+GitHub
 
-React Router DOM
+LeetCode
 
-Architecture
+Growth
 
-Component-Based
+Interview
 
-Status
+Resume
 
-🟡 Release Candidate (RC)
+AI Mentor
+```
+
+The frontend should always consume reusable services and reusable components.
 
 ---
 
 # PROJECT STRUCTURE
 
+```
 frontend/
 
 src/
 
 components/
 
+common/
+account/
+portfolio/
+dashboard/
+workspace/
+admin/
+
 pages/
+
+account/
+portfolio/
+admin/
+auth/
 
 services/
 
 types/
 
-layouts/
-
 hooks/
 
 context/
+
+layouts/
 
 routes/
 
@@ -69,11 +95,13 @@ assets/
 App.tsx
 
 main.tsx
+```
 
 ---
 
 # APPLICATION ARCHITECTURE
 
+```
 React
 
 ↓
@@ -99,29 +127,38 @@ Spring Boot REST API
 ↓
 
 Backend
+```
 
 ---
 
-# ROUTES
+# CURRENT ROUTES
 
 ## Authentication
 
 - Login
 - Register
+- Google OAuth Success
+
+---
 
 ## User Platform
 
 - Dashboard
 - Problems
-- Problem Workspace
+- Workspace
 - Topics
 - Topic Dashboard
 - Mistake Memory
-- Developer Skill Graph
-- Personalized Learning Plan
-- Personalized Revision Plan
+- Developer Skills
+- Learning Plan
+- Revision Plan
 - Growth Report
 - Personalized Interview
+- Profile
+- Settings
+- Portfolio
+
+---
 
 ## Admin Platform
 
@@ -130,147 +167,134 @@ Backend
 - Problems
 - Topics
 - Submissions
-- AI Analytics
 - Platform Analytics
+- AI Analytics
 
 ---
 
-# PAGE STATUS
+# MAJOR FRONTEND MODULES
 
 ## Authentication
 
-✅ COMPLETE
+✅ Complete
+
+Includes
+
+- JWT Login
+- Google OAuth
+- Protected Routes
 
 ---
 
-## Developer Dashboard
+## Dashboard
 
-✅ COMPLETE
-
-Features
-
-- Growth Score
-- Learning Readiness
-- Revision Health
-- Hint Dependency
-- Independent Solve Rate
-- Activity Calendar
-- Interview Summary
-- Concept Growth
-- Quick Actions
+✅ Complete
 
 ---
 
 ## Problems
 
-✅ COMPLETE
-
-Features
-
-- Search
-- Filters
-- Difficulty
-- Pagination
-- Solved Status
-- Navigation
+✅ Complete
 
 ---
 
-## Problem Workspace
+## Workspace
 
-✅ COMPLETE
+✅ Complete
 
-Features
+Includes
 
-- Code Editor
-- Run Code
-- Submit Code
+- Monaco Editor
 - AI Mentor
 - Progressive Hints
 - AI Chat
-- Submission Results
 - Independent Solve Mode
 - Solution Evolution
 
 ---
 
-## Topics
+## Learning Intelligence
 
-✅ COMPLETE
-
-Features
-
-- Topic Dashboard
-- Progress
-- Mastery
-- Weak Concepts
-- Strong Concepts
-- Recommendation Card
-
----
-
-## Growth Report
-
-✅ COMPLETE
-
----
-
-## Personalized Interview
-
-✅ COMPLETE
-
----
-
-## Learning Plan
-
-✅ COMPLETE
-
----
-
-## Revision Plan
-
-✅ COMPLETE
-
----
-
-## Mistake Memory
-
-✅ COMPLETE
-
----
-
-## Developer Skill Graph
-
-✅ COMPLETE
-
----
-
-## Admin Platform
-
-✅ COMPLETE
+✅ Complete
 
 Includes
 
-- Dashboard
-- Users
-- Problems
-- Topics
-- Submissions
-- Platform Analytics
-- AI Analytics
+- Growth Report
+- Learning Plan
+- Revision Plan
+- Interview
+- Developer Skills
+- Mistake Memory
+
+---
+
+## Account Center
+
+✅ Complete
+
+Includes
+
+- Profile
+- Settings
+- UserHero
+- UserAvatar
+
+---
+
+## Portfolio
+
+🟡 Production Polish
+
+Includes
+
+- Portfolio Hero
+- AI Summary
+- AI Skill Analysis
+- Portfolio Stats
+- Projects
+- Coding Profiles
+
+Current backend integration
+
+- User Profile
+- Growth Report
+- Developer Skills
+
+Remaining
+
+- Dynamic Projects
+- GitHub Integration
+- LeetCode Integration
+
+---
+
+# COMMON COMPONENTS
+
+Current reusable components
+
+- UserAvatar
+- UserHero
+- Cards
+- Buttons
+- Layout Components
+
+Future reusable components
+
+- GitHubCard
+- LeetCodeCard
+- ResumeSection
+- RecruiterSummaryCard
 
 ---
 
 # SERVICES
 
-Status
-
-✅ COMPLETE
-
-Current Services
+Current
 
 - api.ts
 - authService.ts
+- userService.ts
+- portfolioService.ts
 - aiMentorService.ts
 - problemService.ts
 - submissionService.ts
@@ -278,29 +302,26 @@ Current Services
 - developerActivityService.ts
 - personalizedInterviewService.ts
 
-All backend communication must go through the service layer.
+Every backend request must go through the service layer.
 
 ---
 
 # TYPES
 
-Status
-
-✅ COMPLETE
-
 Includes
 
+- Auth
 - User
-- Problem
-- Topic
-- Submission
+- Problems
+- Topics
+- Submissions
 - Growth Report
+- Developer Skills
 - Learning Plan
 - Revision Plan
-- Developer Skill
 - Hint Dependency
-- Solution Evolution
 - Interview
+- Portfolio
 - Developer Activity
 
 ---
@@ -309,29 +330,51 @@ Includes
 
 Current
 
-React Hooks
+- useState
+- useEffect
+- Custom Hooks
+- Context API
 
-useState
+Architecture
 
-useEffect
-
-Service-driven architecture
+Service-driven
 
 ---
 
-# UI DESIGN PRINCIPLES
+# DESIGN PRINCIPLES
 
-- AI-first experience
+- AI-first
 - Responsive
 - Dark Theme
 - Reusable Components
-- Minimal Dashboard
-- Clean UX
+- Minimal UI
 - Production Ready
+- Component Reuse
+- Type Safety
 
 ---
 
-# CURRENT FRONTEND COMPLETION
+# DEVELOPER IDENTITY
+
+The frontend should always build a unified Developer Identity.
+
+Developer Identity combines
+
+- User Profile
+- GitHub
+- LeetCode
+- AI Growth
+- Skills
+- Portfolio
+- Resume
+- Interview
+- Learning Analytics
+
+Every future page should strengthen this identity.
+
+---
+
+# CURRENT FRONTEND STATUS
 
 Authentication
 
@@ -349,37 +392,21 @@ Workspace
 
 ✅
 
-Topics
+Learning Intelligence
 
 ✅
 
-AI Mentor
+Profile
 
 ✅
 
-Growth Report
+Settings
 
 ✅
 
-Learning Plan
+Portfolio
 
-✅
-
-Revision Plan
-
-✅
-
-Interview
-
-✅
-
-Developer Skills
-
-✅
-
-Mistake Memory
-
-✅
+🟡 Polish
 
 Admin
 
@@ -387,27 +414,79 @@ Admin
 
 Overall Progress
 
-🚀 ~95%
+🚀 ~97%
 
 ---
 
-# REMAINING FRONTEND WORK
+# NEXT FRONTEND ROADMAP
 
-- Production Polish
-- Responsive Verification
-- Loading UX Improvements
-- Error UX Improvements
-- Accessibility Review
-- Performance Optimization
+Phase 1
+
+Developer Identity
+
+- GitHub Integration
+- LeetCode Integration
+- Dynamic Projects
+
+Phase 2
+
+Portfolio
+
+- AI Portfolio Polish
+- Public Portfolio
+
+Phase 3
+
+Resume
+
+- AI Resume Generator
+- ATS Resume
+- PDF Export
+
+Phase 4
+
+Recruiter Platform
+
+- Recruiter Dashboard
+- AI Candidate Summary
 
 ---
 
 # DEVELOPMENT RULES
 
-- Never duplicate components.
-- Keep components reusable.
-- Use services for every API call.
-- Maintain strict TypeScript typing.
-- Keep pages focused on orchestration.
-- Move reusable logic into components.
-- Preserve existing architecture.
+Always
+
+- Reuse Components
+- Reuse Services
+- Keep Pages Small
+- Maintain Type Safety
+- Preserve Architecture
+- Extend Existing Components
+
+Never
+
+- Duplicate Components
+- Duplicate Services
+- Duplicate Logic
+- Create Parallel Implementations
+- Break Existing Architecture
+
+---
+
+# FINAL PRINCIPLE
+
+Every frontend feature must answer one question:
+
+"Does this improve the Developer Identity?"
+
+If YES
+
+Build it.
+
+If NO
+
+Reconsider the feature.
+
+The frontend is no longer page-driven.
+
+It is Developer Identity driven.

@@ -8,6 +8,7 @@ export interface AuthContextType {
   isAdmin: boolean;
   login: (email: string, password: string) => Promise<AuthUser>;
   logout: () => void;
+  refreshUser: () => Promise<void>;
 }
 
 export const AuthContext =

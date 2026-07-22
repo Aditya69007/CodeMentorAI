@@ -27,6 +27,8 @@ import {
   FiX,
 } from "react-icons/fi";
 
+import UserTopbar from "./UserTopbar";
+
 import {
   useAuth,
 } from "../../hooks/useAuth";
@@ -895,9 +897,11 @@ export default function AppLayout() {
           }
         `}
       >
+        <UserTopbar />
 
-        <Outlet />
-
+        <main className="p-6">
+          <Outlet />
+        </main>
       </div>
 
 

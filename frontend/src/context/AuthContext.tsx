@@ -1,6 +1,9 @@
 import { useEffect, useState, type ReactNode } from "react";
 
-import { loginUser } from "../services/authService";
+import {
+  getCurrentUser,
+  loginUser,
+} from "../services/authService";
 import type { AuthUser } from "../types/auth";
 import { AuthContext } from "./AuthContextDefinition";
 
@@ -124,6 +127,28 @@ export function AuthProvider({
     return authenticatedUser;
   };
 
+  const refreshUser = async () => {
+
+    const currentUser = await getCurrentUser();
+
+    const authenticatedUser: AuthUser = {
+      userId: currentUser.id,
+      firstName: currentUser.firstName,
+      lastName: currentUser.lastName,
+      email: currentUser.email,
+      role: currentUser.role,
+      profilePicture: currentUser.profilePicture,
+    };
+
+    localStorage.setItem(
+      USER_STORAGE_KEY,
+      JSON.stringify(authenticatedUser)
+    );
+
+    setUser(authenticatedUser);
+
+  };
+
   const logout = () => {
 
     localStorage.removeItem(TOKEN_STORAGE_KEY);
@@ -148,6 +173,7 @@ export function AuthProvider({
         isAdmin,
         login,
         logout,
+        refreshUser,
       }}
     >
       {children}
