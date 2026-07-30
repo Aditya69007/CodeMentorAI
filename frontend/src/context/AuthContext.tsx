@@ -102,14 +102,16 @@ export function AuthProvider({
       password,
     });
 
-    const authenticatedUser: AuthUser = {
-      userId: response.userId,
-      firstName: response.firstName,
-      lastName: response.lastName,
-      email: response.email,
-      role: response.role,
-      profilePicture: response.profilePicture,
-    };
+  const authenticatedUser: AuthUser = {
+    userId: response.userId,
+    firstName: response.firstName,
+    lastName: response.lastName,
+    email: response.email,
+    role: response.role,
+    profilePicture: response.profilePicture,
+    provider: response.provider,
+    sessionId: response.sessionId,
+  };
 
     localStorage.setItem(
       TOKEN_STORAGE_KEY,
@@ -131,14 +133,21 @@ export function AuthProvider({
 
     const currentUser = await getCurrentUser();
 
-    const authenticatedUser: AuthUser = {
-      userId: currentUser.id,
-      firstName: currentUser.firstName,
-      lastName: currentUser.lastName,
-      email: currentUser.email,
-      role: currentUser.role,
-      profilePicture: currentUser.profilePicture,
-    };
+  const authenticatedUser: AuthUser = {
+    userId: currentUser.id,
+    firstName: currentUser.firstName,
+    lastName: currentUser.lastName,
+    email: currentUser.email,
+    role: currentUser.role,
+    profilePicture: currentUser.profilePicture,
+    provider: currentUser.provider,
+
+    /*
+    * Temporary fallback.
+    * /auth/me doesn't return sessionId yet.
+    */
+    sessionId: user?.sessionId ?? 0,
+  };
 
     localStorage.setItem(
       USER_STORAGE_KEY,

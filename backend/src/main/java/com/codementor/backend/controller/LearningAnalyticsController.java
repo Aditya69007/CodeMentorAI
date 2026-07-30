@@ -30,4 +30,17 @@ public class LearningAnalyticsController {
         );
     }
 
+        @DeleteMapping("/ai-memory")
+        public ResponseEntity<Void> resetAiMemory(
+                Authentication authentication
+        ) {
+
+        learningAnalyticsService.resetAiMemory(
+                authentication.getName()
+        );
+
+        return ResponseEntity.noContent().build();
+
+        }
+
 }

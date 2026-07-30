@@ -1,8 +1,10 @@
 package com.codementor.backend.dto.leetcode.response;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class RecentSubmission {
 
     private String id;
@@ -11,6 +13,6 @@ public class RecentSubmission {
 
     private String titleSlug;
 
-    private Long timestamp;
+    private String timestamp;
 
 }

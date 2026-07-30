@@ -356,15 +356,46 @@ STEP 10 ✅ Backend Integration
 STEP 11 ✅ Edit Profile
 STEP 12 ✅ Change Password
 
-Contest        ✅ Complete
-Badges         ❌
-Calendar       ❌
-Problems       ❌
-Skills         ❌
-Recent         ❌
-Profile        ❌
+✅ 1. Change Password
+⬜ 2. Appearance Settings
+⬜ 3. Notification Preferences
+⬜ 4. Connected Account Enhancements
+⬜ 5. Danger Zone
+⬜ 6. Developer Profile
+⬜ 7. AI Resume Builder
+⬜ 8. Recruiter Profile
+⬜ 9. Portfolio Generator
 
-Mapper         Partial
-Service        Partial
-Response       Partial
-Frontend       Not Connected
+✅ Change Password
+🟡 Appearance (Backend Complete)
+✅ Notification Preferences (Backend)
+⬜ Connected Account Enhancements
+⬜ Danger Zone
+⬜ Developer Profile
+⬜ AI Resume Builder
+⬜ Recruiter Profile
+⬜ Portfolio Generator
+
+✅ Notification backend (Entity → Repository → Service → Controller)
+✅ Notification APIs
+✅ Bell UI + notification drawer
+✅ Unread badge
+✅ Connect existing modules
+✅ Notification settings integration
+✅ Real-time updates
+✅ Final UI polish
+
+✅ Session management (almost complete)
+🔄 Improve device/browser/OS/IP detection
+🔄 Highlight the current session with a "Current Device" badge
+🔄 Add "Last Active" timestamps (e.g. "2 minutes ago")
+🔄 Add "Login History" page
+🔄 Add suspicious login notifications
+🔄 Add two-factor authentication (2FA)
+
+☑ Export Module Created
+☐ DTOs
+☐ Service
+☐ PDF Generator
+☐ Controller
+☐ Frontend

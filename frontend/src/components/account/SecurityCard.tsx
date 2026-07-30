@@ -1,7 +1,15 @@
+import { useState } from "react";
 import { FiLock, FiChevronRight } from "react-icons/fi";
+import ChangePasswordDialog from "./ChangePasswordDialog";
 
 export default function SecurityCard() {
+
+  const [openDialog, setOpenDialog] = useState(false);
+
+
   return (
+
+    <>
     <section className="app-surface app-border rounded-2xl p-6">
 
       <div className="flex items-start justify-between">
@@ -25,6 +33,7 @@ export default function SecurityCard() {
         </div>
 
         <button
+          onClick={() => setOpenDialog(true)}
           className="rounded-xl border px-4 py-2 transition hover:border-blue-500 hover:text-blue-500"
         >
           <span className="flex items-center gap-2">
@@ -70,5 +79,15 @@ export default function SecurityCard() {
       </div>
 
     </section>
+
+
+
+  <ChangePasswordDialog
+      open={openDialog}
+      onClose={() => setOpenDialog(false)}
+  />
+
+</>
+
   );
 }

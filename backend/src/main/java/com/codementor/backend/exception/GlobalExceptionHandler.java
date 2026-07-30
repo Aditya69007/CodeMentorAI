@@ -150,8 +150,19 @@ public class GlobalExceptionHandler {
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "An unexpected server error occurred."
         );
-    }
+}
 
+        @ExceptionHandler(BadRequestException.class)
+        public ResponseEntity<Map<String, Object>>
+        handleBadRequestException(
+                BadRequestException ex
+        ) {
+
+        return buildResponse(
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage()
+        );
+        }
 
     // ==================================================
     // COMMON ERROR RESPONSE BUILDER
@@ -192,4 +203,6 @@ public class GlobalExceptionHandler {
                 .status(status)
                 .body(response);
     }
+
+
 }

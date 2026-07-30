@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -40,11 +41,46 @@ public class OAuth2AuthenticationSuccessHandler
         OAuth2User oauthUser =
                 (OAuth2User) authentication.getPrincipal();
 
-        String email = oauthUser.getAttribute("email");
-        String firstName = oauthUser.getAttribute("given_name");
-        String lastName = oauthUser.getAttribute("family_name");
-        String picture = oauthUser.getAttribute("picture");
-        String providerId = oauthUser.getAttribute("sub");
+        OAuth2AuthenticationToken oauthToken =
+                (OAuth2AuthenticationToken) authentication;
+
+        String registrationId =
+                oauthToken
+                        .getAuthorizedClientRegistrationId();
+
+        String email;
+
+        String firstName;
+
+        String lastName;
+
+        String picture;
+
+        String providerId;
+
+        AuthProvider provider;
+
+        if ("google".equalsIgnoreCase(registrationId)) {
+
+        email = oauthUser.getAttribute("email");
+
+        firstName = oauthUser.getAttribute("given_name");
+
+        lastName = oauthUser.getAttribute("family_name");
+
+        picture = oauthUser.getAttribute("picture");
+
+        providerId = oauthUser.getAttribute("sub");
+
+        provider = AuthProvider.GOOGLE;
+
+        }else {
+
+        throw new IllegalArgumentException(
+                "Unsupported OAuth provider: " + registrationId
+        );
+
+        }
 
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> {
@@ -57,7 +93,7 @@ public class OAuth2AuthenticationSuccessHandler
                             .role(Role.USER)
                             .enabled(true)
                             .emailVerified(true)
-                            .provider(AuthProvider.GOOGLE)
+                            .provider(provider)
                             .providerId(providerId)
                             .profilePicture(picture)
                             .build();
@@ -65,8 +101,19 @@ public class OAuth2AuthenticationSuccessHandler
                     return userRepository.save(newUser);
                 });
 
+        if (picture != null) {
         user.setProfilePicture(picture);
-        user.setProvider(AuthProvider.GOOGLE);
+        }
+
+        if (firstName != null && !firstName.isBlank()) {
+        user.setFirstName(firstName);
+        }
+
+        if (lastName != null && !lastName.isBlank()) {
+        user.setLastName(lastName);
+        }
+
+        user.setProvider(provider);
         user.setProviderId(providerId);
         user.setEmailVerified(true);
 

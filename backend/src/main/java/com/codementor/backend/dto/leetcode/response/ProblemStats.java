@@ -1,9 +1,13 @@
 package com.codementor.backend.dto.leetcode.response;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class ProblemStats {
+
+    private Integer totalSolved;
 
     private Integer easySolved;
 
@@ -11,10 +15,14 @@ public class ProblemStats {
 
     private Integer hardSolved;
 
-    private Integer easyFailed;
+    private Integer totalSubmissions;
 
-    private Integer mediumFailed;
+    private Integer easySubmissions;
 
-    private Integer hardFailed;
+    private Integer mediumSubmissions;
+
+    private Integer hardSubmissions;
+
+    private Double acceptanceRate;
 
 }

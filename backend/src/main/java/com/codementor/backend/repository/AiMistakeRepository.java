@@ -6,6 +6,7 @@ import com.codementor.backend.entity.MistakeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import com.codementor.backend.entity.User;
 
 import java.util.List;
 
@@ -13,6 +14,8 @@ public interface AiMistakeRepository
         extends JpaRepository<AiMistake, Long> {
 
         void deleteByUserId(Long userId);
+
+        void deleteByUser(User user);
 
         @Query("""
                 SELECT

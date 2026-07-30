@@ -1,24 +1,23 @@
 import axios from "axios";
 import { FiAward, FiGithub } from "react-icons/fi";
 import { SiLeetcode } from "react-icons/si";
-import { FaLinkedin } from "react-icons/fa";
 import PlatformCard from "./PlatformCard";
 import PlatformDialog from "./PlatformDialog";
 
 import GitHubContent from "./platform-content/GitHubContent";
 import LeetCodeContent from "./platform-content/LeetCodeContent";
-import LinkedInContent from "./platform-content/LinkedInContent";
 
 import { useEffect, useState } from "react";
 
+
 import {
   getConnectedAccounts,
-  getGitHubProfile,
+  getGitHubDashboard,
   updateConnectedAccounts,
   type ConnectedAccountsResponse,
   type GitHubProfileResponse,
 } from "../../../services/connectedAccountsService";
-
+import type { GitHubDashboard } from "../../../types/github";
 
 
 
@@ -29,6 +28,15 @@ export default function DeveloperIdentityCard() {
 
   const [githubProfile, setGithubProfile] =
     useState<GitHubProfileResponse | null>(null);
+
+  const [githubDashboard, setGithubDashboard] =
+      useState<GitHubDashboard | null>(null);
+
+  const [leetcodeConnected, setLeetcodeConnected] =
+      useState(false);
+
+  const [leetcodeUsername, setLeetcodeUsername] =
+      useState("");
 
   const [githubUsername, setGithubUsername] =
     useState("");
@@ -45,7 +53,7 @@ export default function DeveloperIdentityCard() {
   const [githubError, setGithubError] = useState("");
 
   const [selectedPlatform, setSelectedPlatform] =
-    useState<"github" | "leetcode" | "linkedin" | null>(null);
+    useState<"github" | "leetcode" | null>(null);
 
   useEffect(() => {
     loadAccounts();
@@ -57,7 +65,6 @@ export default function DeveloperIdentityCard() {
 
       const connected =
         await getConnectedAccounts();
-        console.log("Connected Accounts:", connected);
 
       setAccounts(connected);
 
@@ -65,22 +72,34 @@ export default function DeveloperIdentityCard() {
         connected.githubUsername ?? ""
       );
 
+      setLeetcodeUsername(
+          connected.leetcodeUsername ?? ""
+      );
+
+      setLeetcodeConnected(
+          connected.leetcodeConnected
+      );
+
       if (
         connected.githubConnected &&
         connected.githubUsername
       ) {
 
-        const profile =
-          await getGitHubProfile(
+    const dashboard =
+        await getGitHubDashboard(
             connected.githubUsername
-          );
-          console.log("GitHub Profile:", profile);
+        );
 
-        setGithubProfile(profile);
+    setGithubDashboard(dashboard);
+
+    setGithubProfile(
+        dashboard.profile
+    );
 
       } else {
 
         setGithubProfile(null);
+        setGithubDashboard(null);
 
       }
 
@@ -103,12 +122,11 @@ export default function DeveloperIdentityCard() {
 
       setSaving(true);
 
+      const accounts = await getConnectedAccounts();
+
       await updateConnectedAccounts({
-
-        githubUsername,
-
-        leetcodeUsername: ""
-
+          githubUsername,
+          leetcodeUsername: accounts.leetcodeUsername ?? ""
       });
 
       await loadAccounts();
@@ -162,11 +180,11 @@ export default function DeveloperIdentityCard() {
 
           setSaving(true);
 
+          const accounts = await getConnectedAccounts();
+
           await updateConnectedAccounts({
-
               githubUsername,
-              leetcodeUsername: ""
-
+              leetcodeUsername: accounts.leetcodeUsername ?? ""
           });
 
           await loadAccounts();
@@ -206,14 +224,21 @@ export default function DeveloperIdentityCard() {
 
           setSaving(true);
 
+          const accounts =
+              await getConnectedAccounts();
+
           await updateConnectedAccounts({
 
               githubUsername: "",
-              leetcodeUsername: ""
+
+              leetcodeUsername:
+                  accounts.leetcodeUsername ?? ""
 
           });
 
           setGithubProfile(null);
+
+          setGithubDashboard(null);
 
           setGithubUsername("");
 
@@ -238,6 +263,7 @@ export default function DeveloperIdentityCard() {
       }
 
   }
+
 
   return (
 
@@ -275,51 +301,7 @@ export default function DeveloperIdentityCard() {
 
       {/* Progress */}
 
-      <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.02] p-5">
 
-        <div className="flex items-center justify-between">
-
-          <div>
-
-            <p className="app-text-secondary text-sm">
-
-              Profile Completion
-
-            </p>
-
-            <h3 className="mt-2 text-3xl font-bold">
-
-              67%
-
-            </h3>
-
-          </div>
-
-          <div className="text-right">
-
-            <p className="app-text-secondary text-sm">
-
-              Connected Platforms
-
-            </p>
-
-            <h3 className="mt-2 text-2xl font-bold">
-
-              2 / 3
-
-            </h3>
-
-          </div>
-
-        </div>
-
-        <div className="mt-5 h-3 rounded-full bg-white/10 overflow-hidden">
-
-          <div className="h-full w-2/3 bg-green-500 rounded-full" />
-
-        </div>
-
-      </div>
 
       {/* Platform Cards */}
 
@@ -347,21 +329,24 @@ export default function DeveloperIdentityCard() {
         />
 
         <PlatformCard
-          icon={<SiLeetcode />}
-          title="LeetCode"
-          subtitle="Connect your LeetCode profile"
-          status="disconnected"
-          buttonText="Connect"
-          onClick={() => setSelectedPlatform("leetcode")}
-        />
-
-        <PlatformCard
-          icon={<FaLinkedin />}
-          title="LinkedIn"
-          subtitle="Connect your LinkedIn profile"
-          status="disconnected"
-          buttonText="Connect"
-          onClick={() => setSelectedPlatform("linkedin")}
+            icon={<SiLeetcode />}
+            title="LeetCode"
+            subtitle={
+                leetcodeConnected
+                    ? `@${leetcodeUsername}`
+                    : "Connect your LeetCode profile"
+            }
+            status={
+                leetcodeConnected
+                    ? "connected"
+                    : "disconnected"
+            }
+            buttonText={
+                leetcodeConnected
+                    ? "View Details"
+                    : "Connect"
+            }
+            onClick={() => setSelectedPlatform("leetcode")}
         />
 
       </div>
@@ -371,9 +356,7 @@ export default function DeveloperIdentityCard() {
           title={
             selectedPlatform === "github"
               ? "GitHub"
-              : selectedPlatform === "leetcode"
-              ? "LeetCode"
-              : "LinkedIn"
+              : "LeetCode"
           }
           onClose={() => setSelectedPlatform(null)}
         >
@@ -381,7 +364,7 @@ export default function DeveloperIdentityCard() {
           {selectedPlatform === "github" && (
 
             <GitHubContent
-                profile={githubProfile}
+                dashboard={githubDashboard}
                 githubUsername={githubUsername}
                 setGithubUsername={setGithubUsername}
                 connectGitHub={connectGitHub}
@@ -400,13 +383,9 @@ export default function DeveloperIdentityCard() {
 
           {selectedPlatform === "leetcode" && (
 
-            <LeetCodeContent />
-
-          )}
-
-          {selectedPlatform === "linkedin" && (
-
-            <LinkedInContent />
+            <LeetCodeContent
+                onConnected={loadAccounts}
+            />
 
           )}
 

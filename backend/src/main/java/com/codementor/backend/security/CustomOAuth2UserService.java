@@ -31,22 +31,47 @@ public class CustomOAuth2UserService
         OAuth2User oauthUser =
                 new DefaultOAuth2UserService().loadUser(userRequest);
 
-System.out.println("========== GOOGLE OAUTH ==========");
-System.out.println("Email : " + oauthUser.getAttribute("email"));
-System.out.println("Given : " + oauthUser.getAttribute("given_name"));
-System.out.println("Family: " + oauthUser.getAttribute("family_name"));
-System.out.println("==================================");
+        System.out.println("Google attributes: " + oauthUser.getAttributes());
+                
+        String registrationId =
+                userRequest
+                        .getClientRegistration()
+                        .getRegistrationId();
+        String email;
 
-        String email = oauthUser.getAttribute("email");
+        String firstName;
 
-        String firstName = oauthUser.getAttribute("given_name");
+        String lastName;
 
-        String lastName = oauthUser.getAttribute("family_name");
+        String picture;
 
-        String picture = oauthUser.getAttribute("picture");
+        String providerId;
 
-        String providerId = oauthUser.getAttribute("sub");
+        AuthProvider provider;
 
+        if ("google".equals(registrationId)) {
+
+        email = oauthUser.getAttribute("email");
+
+        firstName = oauthUser.getAttribute("given_name");
+
+        lastName = oauthUser.getAttribute("family_name");
+
+        picture = oauthUser.getAttribute("picture");
+
+        providerId = oauthUser.getAttribute("sub");
+
+        provider = AuthProvider.GOOGLE;
+
+        } else {
+
+        throw new OAuth2AuthenticationException(
+                "Unsupported OAuth Provider"
+        );
+
+        }
+
+                        
         User user = userRepository
                 .findByEmail(email)
                 .orElseGet(() -> {
@@ -63,21 +88,31 @@ System.out.println("==================================");
                         .role(Role.USER)
                         .enabled(true)
                         .emailVerified(true)
-                        .provider(AuthProvider.GOOGLE)
+                        .provider(provider)
                         .providerId(providerId)
                         .profilePicture(picture)
                         .build();
-                System.out.println("Creating new Google user...");
+                System.out.println(
+                        "Creating new OAuth user (" + provider + ")..."
+                );
 
                     return userRepository.save(newUser);
                 });
 
-        if (user.getProvider() == AuthProvider.LOCAL) {
-            user.setProvider(AuthProvider.GOOGLE);
+        if (picture != null) {
+        user.setProfilePicture(picture);
         }
 
+        if (firstName != null && !firstName.isBlank()) {
+        user.setFirstName(firstName);
+        }
+
+        if (lastName != null && !lastName.isBlank()) {
+        user.setLastName(lastName);
+        }
+
+        user.setProvider(provider);
         user.setProviderId(providerId);
-        user.setProfilePicture(picture);
         user.setEmailVerified(true);
 
         userRepository.save(user);

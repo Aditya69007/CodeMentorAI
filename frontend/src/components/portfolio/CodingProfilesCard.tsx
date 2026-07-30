@@ -3,7 +3,7 @@ import {
   FiExternalLink,
   FiCheckCircle,
 } from "react-icons/fi";
-import { FaLinkedin, FaGoogle } from "react-icons/fa";
+import { FaGoogle } from "react-icons/fa";
 import { SiLeetcode } from "react-icons/si";
 
 interface CodingProfile {
@@ -28,13 +28,6 @@ const profiles: CodingProfile[] = [
     status: "Coming Soon",
     icon: SiLeetcode,
     color: "text-orange-500",
-  },
-  {
-    name: "LinkedIn",
-    username: "@your_profile",
-    status: "Coming Soon",
-    icon: FaLinkedin,
-    color: "text-blue-500",
   },
   {
     name: "Google",

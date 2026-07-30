@@ -3,11 +3,16 @@ import {
   useState,
   type ReactNode,
 } from "react";
-
+import { useAuth } from "../hooks/useAuth";
 import {
   ThemeContext,
   type Theme,
 } from "./ThemeContextDefinition";
+
+import {
+  getThemePreference,
+  updateThemePreference,
+} from "../services/themeService";
 
 interface ThemeProviderProps {
   children: ReactNode;
@@ -16,38 +21,86 @@ interface ThemeProviderProps {
 export function ThemeProvider({
   children,
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(() => {
-    const savedTheme = localStorage.getItem("theme");
 
-    if (savedTheme === "light" || savedTheme === "dark") {
-      return savedTheme;
-    }
-
-    return "dark";
-  });
+  const [theme, setThemeState] =
+    useState<Theme>("DARK");
+  const { isAuthenticated } = useAuth();
+    
+    useEffect(() => {
+      
+      document.documentElement.classList.toggle(
+        "dark",
+        theme === "DARK"
+      );
+      
+    }, [theme]);
+  
 
   useEffect(() => {
-    const root = document.documentElement;
+    if (!isAuthenticated) {
+      return;
+    }
 
-    root.classList.toggle("dark", theme === "dark");
+    const loadTheme = async () => {
+      try {
+        const savedTheme = await getThemePreference();
+        setThemeState(savedTheme);
+      } catch (error) {
+        console.error("Failed to load theme", error);
+      }
+    };
 
-    localStorage.setItem("theme", theme);
-  }, [theme]);
+    loadTheme();
+  }, [isAuthenticated]);
 
-  const toggleTheme = () => {
-    setTheme((currentTheme) =>
-      currentTheme === "dark" ? "light" : "dark"
+
+  const setTheme = async (
+    newTheme: Theme
+  ) => {
+
+    setThemeState(newTheme);
+
+    try {
+
+      await updateThemePreference({
+        themePreference: newTheme,
+      });
+
+    } catch (error) {
+
+      console.error(
+        "Failed to save theme",
+        error
+      );
+
+    }
+
+  };
+
+  const toggleTheme = async () => {
+
+    await setTheme(
+      theme === "DARK"
+        ? "LIGHT"
+        : "DARK"
     );
+
   };
 
   return (
+
     <ThemeContext.Provider
       value={{
         theme,
+        setTheme,
         toggleTheme,
       }}
     >
+
       {children}
+
     </ThemeContext.Provider>
+
   );
+
 }

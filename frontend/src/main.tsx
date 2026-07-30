@@ -14,42 +14,39 @@ createRoot(
 ).render(
   <StrictMode>
 
-    <BrowserRouter>
+  <BrowserRouter>
+
+    <AuthProvider>
 
       <ThemeProvider>
 
-        <AuthProvider>
+        <App />
 
-          <App />
-
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              duration: 4000,
-
-              style: {
-                background: "#161b22",
-                color: "#f8fafc",
-                border: "1px solid #30363d",
-                borderRadius: "10px",
-                padding: "12px 16px",
-              },
-
-              success: {
-                duration: 3000,
-              },
-
-              error: {
-                duration: 5000,
-              },
-            }}
-          />
-
-        </AuthProvider>
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: "#161b22",
+              color: "#f8fafc",
+              border: "1px solid #30363d",
+              borderRadius: "10px",
+              padding: "12px 16px",
+            },
+            success: {
+              duration: 3000,
+            },
+            error: {
+              duration: 5000,
+            },
+          }}
+        />
 
       </ThemeProvider>
 
-    </BrowserRouter>
+    </AuthProvider>
+
+  </BrowserRouter>
 
   </StrictMode>
 );

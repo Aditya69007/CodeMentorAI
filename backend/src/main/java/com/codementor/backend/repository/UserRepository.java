@@ -18,4 +18,6 @@ public interface UserRepository
     long countByRole(Role role);
 
     List<User> findByRoleOrderByCreatedAtDesc(Role role);
+
+    Optional<User> findByPasswordResetToken(String passwordResetToken);
 }

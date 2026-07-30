@@ -4,7 +4,9 @@ import com.codementor.backend.dto.leetcode.GraphQLRequest;
 import com.codementor.backend.dto.leetcode.graphql.badges.BadgesResponse;
 import com.codementor.backend.dto.leetcode.graphql.calendar.CalendarResponse;
 import com.codementor.backend.dto.leetcode.graphql.contest.ContestResponse;
-
+import com.codementor.backend.dto.leetcode.graphql.problems.ProblemProgressResponse;
+import com.codementor.backend.dto.leetcode.graphql.skills.SkillStatsResponse;
+import com.codementor.backend.dto.leetcode.graphql.recent.RecentSubmissionResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -110,7 +112,115 @@ public class LeetCodeGraphQLClient {
                 .variables(Map.of("username", username))
                 .build();
 
-        return execute(request, CalendarResponse.class);
+        CalendarResponse response =
+                execute(request, CalendarResponse.class);
+
+        System.out.println(
+                "Calendar Streak = " +
+                response.getData()
+                        .getMatchedUser()
+                        .getUserCalendar()
+                        .getStreak()
+        );
+
+        System.out.println(
+                "Total Active Days = " +
+                response.getData()
+                        .getMatchedUser()
+                        .getUserCalendar()
+                        .getTotalActiveDays()
+        );
+
+        return response;
     }
+
+    public ProblemProgressResponse getProblemProgress(String username) {
+
+        GraphQLRequest request = GraphQLRequest.builder()
+                .operationName("userSessionProgress")
+                .query("""
+                    query userSessionProgress($username: String!) {
+                    allQuestionsCount {
+                        difficulty
+                        count
+                    }
+
+                    matchedUser(username: $username) {
+                        submitStats {
+                        acSubmissionNum {
+                            difficulty
+                            count
+                            submissions
+                        }
+                        totalSubmissionNum {
+                            difficulty
+                            count
+                            submissions
+                        }
+                        }
+                    }
+                    }
+                    """)
+                .variables(Map.of("username", username))
+                .build();
+
+        return execute(request, ProblemProgressResponse.class);
+    }
+
+    public SkillStatsResponse getSkillStats(String username) {
+
+        GraphQLRequest request = GraphQLRequest.builder()
+                .operationName("skillStats")
+                .query("""
+                    query skillStats($username: String!) {
+                    matchedUser(username: $username) {
+                        tagProblemCounts {
+                        advanced {
+                            tagName
+                            tagSlug
+                            problemsSolved
+                        }
+                        intermediate {
+                            tagName
+                            tagSlug
+                            problemsSolved
+                        }
+                        fundamental {
+                            tagName
+                            tagSlug
+                            problemsSolved
+                        }
+                        }
+                    }
+                    }
+                    """)
+                .variables(Map.of("username", username))
+                .build();
+
+        return execute(request, SkillStatsResponse.class);
+    }
+
+    public RecentSubmissionResponse getRecentSubmissions(String username) {
+
+        GraphQLRequest request = GraphQLRequest.builder()
+                .operationName("recentAcSubmissions")
+                .query("""
+                    query recentAcSubmissions($username: String!, $limit: Int!) {
+                    recentAcSubmissionList(username: $username, limit: $limit) {
+                        id
+                        title
+                        titleSlug
+                        timestamp
+                    }
+                    }
+                    """)
+                .variables(Map.of(
+                        "username", username,
+                        "limit", 15
+                ))
+                .build();
+
+        return execute(request, RecentSubmissionResponse.class);
+    }    
 
 }

@@ -1,7 +1,11 @@
 package com.codementor.backend.controller;
+import com.codementor.backend.service.GitHubDashboardService;
 import com.codementor.backend.service.GitHubService;
 import com.codementor.backend.dto.GitHubProfileResponse;
 import com.codementor.backend.dto.GitHubRepositoryResponse;
+
+import com.codementor.backend.dto.github.GitHubDashboardResponse;
+import com.codementor.backend.service.GitHubDashboardService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +18,8 @@ import java.util.List;
 public class GitHubController {
 
     private final GitHubService gitHubService;
+
+    private final GitHubDashboardService gitHubDashboardService;
 
     @GetMapping("/profile/{username}")
     public GitHubProfileResponse profile(
@@ -30,6 +36,16 @@ public class GitHubController {
     ) {
 
         return gitHubService.getRepositories(username);
+
+    }
+
+    @GetMapping("/dashboard/{username}")
+    public GitHubDashboardResponse dashboard(
+            @PathVariable String username
+    ) {
+
+        return gitHubDashboardService
+                .getDashboard(username);
 
     }
     

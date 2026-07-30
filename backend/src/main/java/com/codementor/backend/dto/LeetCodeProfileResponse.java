@@ -1,5 +1,6 @@
 package com.codementor.backend.dto;
 
+import com.codementor.backend.dto.leetcode.response.AnalyticsInfo;
 import com.codementor.backend.dto.leetcode.response.BadgeInfo;
 import com.codementor.backend.dto.leetcode.response.CalendarInfo;
 import com.codementor.backend.dto.leetcode.response.ContestInfo;
@@ -36,5 +37,7 @@ public class LeetCodeProfileResponse {
     private List<BadgeInfo> badges;
 
     private List<RecentSubmission> recentSubmissions;
+
+    private AnalyticsInfo analytics;
 
 }

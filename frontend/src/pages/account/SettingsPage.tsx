@@ -4,7 +4,7 @@ import SettingsNavigation from "../../components/account/SettingsNavigation";
 import NotificationCard from "../../components/account/NotificationCard";
 import DangerZoneCard from "../../components/account/DangerZoneCard";
 import DeveloperIdentityCard from "../../components/account/developer-identity/DeveloperIdentityCard";
-
+import DeveloperToolsCard from "../../components/account/DeveloperToolsCard";
 
 export default function SettingsPage() {
   return (
@@ -40,8 +40,10 @@ export default function SettingsPage() {
           <DeveloperIdentityCard />
 
       </div>
+        <DeveloperToolsCard />
 
-      <DangerZoneCard />
+        <DangerZoneCard />
+
 
     </div>
 

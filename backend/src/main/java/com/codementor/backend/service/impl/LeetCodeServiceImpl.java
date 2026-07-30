@@ -5,14 +5,18 @@ import com.codementor.backend.dto.LeetCodeProfileResponse;
 import com.codementor.backend.mapper.LeetCodeMapper;
 import com.codementor.backend.dto.leetcode.graphql.badges.BadgesResponse;
 import com.codementor.backend.dto.leetcode.graphql.contest.ContestResponse;
+import com.codementor.backend.dto.leetcode.response.RecentSubmission;
+import com.codementor.backend.dto.leetcode.response.AnalyticsInfo;
 import com.codementor.backend.dto.leetcode.response.BadgeInfo;
 import com.codementor.backend.dto.leetcode.response.ContestInfo;
+import com.codementor.backend.dto.leetcode.response.ProblemStats;
 import com.codementor.backend.service.LeetCodeService;
-
+import com.codementor.backend.dto.leetcode.response.SkillStats;
 import com.codementor.backend.dto.leetcode.graphql.calendar.CalendarResponse;
 import com.codementor.backend.dto.leetcode.response.CalendarInfo;
-
-
+import com.codementor.backend.dto.leetcode.analytics.LeetCodeAnalyticsService;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,37 +28,65 @@ public class LeetCodeServiceImpl implements LeetCodeService {
 
     private final LeetCodeGraphQLClient leetCodeGraphQLClient;
     private final LeetCodeMapper leetCodeMapper;
+    private final LeetCodeAnalyticsService analyticsService;
+    private final Executor leetCodeExecutor;
 
 @Override
 public LeetCodeProfileResponse getProfile(String username) {
 
-    ContestResponse contestResponse =
-            leetCodeGraphQLClient.getContestRanking(username);
-
-    ContestInfo contest =
-            leetCodeMapper.mapContest(contestResponse);
-
-    BadgesResponse badgesResponse =
-            leetCodeGraphQLClient.getBadges(username);
+        CompletableFuture<ContestInfo> contestFuture =
+                CompletableFuture.supplyAsync(
+                        () -> leetCodeMapper.mapContest(
+                                leetCodeGraphQLClient.getContestRanking(username)
+                        ),
+                        leetCodeExecutor
+                );
+        ContestInfo contest = contestFuture.join();
 
     List<BadgeInfo> badges =
-            leetCodeMapper.mapBadges(badgesResponse);
-
-    CalendarResponse calendarResponse =
-            leetCodeGraphQLClient.getCalendar(username);
+            leetCodeMapper.mapBadges(
+                    leetCodeGraphQLClient.getBadges(username)
+            );
 
     CalendarInfo calendar =
-            leetCodeMapper.mapCalendar(calendarResponse);
+            leetCodeMapper.mapCalendar(
+                    leetCodeGraphQLClient.getCalendar(username)
+            );
+    
+    ProblemStats problems =
+            leetCodeMapper.mapProblemStats(
+                    leetCodeGraphQLClient.getProblemProgress(username)
+            );
+            
 
-    System.out.println("=========================");
-    System.out.println(contest);
-    System.out.println("=========================");
-    System.out.println(badges);
-    System.out.println("=========================");
-    System.out.println(calendar);
-    System.out.println("=========================");
+        SkillStats skills =
+                leetCodeMapper.mapSkillStats(
+                        leetCodeGraphQLClient.getSkillStats(username)
+                );
 
-    throw new RuntimeException("Check Badges");
+        List<RecentSubmission> recentSubmissions =
+                leetCodeMapper.mapRecentSubmissions(
+                        leetCodeGraphQLClient.getRecentSubmissions(username)
+                );
+
+        AnalyticsInfo analytics =
+                analyticsService.generateAnalytics(
+                        contest,
+                        calendar,
+                        problems,
+                        skills
+                );
+
+        return LeetCodeProfileResponse.builder()
+                .username(username)
+                .contest(contest)
+                .badges(badges)
+                .calendar(calendar)
+                .problems(problems)
+                .skills(skills)
+                .recentSubmissions(recentSubmissions)
+                .analytics(analytics)
+                .build();
 }
 
 }

@@ -27,3 +27,20 @@ export const getProfile = async () => {
   return response.data;
 
 };
+
+export interface DeleteAccountRequest {
+  password: string;
+}
+
+export async function deleteAccount(
+  request: DeleteAccountRequest
+): Promise<void> {
+
+  await api.delete(
+    "/users/delete-account",
+    {
+      data: request,
+    }
+  );
+
+}

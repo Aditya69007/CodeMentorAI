@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 
@@ -8,6 +9,7 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -78,6 +80,7 @@ export default function LoginPage() {
 
             <input
               type="email"
+              placeholder="Email"
               value={email}
               onChange={(event) =>
                 setEmail(event.target.value)
@@ -94,26 +97,36 @@ export default function LoginPage() {
                 Password
               </label>
 
-              <button
-                type="button"
-                disabled
-                title="Password recovery will be added later"
-                className="cursor-not-allowed text-xs text-slate-600"
-              >
-                Forgot password?
-              </button>
+            <Link
+              to="/forgot-password"
+              className="text-xs text-blue-400 hover:text-blue-300"
+            >
+              Forgot password?
+            </Link>
 
             </div>
 
-            <input
-              type="password"
-              value={password}
-              onChange={(event) =>
-                setPassword(event.target.value)
-              }
-              required
-              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none focus:border-blue-500"
-            />
+            <div className="relative">
+
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                required
+                className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 pr-12 text-white outline-none focus:border-blue-500"
+              />
+
+              <button
+                type="button"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                onClick={() => setShowPassword((value) => !value)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+              >
+                {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+              </button>
+
+            </div>
           </div>
 
           <button

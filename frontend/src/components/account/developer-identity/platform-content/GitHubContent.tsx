@@ -2,13 +2,10 @@
 
 
 import type { Dispatch, SetStateAction } from "react";
-
-import type {
-  GitHubProfileResponse,
-} from "../../../../services/connectedAccountsService";
+import type { GitHubDashboard } from "../../../../types/github";
 
 type Props = {
-  profile: GitHubProfileResponse | null;
+  dashboard: GitHubDashboard | null;
   githubUsername: string;
   setGithubUsername: Dispatch<SetStateAction<string>>;
   connectGitHub: () => Promise<void>;
@@ -25,7 +22,7 @@ type Props = {
   disconnectGitHub: () => Promise<void>;
 };
 export default function GitHubContent({
-  profile,
+  dashboard,
   githubUsername,
   setGithubUsername,
   connectGitHub,
@@ -48,7 +45,7 @@ export default function GitHubContent({
   */
 
 
-  if (!profile){
+  if (!dashboard){
 
     return (
 
@@ -83,7 +80,7 @@ export default function GitHubContent({
                 setGithubUsername(e.target.value);
 
             }}
-            placeholder="Aditya69007"
+            placeholder="Enter your GitHub username"
             autoComplete="off"
             className="mt-3 w-full rounded-xl border border-white/10 bg-transparent px-4 py-3 outline-none transition-all duration-300 focus:border-green-500"
             />
@@ -145,105 +142,473 @@ export default function GitHubContent({
 
   }
 
+    const profile = dashboard.profile;
+
+    const statistics = dashboard.statistics;
+
+    const analytics = dashboard.analytics;
+
+    const repositories = dashboard.topRepositories;
+
+
     return (
 
     <div className="space-y-8">
 
-        {/* Profile */}
+        {/* Header */}
 
-        <div className="flex gap-6">
+        <div className="flex items-start gap-6 rounded-2xl border border-white/10 bg-white/[0.02] p-6">
 
-        <img
-            src={profile.avatarUrl}
-            alt="GitHub"
-            className="h-24 w-24 rounded-full border-4 border-green-500/20"
-        />
+            <img
+                src={profile.avatarUrl}
+                alt={profile.username}
+                className="h-24 w-24 rounded-full border-4 border-green-500/20 object-cover"
+            />
 
-        <div className="flex-1">
+            <div className="flex-1">
 
-            <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3">
 
-            <h2 className="text-3xl font-bold">
+                    <h2 className="text-3xl font-bold">
 
-                {profile.name}
+                        {profile.name}
 
-            </h2>
+                    </h2>
 
-            <span className="rounded-full bg-green-500/10 px-3 py-1 text-xs font-semibold text-green-400">
+                    <span className="rounded-full bg-green-500/10 px-3 py-1 text-xs font-semibold text-green-400">
 
-                Connected
+                        Connected
 
-            </span>
+                    </span>
+
+                </div>
+
+                <p className="mt-2 text-zinc-400">
+
+                    @{profile.username}
+
+                </p>
+
+                <p className="mt-4 leading-7 text-zinc-300">
+
+                    {profile.bio || "No bio available."}
+
+                </p>
+
+                <div className="mt-6 flex flex-wrap gap-6 text-sm app-text-secondary">
+
+                    <span>
+
+                        📍 {profile.location || "Not specified"}
+
+                    </span>
+
+                    <span>
+
+                        🏢 {profile.company || "Independent"}
+
+                    </span>
+
+                    <span>
+
+                        🌐 {profile.blog || "No website"}
+
+                    </span>
+
+                    <span>
+
+                        📅 GitHub since {statistics.accountAgeYears} years
+
+                    </span>
+
+                </div>
 
             </div>
 
-            <p className="mt-2 text-zinc-400">
+        </div>
 
-            @{profile.username}
+        {/* Statistics */}
 
-            </p>
+        <div className="grid grid-cols-2 gap-4">
 
-            <p className="mt-5 leading-7 text-zinc-300">
+            <div className="rounded-xl border border-white/10 p-4">
 
-            {profile.bio}
+                <p className="text-sm app-text-secondary">
 
-            </p>
+                    Developer Score
+
+                </p>
+
+                <h2 className="mt-2 text-3xl font-bold text-green-400">
+
+                    {statistics.developerScore.toFixed(1)}
+
+                </h2>
+
+            </div>
+
+            <div className="rounded-xl border border-white/10 p-4">
+
+                <p className="text-sm app-text-secondary">
+
+                    Repositories
+
+                </p>
+
+                <h2 className="mt-2 text-3xl font-bold text-blue-400">
+
+                    {statistics.repositories}
+
+                </h2>
+
+            </div>
+
+            <div className="rounded-xl border border-white/10 p-4">
+
+                <p className="text-sm app-text-secondary">
+
+                    Followers
+
+                </p>
+
+                <h2 className="mt-2 text-3xl font-bold">
+
+                    {statistics.followers}
+
+                </h2>
+
+            </div>
+
+            <div className="rounded-xl border border-white/10 p-4">
+
+                <p className="text-sm app-text-secondary">
+
+                    Following
+
+                </p>
+
+                <h2 className="mt-2 text-3xl font-bold">
+
+                    {statistics.following}
+
+                </h2>
+
+            </div>
 
         </div>
 
+        {/* Repository Analytics */}
+
+        <div className="grid grid-cols-2 gap-4">
+
+            <div className="rounded-xl border border-green-500/20 bg-green-500/5 p-5">
+
+                <p className="text-sm app-text-secondary">
+
+                    Repository Score
+
+                </p>
+
+                <h2 className="mt-2 text-4xl font-bold text-green-400">
+
+                    {analytics.repositoryScore.toFixed(0)}
+
+                </h2>
+
+            </div>
+
+            <div className="rounded-xl border border-orange-500/20 bg-orange-500/5 p-5">
+
+                <p className="text-sm app-text-secondary">
+
+                    Language Diversity
+
+                </p>
+
+                <h2 className="mt-2 text-4xl font-bold text-orange-400">
+
+                    {analytics.languageDiversityScore.toFixed(0)}
+
+                </h2>
+
+            </div>
+
+            <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-5">
+
+                <p className="text-sm app-text-secondary">
+
+                    Public Gists
+
+                </p>
+
+                <h2 className="mt-2 text-4xl font-bold text-cyan-400">
+
+                    {statistics.publicGists}
+
+                </h2>
+
+            </div>
+
+            <div className="rounded-xl border border-purple-500/20 bg-purple-500/5 p-5">
+
+                <p className="text-sm app-text-secondary">
+
+                    Account Age
+
+                </p>
+
+                <h2 className="mt-2 text-4xl font-bold text-purple-400">
+
+                    {statistics.accountAgeYears} Years
+
+                </h2>
+
+            </div>
+
         </div>
 
-        {/* Stats */}
+        {/* Top Technologies */}
 
-        <div className="grid grid-cols-3 gap-5">
+        <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-5">
 
-        <div className="rounded-2xl border border-white/10 p-6 text-center">
+            <h3 className="text-lg font-semibold text-emerald-400">
 
-            <p className="text-4xl font-bold">
+                💻 Top Technologies
 
-            {profile.publicRepositories}
+            </h3>
 
-            </p>
+            <div className="mt-4 flex flex-wrap gap-3">
 
-            <p className="mt-2 app-text-secondary">
+                {analytics.strongestTechnologies.map((technology) => (
 
-            Repositories
+                    <span
+                        key={technology}
+                        className="rounded-full bg-emerald-500/15 px-4 py-2 text-sm font-medium text-emerald-300"
+                    >
 
-            </p>
+                        {technology}
 
-        </div>
+                    </span>
 
-        <div className="rounded-2xl border border-white/10 p-6 text-center">
+                ))}
 
-            <p className="text-4xl font-bold">
-
-            {profile.followers}
-
-            </p>
-
-            <p className="mt-2 app-text-secondary">
-
-            Followers
-
-            </p>
+            </div>
 
         </div>
 
-        <div className="rounded-2xl border border-white/10 p-6 text-center">
+        {/* Recommended Technologies */}
 
-            <p className="text-4xl font-bold">
+        <div className="rounded-xl border border-orange-500/20 bg-orange-500/5 p-5">
 
-            {profile.following}
+            <h3 className="text-lg font-semibold text-orange-400">
 
-            </p>
+                🚀 Recommended Technologies
 
-            <p className="mt-2 app-text-secondary">
+            </h3>
 
-            Following
+            <div className="mt-4 flex flex-wrap gap-3">
 
-            </p>
+                {analytics.recommendedTechnologies.map((technology) => (
+
+                    <span
+                        key={technology}
+                        className="rounded-full bg-orange-500/15 px-4 py-2 text-sm font-medium text-orange-300"
+                    >
+
+                        {technology}
+
+                    </span>
+
+                ))}
+
+            </div>
 
         </div>
+
+        {/* Top Repositories */}
+
+        <div className="rounded-xl border border-white/10 p-5">
+
+            <h3 className="text-lg font-semibold">
+
+                📦 Top Repositories
+
+            </h3>
+
+            <div className="mt-4 space-y-3">
+
+                {repositories.map((repository) => (
+
+                    <div
+                        key={repository.name}
+                        className="flex items-center justify-between rounded-lg border border-white/5 bg-white/[0.02] p-4"
+                    >
+
+                        <div className="flex-1">
+
+                            <h4 className="font-semibold">
+
+                                {repository.name}
+
+                            </h4>
+
+                            <p className="mt-1 text-sm app-text-secondary">
+
+                                {repository.description || "No description available."}
+
+                            </p>
+
+                            <div className="mt-3 flex flex-wrap gap-4 text-xs app-text-secondary">
+
+                                <span>
+
+                                    💻 {repository.language || "Unknown"}
+
+                                </span>
+
+                                <span>
+
+                                    ⭐ {repository.stars}
+
+                                </span>
+
+                                <span>
+
+                                    🍴 {repository.forks}
+
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <a
+                            href={repository.repositoryUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="rounded-lg border border-green-500/30 px-4 py-2 text-sm font-medium text-green-400 transition hover:bg-green-500/10"
+                        >
+
+                            Open →
+
+                        </a>
+
+                    </div>
+
+                ))}
+
+            </div>
+
+        </div>
+
+        {/* AI Strengths */}
+
+        <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-5">
+
+            <h3 className="text-lg font-semibold text-emerald-400">
+
+                💪 AI Strengths
+
+            </h3>
+
+            <div className="mt-4 space-y-3">
+
+                {analytics.strengths.map((strength) => (
+
+                    <div
+                        key={strength}
+                        className="flex items-start gap-3 rounded-lg bg-emerald-500/10 p-3"
+                    >
+
+                        <span className="text-emerald-400">
+
+                            ✔
+
+                        </span>
+
+                        <p className="text-sm">
+
+                            {strength}
+
+                        </p>
+
+                    </div>
+
+                ))}
+
+            </div>
+
+        </div>
+
+        {/* AI Improvements */}
+
+        <div className="rounded-xl border border-orange-500/20 bg-orange-500/5 p-5">
+
+            <h3 className="text-lg font-semibold text-orange-400">
+
+                🎯 AI Improvements
+
+            </h3>
+
+            <div className="mt-4 space-y-3">
+
+                {analytics.improvements.map((item) => (
+
+                    <div
+                        key={item}
+                        className="flex items-start gap-3 rounded-lg bg-orange-500/10 p-3"
+                    >
+
+                        <span className="text-orange-400">
+
+                            ⚠
+
+                        </span>
+
+                        <p className="text-sm">
+
+                            {item}
+
+                        </p>
+
+                    </div>
+
+                ))}
+
+            </div>
+
+        </div>
+
+        {/* AI Insights */}
+
+        <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-5">
+
+            <h3 className="text-lg font-semibold text-cyan-400">
+
+                🤖 AI GitHub Insights
+
+            </h3>
+
+            <div className="mt-4 space-y-4">
+
+                {analytics.insights.map((insight) => (
+
+                    <div
+                        key={insight}
+                        className="rounded-lg bg-cyan-500/10 p-4"
+                    >
+
+                        <p className="leading-7">
+
+                            {insight}
+
+                        </p>
+
+                    </div>
+
+                ))}
+
+            </div>
 
         </div>
 

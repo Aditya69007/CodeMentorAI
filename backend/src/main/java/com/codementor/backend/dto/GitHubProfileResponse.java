@@ -24,6 +24,21 @@ public class GitHubProfileResponse {
     @JsonAlias("public_repos")
     private Integer publicRepositories;
 
+    @JsonAlias("public_gists")
+    private Integer publicGists;
+
+    @JsonAlias("created_at")
+    private String createdAt;
+
+    @JsonAlias("company")
+    private String company;
+
+    @JsonAlias("location")
+    private String location;
+
+    @JsonAlias("blog")
+    private String blog;
+
     private Integer followers;
 
     private Integer following;

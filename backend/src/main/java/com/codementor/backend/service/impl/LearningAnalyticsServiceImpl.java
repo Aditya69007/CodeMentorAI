@@ -288,4 +288,16 @@ public class LearningAnalyticsServiceImpl
                 .build();
     }
 
+        @Override
+        @Transactional
+        public void resetAiMemory(String email) {
+
+        var user = userRepository
+                .findByEmail(email)
+                .orElseThrow();
+
+        aiMistakeRepository.deleteByUserId(user.getId());
+
+        }
+
 }

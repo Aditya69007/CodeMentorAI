@@ -5,7 +5,7 @@ import {
   FiRefreshCw,
   FiExternalLink,
 } from "react-icons/fi";
-import { FaGoogle, FaLinkedin } from "react-icons/fa";
+import { FaGoogle} from "react-icons/fa";
 import { SiLeetcode } from "react-icons/si";
 
 import {
@@ -22,7 +22,6 @@ export default function ConnectedAccountsCard() {
     useState<ConnectedAccountsResponse | null>(null);
   const [githubUsername, setGithubUsername] = useState("");
   const [leetcodeUsername, setLeetcodeUsername] = useState("");
-  const [linkedinUrl, setLinkedinUrl] = useState("");
   const [saving, setSaving] = useState(false);
 
   const [githubProfile, setGithubProfile] =
@@ -286,26 +285,6 @@ export default function ConnectedAccountsCard() {
             {accounts?.leetcodeConnected
               ? "Connected"
               : "Not Connected"}
-
-          </span>
-
-        </div>
-
-        {/* LinkedIn */}
-
-        <div className="flex items-center justify-between">
-
-          <div className="flex items-center gap-3">
-
-            <FaLinkedin className="text-xl text-blue-500" />
-
-            <span>LinkedIn</span>
-
-          </div>
-
-          <span className="text-yellow-500">
-
-            Coming Soon
 
           </span>
 

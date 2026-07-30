@@ -7,7 +7,9 @@ import lombok.Data;
 @Builder
 public class CalendarInfo {
 
-    private Integer streak;
+    private Integer currentStreak;
+
+    private Integer maxStreak;
 
     private Integer totalActiveDays;
 

@@ -1,16 +1,18 @@
 package com.codementor.backend.dto.leetcode.response;
 
+import lombok.Builder;
 import lombok.Data;
 
-import java.util.Map;
+import java.util.List;
 
 @Data
+@Builder
 public class SkillStats {
 
-    private Map<String, Integer> fundamental;
+    private List<SkillInfo> fundamental;
 
-    private Map<String, Integer> intermediate;
+    private List<SkillInfo> intermediate;
 
-    private Map<String, Integer> advanced;
+    private List<SkillInfo> advanced;
 
 }

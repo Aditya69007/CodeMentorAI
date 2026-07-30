@@ -50,7 +50,7 @@ public class SecurityConfig {
 
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(
-                                SessionCreationPolicy.STATELESS
+                                SessionCreationPolicy.IF_REQUIRED
                         )
                 )
 
@@ -80,6 +80,11 @@ public class SecurityConfig {
                         )
 
                         .successHandler(oAuth2AuthenticationSuccessHandler)
+
+                        .failureHandler((request, response, exception) -> {
+                        exception.printStackTrace();
+                        response.sendRedirect("/login?error");
+                        })
                 )
 
                 .exceptionHandling(ex -> ex

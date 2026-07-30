@@ -2,7 +2,10 @@ import {
   Route,
   Routes,
 } from "react-router-dom";
-
+import SessionsPage from "./pages/settings/SessionsPage";
+import { NotificationProvider } from "./context/NotificationContext";
+import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import AdminTopicsPage from "./pages/admin/AdminTopicsPage";
 import AdminProblemsPage from "./pages/admin/AdminProblemsPage";
 import AdminEditProblemPage from "./pages/admin/AdminEditProblemPage";
@@ -58,275 +61,291 @@ import UserDashboardPage
 export default function App() {
 
   return (
-
-    <Routes>
-
-
-      {/* ==========================================
-          ROOT REDIRECT
-      ========================================== */}
-
-      <Route
-        path="/"
-        element={<RoleBasedRedirect />}
-      />
-
-
-      {/* ==========================================
-          PUBLIC ROUTES
-      ========================================== */}
-
-      <Route
-        path="/login"
-        element={<LoginPage />}
-      />
-
-      <Route
-        path="/register"
-        element={<RegisterPage />}
-      />
-
-      <Route
-          path="/oauth-success"
-          element={<OAuthSuccess />}
-      />
-
-      {/* ==========================================
-          USER PLATFORM
-      ========================================== */}
-
-      <Route element={<UserRoute />}>
+  <NotificationProvider>
+      <Routes>
 
 
         {/* ==========================================
-            FULL-SCREEN CODING WORKSPACE
-
-            IMPORTANT:
-            This route is intentionally outside
-            AppLayout.
-
-            Therefore ProblemSolvePage will NOT
-            display the platform sidebar.
+            ROOT REDIRECT
         ========================================== */}
 
         <Route
-          path="/problems/:id"
-          element={<ProblemSolvePage />}
+          path="/"
+          element={<RoleBasedRedirect />}
         />
 
 
         {/* ==========================================
-            USER PLATFORM WITH SIDEBAR
+            PUBLIC ROUTES
         ========================================== */}
 
-        <Route element={<AppLayout />}>
+        <Route
+          path="/login"
+          element={<LoginPage />}
+        />
+
+        <Route
+          path="/register"
+          element={<RegisterPage />}
+        />
+
+        <Route
+            path="/forgot-password"
+            element={<ForgotPasswordPage />}
+        />
+
+        <Route
+            path="/reset-password"
+            element={<ResetPasswordPage />}
+        />
+
+        <Route
+            path="/oauth-success"
+            element={<OAuthSuccess />}
+        />
+
+        {/* ==========================================
+            USER PLATFORM
+        ========================================== */}
+
+        <Route element={<UserRoute />}>
 
 
-          {/* DASHBOARD */}
+          {/* ==========================================
+              FULL-SCREEN CODING WORKSPACE
+
+              IMPORTANT:
+              This route is intentionally outside
+              AppLayout.
+
+              Therefore ProblemSolvePage will NOT
+              display the platform sidebar.
+          ========================================== */}
 
           <Route
-            path="/dashboard"
-            element={<UserDashboardPage />}
+            path="/problems/:id"
+            element={<ProblemSolvePage />}
           />
 
 
-          {/* PROBLEMS */}
+          {/* ==========================================
+              USER PLATFORM WITH SIDEBAR
+          ========================================== */}
 
-          <Route
-            path="/problems"
-            element={<ProblemsPage />}
-          />
-
-
-          {/* TOPICS */}
-
-          <Route
-            path="/topics"
-            element={<TopicsPage />}
-          />
+          <Route element={<AppLayout />}>
 
 
-          <Route
-            path="/topics/:slug"
-            element={<TopicProblemsPage />}
-          />
+            {/* DASHBOARD */}
+
+            <Route
+              path="/dashboard"
+              element={<UserDashboardPage />}
+            />
 
 
-          {/* MISTAKE MEMORY */}
+            {/* PROBLEMS */}
 
-          <Route
-            path="/mistake-memory"
-            element={<MistakeMemoryPage />}
-          />
-
-
-          {/* DEVELOPER SKILLS */}
-
-          <Route
-            path="/developer-skills"
-            element={<DeveloperSkillGraphPage />}
-          />
+            <Route
+              path="/problems"
+              element={<ProblemsPage />}
+            />
 
 
-          {/* PERSONALIZED LEARNING PLAN */}
+            {/* TOPICS */}
 
-          <Route
-            path="/learning-plan"
-            element={<PersonalizedLearningPlanPage />}
-          />
-
-
-          {/* PERSONALIZED REVISION PLAN */}
-
-          <Route
-            path="/revision-plan"
-            element={<PersonalizedRevisionPlanPage />}
-          />
+            <Route
+              path="/topics"
+              element={<TopicsPage />}
+            />
 
 
-          {/* GROWTH REPORT */}
-
-          <Route
-            path="/growth-report"
-            element={<GrowthReportPage />}
-          />
+            <Route
+              path="/topics/:slug"
+              element={<TopicProblemsPage />}
+            />
 
 
-          {/* PERSONALIZED INTERVIEW */}
+            {/* MISTAKE MEMORY */}
 
-          <Route
-            path="/interview"
-            element={<PersonalizedInterviewPage />}
-          />
+            <Route
+              path="/mistake-memory"
+              element={<MistakeMemoryPage />}
+            />
 
-          {/* ACCOUNT */}
 
-          <Route
-            path="/account/profile"
-            element={<ProfilePage />}
-          />
+            {/* DEVELOPER SKILLS */}
 
-          <Route
-            path="/account/settings"
-            element={<SettingsPage />}
-          />
+            <Route
+              path="/developer-skills"
+              element={<DeveloperSkillGraphPage />}
+            />
 
-          {/* PORTFOLIO */}
-          <Route
-              path="/portfolio"
-              element={<PortfolioPage />}
-          />
+
+            {/* PERSONALIZED LEARNING PLAN */}
+
+            <Route
+              path="/learning-plan"
+              element={<PersonalizedLearningPlanPage />}
+            />
+
+
+            {/* PERSONALIZED REVISION PLAN */}
+
+            <Route
+              path="/revision-plan"
+              element={<PersonalizedRevisionPlanPage />}
+            />
+
+
+            {/* GROWTH REPORT */}
+
+            <Route
+              path="/growth-report"
+              element={<GrowthReportPage />}
+            />
+
+
+            {/* PERSONALIZED INTERVIEW */}
+
+            <Route
+              path="/interview"
+              element={<PersonalizedInterviewPage />}
+            />
+
+            {/* ACCOUNT */}
+
+            <Route
+              path="/account/profile"
+              element={<ProfilePage />}
+            />
+
+            <Route
+              path="/account/settings"
+              element={<SettingsPage />}
+            />
+
+            <Route
+              path="/account/sessions"
+              element={<SessionsPage />}
+            />
+
+            {/* PORTFOLIO */}
+            <Route
+                path="/portfolio"
+                element={<PortfolioPage />}
+            />
+
+          </Route>
 
         </Route>
 
-      </Route>
+
+        {/* ==========================================
+            ADMIN PLATFORM
+        ========================================== */}
+
+        <Route element={<AdminRoute />}>
 
 
-      {/* ==========================================
-          ADMIN PLATFORM
-      ========================================== */}
-
-      <Route element={<AdminRoute />}>
+          <Route element={<AdminLayout />}>
 
 
-        <Route element={<AdminLayout />}>
+            {/* PLATFORM ANALYTICS */}
+
+            <Route
+              path="/admin/analytics"
+              element={<AdminPlatformAnalyticsPage />}
+            />
 
 
-          {/* PLATFORM ANALYTICS */}
+            {/* AI ANALYTICS */}
 
-          <Route
-            path="/admin/analytics"
-            element={<AdminPlatformAnalyticsPage />}
-          />
-
-
-          {/* AI ANALYTICS */}
-
-          <Route
-            path="/admin/ai-analytics"
-            element={<AdminAiAnalyticsPage />}
-          />
+            <Route
+              path="/admin/ai-analytics"
+              element={<AdminAiAnalyticsPage />}
+            />
 
 
-          {/* TOPICS */}
+            {/* TOPICS */}
 
-          <Route
-            path="/admin/topics"
-            element={<AdminTopicsPage />}
-          />
-
-
-          {/* PROBLEMS */}
-
-          <Route
-            path="/admin/problems"
-            element={<AdminProblemsPage />}
-          />
+            <Route
+              path="/admin/topics"
+              element={<AdminTopicsPage />}
+            />
 
 
-          {/* ADMIN DASHBOARD */}
+            {/* PROBLEMS */}
 
-          <Route
-            path="/admin/dashboard"
-            element={<AdminDashboardPage />}
-          />
-
-
-          {/* USERS */}
-
-          <Route
-            path="/admin/users"
-            element={<AdminUsersPage />}
-          />
+            <Route
+              path="/admin/problems"
+              element={<AdminProblemsPage />}
+            />
 
 
-          <Route
-            path="/admin/users/:userId"
-            element={<AdminUserDetailsPage />}
-          />
+            {/* ADMIN DASHBOARD */}
+
+            <Route
+              path="/admin/dashboard"
+              element={<AdminDashboardPage />}
+            />
 
 
-          {/* CREATE PROBLEM */}
+            {/* USERS */}
 
-          <Route
-            path="/admin/problems/create"
-            element={<AdminCreateProblemPage />}
-          />
-
-
-          {/* EDIT PROBLEM */}
-
-          <Route
-            path="/admin/problems/:problemId/edit"
-            element={<AdminEditProblemPage />}
-          />
+            <Route
+              path="/admin/users"
+              element={<AdminUsersPage />}
+            />
 
 
-          {/* SUBMISSIONS */}
+            <Route
+              path="/admin/users/:userId"
+              element={<AdminUserDetailsPage />}
+            />
 
-          <Route
-            path="/admin/submissions"
-            element={<AdminSubmissionsPage />}
-          />
 
+            {/* CREATE PROBLEM */}
+
+            <Route
+              path="/admin/problems/create"
+              element={<AdminCreateProblemPage />}
+            />
+
+
+            {/* EDIT PROBLEM */}
+
+            <Route
+              path="/admin/problems/:problemId/edit"
+              element={<AdminEditProblemPage />}
+            />
+
+
+            {/* SUBMISSIONS */}
+
+            <Route
+              path="/admin/submissions"
+              element={<AdminSubmissionsPage />}
+            />
+
+
+          </Route>
 
         </Route>
 
-      </Route>
+
+        {/* ==========================================
+            FALLBACK
+        ========================================== */}
+
+        <Route
+          path="*"
+          element={<RoleBasedRedirect />}
+        />
 
 
-      {/* ==========================================
-          FALLBACK
-      ========================================== */}
-
-      <Route
-        path="*"
-        element={<RoleBasedRedirect />}
-      />
-
-
-    </Routes>
-
-  );
+      </Routes>
+  </NotificationProvider>
+  
+);
 
 }

@@ -1,4 +1,6 @@
 import api from "./api";
+import type { LeetCodeProfile } from "../types/leetcode";
+import type { GitHubDashboard } from "../types/github";
 
 export interface ConnectedAccountsResponse {
   githubUsername: string | null;
@@ -52,4 +54,41 @@ export const getGitHubProfile = async (
   );
 
   return response.data;
+};
+
+export const getLeetCodeProfile = async (
+  username: string
+) => {
+
+  const response = await api.get<LeetCodeProfile>(
+    `/leetcode/profile/${username}`
+  );
+
+  return response.data;
+
+};
+
+export const refreshLeetCodeProfile = async (
+  username: string
+) => {
+
+  const response = await api.get<LeetCodeProfile>(
+    `/leetcode/profile/${username}`
+  );
+
+  return response.data;
+
+};
+
+export const getGitHubDashboard = async (
+    username: string
+) => {
+
+    const response =
+        await api.get<GitHubDashboard>(
+            `/github/dashboard/${username}`
+        );
+
+    return response.data;
+
 };

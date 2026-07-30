@@ -2,11 +2,99 @@ import {
   FiAlertTriangle,
   FiLogOut,
   FiTrash2,
-  FiDownload,
-  FiRotateCcw,
 } from "react-icons/fi";
 
+import { useState } from "react";
+import toast from "react-hot-toast";
+import sessionService from "../../services/sessionService";
+import { deleteAccount } from "../../services/userService";
+import { useNavigate } from "react-router-dom";
+import DeleteAccountModal from "../../pages/settings/DeleteAccountModal";
+
+import { useAuth } from "../../context/useAuth";
+
 export default function DangerZoneCard() {
+
+  const { user, logout } = useAuth();
+
+  const navigate = useNavigate();
+
+  const [deleting, setDeleting] = useState(false);
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  const handleLogoutAllDevices = async () => {
+
+    if (!user?.sessionId) {
+      toast.error("Session not found.");
+      return;
+    }
+
+    try {
+
+      setLoggingOut(true);
+
+      await sessionService.logoutAll(user.sessionId);
+
+      toast.success("Logged out from all other devices.");
+
+    } catch (error) {
+
+      console.error(error);
+
+      toast.error("Failed to logout from all devices.");
+
+    } finally {
+
+      setLoggingOut(false);
+
+    }
+
+  };
+
+  const handleDeleteAccount = async (
+    password: string
+  ) => {
+
+    try {
+
+      setDeleting(true);
+
+      await deleteAccount({
+        password,
+      });
+
+      logout();
+
+      toast.success(
+        "Account deleted successfully."
+      );
+
+      navigate("/login", {
+        replace: true,
+      });
+
+    } catch (error) {
+
+      console.error(error);
+
+      toast.error(
+        "Failed to delete account."
+      );
+
+    } finally {
+
+      setDeleting(false);
+
+      setShowDeleteModal(false);
+
+    }
+
+  };
+
+
   return (
     <section className="rounded-2xl border border-red-500/30 bg-red-500/5 p-6">
 
@@ -34,7 +122,11 @@ export default function DangerZoneCard() {
 
       <div className="space-y-3">
 
-        <button className="flex w-full items-center justify-between rounded-xl border border-red-500/20 p-4 transition hover:bg-red-500/10">
+        <button
+            onClick={handleLogoutAllDevices}
+            disabled={loggingOut}
+            className="flex w-full items-center justify-between rounded-xl border border-red-500/20 p-4 transition hover:bg-red-500/10 disabled:opacity-60"
+        >
 
           <div className="flex items-center gap-3">
 
@@ -44,61 +136,39 @@ export default function DangerZoneCard() {
 
           </div>
 
-          <span className="text-sm text-yellow-500">
-            Coming Soon
+          <span className="text-sm font-medium text-red-500">
+              {loggingOut ? "Logging out..." : "Active"}
           </span>
 
         </button>
 
-        <button className="flex w-full items-center justify-between rounded-xl border border-red-500/20 p-4 transition hover:bg-red-500/10">
+    <button
+      onClick={() => setShowDeleteModal(true)}
+      className="flex w-full items-center justify-between rounded-xl border border-red-500/20 p-4 transition hover:bg-red-500/10"
+    >
 
-          <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3">
 
-            <FiDownload />
+        <FiTrash2 />
 
-            <span>Export My Data</span>
-
-          </div>
-
-          <span className="text-sm text-yellow-500">
-            Coming Soon
-          </span>
-
-        </button>
-
-        <button className="flex w-full items-center justify-between rounded-xl border border-red-500/20 p-4 transition hover:bg-red-500/10">
-
-          <div className="flex items-center gap-3">
-
-            <FiRotateCcw />
-
-            <span>Reset AI Learning History</span>
-
-          </div>
-
-          <span className="text-sm text-yellow-500">
-            Coming Soon
-          </span>
-
-        </button>
-
-        <button className="flex w-full items-center justify-between rounded-xl border border-red-500/20 p-4 transition hover:bg-red-500/10">
-
-          <div className="flex items-center gap-3">
-
-            <FiTrash2 />
-
-            <span>Delete Account</span>
-
-          </div>
-
-          <span className="font-semibold text-red-500">
-            Permanent
-          </span>
-
-        </button>
+        <span>Delete Account</span>
 
       </div>
+
+      <span className="font-semibold text-red-500">
+        Permanent
+      </span>
+
+    </button>
+
+      </div>
+
+    <DeleteAccountModal
+      open={showDeleteModal}
+      loading={deleting}
+      onClose={() => setShowDeleteModal(false)}
+      onConfirm={handleDeleteAccount}
+    />
 
     </section>
   );

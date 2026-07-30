@@ -17,6 +17,10 @@ import com.codementor.backend.entity.AuthProvider;
 @Table(name = "users")
 public class User {
 
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private ThemePreference themePreference = ThemePreference.SYSTEM;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -88,5 +92,20 @@ public class User {
     private LocalDateTime githubLastSyncedAt;
 
     private LocalDateTime leetcodeLastSyncedAt;
+
+    @Builder.Default
+    private Boolean emailNotifications = true;
+
+    @Builder.Default
+    private Boolean aiLearningTips = true;
+
+    @Builder.Default
+    private Boolean contestReminders = true;
+
+    @Builder.Default
+    private Boolean weeklyGrowthReport = true;
+
+    @Builder.Default
+    private Boolean interviewAlerts = true;
 
 }

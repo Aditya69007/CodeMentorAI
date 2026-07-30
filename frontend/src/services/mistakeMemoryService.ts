@@ -87,3 +87,11 @@ export const getMyPracticeRecommendations =
 
     return response.data;
   };
+
+  // ==================================================
+// RESET AI MEMORY
+// ==================================================
+
+export const resetAiMemory = async (): Promise<void> => {
+  await api.delete("/learning/ai-memory");
+};

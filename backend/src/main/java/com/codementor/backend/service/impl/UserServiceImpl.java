@@ -4,8 +4,11 @@ import com.codementor.backend.client.GitHubClient;
 import com.codementor.backend.dto.RegisterRequest;
 import com.codementor.backend.entity.User;
 import com.codementor.backend.exception.ResourceAlreadyExistsException;
+import com.codementor.backend.notification.repository.NotificationRepository;
 import com.codementor.backend.repository.UserRepository;
 import com.codementor.backend.service.UserService;
+import com.codementor.backend.session.repository.UserSessionRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,8 +17,13 @@ import com.codementor.backend.entity.AuthProvider;
 import com.codementor.backend.dto.UpdateProfileRequest;
 import com.codementor.backend.dto.UserProfileResponse;
 import com.codementor.backend.dto.ConnectedAccountsResponse;
+import com.codementor.backend.dto.NotificationSettingsResponse;
 import com.codementor.backend.dto.UpdateConnectedAccountsRequest;
+import com.codementor.backend.dto.UpdateNotificationSettingsRequest;
+import com.codementor.backend.dto.DeleteAccountRequest;
+import com.codementor.backend.export.dto.ProfileExport;
 import java.time.LocalDateTime;
+import jakarta.transaction.Transactional;
 
 
 @Service
@@ -27,6 +35,11 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     private final GitHubClient gitHubClient;
+
+    private final NotificationRepository notificationRepository;
+
+    private final UserSessionRepository userSessionRepository;
+
 
     @Override
     public void registerUser(RegisterRequest request) {
@@ -97,38 +110,52 @@ public class UserServiceImpl implements UserService {
 
         // GitHub
 
-        String githubUsername = request.getGithubUsername();
+        if (request.getGithubUsername() != null) {
 
-        if (githubUsername != null && !githubUsername.isBlank()) {
+            String githubUsername = request.getGithubUsername().trim();
 
-            // Validate GitHub username
-            gitHubClient.getUserProfile(githubUsername);
+            if (!githubUsername.isEmpty()) {
 
-            user.setGithubUsername(githubUsername);
-            user.setGithubConnected(true);
-            user.setGithubLastSyncedAt(LocalDateTime.now());
+                // Validate GitHub username
+                gitHubClient.getUserProfile(githubUsername);
 
-        } else {
+                user.setGithubUsername(githubUsername);
+                user.setGithubConnected(true);
+                user.setGithubLastSyncedAt(LocalDateTime.now());
 
-            user.setGithubUsername(null);
-            user.setGithubConnected(false);
-            user.setGithubLastSyncedAt(null);
+            } else {
+
+                user.setGithubUsername(null);
+                user.setGithubConnected(false);
+                user.setGithubLastSyncedAt(null);
+
+            }
 
         }
 
         // LeetCode
-        user.setLeetcodeUsername(request.getLeetcodeUsername());
 
-        boolean leetcodeConnected =
-                request.getLeetcodeUsername() != null &&
-                !request.getLeetcodeUsername().trim().isEmpty();
+        if (request.getLeetcodeUsername() != null) {
 
-        user.setLeetcodeConnected(leetcodeConnected);
+            String leetcodeUsername =
+                    request.getLeetcodeUsername().trim();
 
-        if (leetcodeConnected) {
-            user.setLeetcodeLastSyncedAt(LocalDateTime.now());
-        } else {
-            user.setLeetcodeLastSyncedAt(null);
+            user.setLeetcodeUsername(leetcodeUsername);
+
+            boolean connected = !leetcodeUsername.isEmpty();
+
+            user.setLeetcodeConnected(connected);
+
+            if (connected) {
+
+                user.setLeetcodeLastSyncedAt(LocalDateTime.now());
+
+            } else {
+
+                user.setLeetcodeLastSyncedAt(null);
+
+            }
+
         }
 
         userRepository.save(user);
@@ -163,4 +190,84 @@ public class UserServiceImpl implements UserService {
                 .build();
 
     }
+
+    @Override
+    public NotificationSettingsResponse getNotificationSettings(String email) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return NotificationSettingsResponse.builder()
+                .emailNotifications(user.getEmailNotifications())
+                .aiLearningTips(user.getAiLearningTips())
+                .contestReminders(user.getContestReminders())
+                .weeklyGrowthReport(user.getWeeklyGrowthReport())
+                .interviewAlerts(user.getInterviewAlerts())
+                .build();
+
+    }
+
+    @Override
+    public NotificationSettingsResponse updateNotificationSettings(
+            String email,
+            UpdateNotificationSettingsRequest request
+    ) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setEmailNotifications(request.getEmailNotifications());
+        user.setAiLearningTips(request.getAiLearningTips());
+        user.setContestReminders(request.getContestReminders());
+        user.setWeeklyGrowthReport(request.getWeeklyGrowthReport());
+        user.setInterviewAlerts(request.getInterviewAlerts());
+
+        userRepository.save(user);
+
+        return NotificationSettingsResponse.builder()
+                .emailNotifications(user.getEmailNotifications())
+                .aiLearningTips(user.getAiLearningTips())
+                .contestReminders(user.getContestReminders())
+                .weeklyGrowthReport(user.getWeeklyGrowthReport())
+                .interviewAlerts(user.getInterviewAlerts())
+                .build();
+
+    }
+
+    @Override
+    @Transactional
+    public void deleteAccount(
+            String email,
+            DeleteAccountRequest request
+    ) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Verify password for LOCAL accounts
+        if (user.getProvider() == AuthProvider.LOCAL) {
+
+            if (request.getPassword() == null ||
+                    !passwordEncoder.matches(
+                            request.getPassword(),
+                            user.getPassword()
+                    )) {
+
+                throw new RuntimeException("Invalid password.");
+
+            }
+
+        }
+
+        // Delete notifications
+        notificationRepository.deleteByUser(user);
+
+        // Delete all sessions
+        userSessionRepository.deleteByUser(user);
+
+        // Finally delete user
+        userRepository.delete(user);
+
+    }
+
 }

@@ -9,4 +9,6 @@ public interface LearningAnalyticsService {
             String userEmail
     );
 
+    void resetAiMemory(String email);
+
 }

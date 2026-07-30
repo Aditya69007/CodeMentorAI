@@ -1,5 +1,4 @@
 import {
-  FiBell,
   FiChevronDown,
   FiLogOut,
   FiMoon,
@@ -8,6 +7,7 @@ import {
   FiUser,
   FiZap,
   FiBriefcase,
+  FiShield,
 } from "react-icons/fi";
 
 import { useNavigate } from "react-router-dom";
@@ -15,6 +15,7 @@ import { useTheme } from "../../hooks/useTheme";
 import { useAuth } from "../../hooks/useAuth";
 import { useEffect, useRef, useState } from "react";
 import UserAvatar from "../common/UserAvatar";
+import NotificationBell from "../notifications/NotificationBell";
 
 export default function UserTopbar() {
 
@@ -128,7 +129,7 @@ const fullName = `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim();
         onClick={toggleTheme}
 
         title={
-        theme === "dark"
+        theme === "DARK"
             ? "Switch to light mode"
             : "Switch to dark mode"
         }
@@ -157,7 +158,7 @@ const fullName = `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim();
     >
 
         {
-        theme === "dark"
+        theme === "DARK"
 
             ? <FiSun />
 
@@ -167,63 +168,7 @@ const fullName = `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim();
 
     </button>
 
-    <button
-
-    type="button"
-
-    aria-label="Notifications"
-
-    className="
-        app-surface-secondary
-        app-border
-        app-text-secondary
-
-        relative
-
-        ml-2
-
-        flex
-        h-10
-        w-10
-
-        items-center
-        justify-center
-
-        rounded-lg
-
-        border
-
-        transition
-
-        hover:text-blue-500
-    "
-
-    >
-
-    <FiBell />
-
-    <span
-        className="
-        absolute
-        -right-1
-        -top-1
-        flex
-        h-5
-        w-5
-        items-center
-        justify-center
-        rounded-full
-        bg-red-500
-        text-[10px]
-        font-bold
-        text-white
-        "
-    >
-        2
-
-    </span>
-
-    </button>
+    <NotificationBell />
 
     <div ref={profileRef} className="relative">
         <button
@@ -311,8 +256,18 @@ const fullName = `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim();
         Settings
       </button>
 
-    </div>
+      <button
+        onClick={() => {
+          setProfileOpen(false);
+          navigate("/account/sessions");
+        }}
+        className="flex w-full items-center gap-3 rounded-lg px-3 py-2 hover:bg-slate-500/10"
+      >
+        <FiShield />
+        Security Center
+      </button>
 
+    </div>
     <div className="border-t app-border p-2">
 
       <button
