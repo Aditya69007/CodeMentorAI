@@ -76,19 +76,55 @@ export interface GitHubLanguage {
 
 }
 
-export interface GitHubTopRepository {
+export interface GitHubRepository {
 
     name: string;
 
-    description: string;
+    description: string | null;
 
-    language: string;
+    language: string | null;
 
     stars: number;
 
     forks: number;
 
     repositoryUrl: string;
+
+    watchers: number;
+
+    openIssues: number;
+
+    updatedAt: string;
+
+    isPrivate: boolean;
+
+    topics: string[];
+
+}
+
+export interface GitHubTopRepository {
+
+    name: string;
+
+    description: string | null;
+
+    language: string | null;
+
+    stars: number;
+
+    forks: number;
+
+    repositoryUrl: string;
+
+    watchers: number;
+
+    openIssues: number;
+
+    updatedAt: string;
+
+    isPrivate: boolean;
+
+    topics: string[];
 
 }
 
@@ -103,5 +139,7 @@ export interface GitHubDashboard {
     languages: GitHubLanguage[];
 
     topRepositories: GitHubTopRepository[];
+
+    repositories: GitHubRepository[];
 
 }

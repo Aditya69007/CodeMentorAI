@@ -1,6 +1,8 @@
 package com.codementor.backend.dto.github;
 
 import com.codementor.backend.dto.GitHubProfileResponse;
+import com.codementor.backend.dto.GitHubRepositoryResponse;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,4 +26,5 @@ public class GitHubDashboardResponse {
 
     private List<GitHubTopRepositoryResponse> topRepositories;
 
+    private List<GitHubRepositoryDto> repositories;
 }

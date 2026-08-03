@@ -1,55 +1,26 @@
 import {
   FiGithub,
-  FiExternalLink,
-  FiCheckCircle,
 } from "react-icons/fi";
+import type { GitHubRepository } from "../../types/github";
 
-interface Project {
-  title: string;
-  description: string;
-  tech: string[];
-  status: string;
+interface ProjectsCardProps {
+  projects?: GitHubRepository[];
 }
 
-const projects: Project[] = [
-  {
-    title: "CodeMentorAI",
-    description:
-      "AI-powered coding career platform with adaptive learning, interview preparation, AI mentor, growth analytics, and personalized learning.",
-    tech: [
-      "React",
-      "Spring Boot",
-      "PostgreSQL",
-      "Gemini AI",
-    ],
-    status: "Production Ready",
-  },
-  {
-    title: "Student Dropout Prediction",
-    description:
-      "Machine learning system for predicting student dropout risk using explainable AI and ensemble learning.",
-    tech: [
-      "Python",
-      "Flask",
-      "LightGBM",
-      "TabNet",
-    ],
-    status: "Research Project",
-  },
-];
-
-export default function ProjectsCard() {
+export default function ProjectsCard({
+  projects = [],
+}: ProjectsCardProps) {
   return (
     <section className="app-surface app-border rounded-2xl p-6">
 
       <div className="mb-6">
 
-        <h2 className="text-xl font-bold">
-          Featured Projects
+        <h2 className="text-2xl font-bold">
+          Featured Project
         </h2>
 
         <p className="app-text-secondary mt-2">
-          Projects that showcase your engineering skills.
+          Your flagship GitHub repository.
         </p>
 
       </div>
@@ -58,67 +29,109 @@ export default function ProjectsCard() {
 
         {projects.map((project) => (
 
-          <div
-            key={project.title}
-            className="rounded-2xl border border-slate-700/40 p-5 transition hover:border-blue-500"
-          >
+        <div
+          key={project.name}
+          className="group rounded-3xl border border-slate-700/40 bg-slate-900/40 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-blue-500 hover:shadow-xl hover:shadow-blue-500/10"
+        >
 
-            <div className="flex items-center justify-between">
+          <div className="flex items-start justify-between">
 
-              <h3 className="text-lg font-bold">
-                {project.title}
+            <div>
+
+              {project.name === "CodeMentorAI" && (
+                <span className="mb-3 inline-flex rounded-full bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-400">
+                  ⭐ FEATURED PROJECT
+                </span>
+              )}
+
+              <h3 className="text-3xl font-bold tracking-tight">
+                {project.name}
               </h3>
 
-              <span className="flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-sm font-medium text-emerald-500">
+              <p className="mt-3 text-sm app-text-secondary">
 
-                <FiCheckCircle />
+                {project.language}
 
-                {project.status}
+                {" • "}
 
-              </span>
+                {project.isPrivate ? "Private Repository" : "Public Repository"}
+
+                {" • "}
+
+                Updated {formatDate(project.updatedAt)}
+
+              </p>
 
             </div>
 
-            <p className="app-text-secondary mt-3">
-              {project.description}
-            </p>
+            <FiGithub
+              className="text-3xl text-slate-500 transition group-hover:text-white"
+            />
+
+          </div>
+
+          <p className="mt-5 leading-7 app-text-secondary">
+
+          {
+            project.description ??
+            `A ${project.language ?? "software"} project hosted on GitHub.`
+          }
+
+          </p>
+
+          {project.topics.length > 0 && (
 
             <div className="mt-5 flex flex-wrap gap-2">
 
-              {project.tech.map((tech) => (
+              {project.topics.map((topic) => (
 
                 <span
-                  key={tech}
-                  className="rounded-full bg-blue-500/10 px-3 py-1 text-sm font-medium text-blue-500"
+                  key={topic}
+                  className="rounded-full bg-slate-800 px-3 py-1 text-xs text-blue-300"
                 >
-                  {tech}
+                  #{topic}
                 </span>
 
               ))}
 
             </div>
 
-            <div className="mt-6 flex gap-3">
+          )}
 
-              <button className="flex items-center gap-2 rounded-xl border px-4 py-2 transition hover:border-blue-500">
+          <div className="mt-8 flex flex-wrap items-center gap-6 rounded-2xl border border-slate-700/40 bg-slate-800/40 px-5 py-4">
 
-                <FiGithub />
+            <span className="font-medium">
+              ⭐ {project.stars} Stars
+            </span>
 
-                GitHub
+            <span className="font-medium">
+              🍴 {project.forks} Forks
+            </span>
 
-              </button>
+            <span className="font-medium">
+              👀 {project.watchers} Watchers
+            </span>
 
-              <button className="flex items-center gap-2 rounded-xl border px-4 py-2 transition hover:border-blue-500">
-
-                <FiExternalLink />
-
-                Live Demo
-
-              </button>
-
-            </div>
+            <span className="font-medium">
+              🐞 {project.openIssues} Issues
+            </span>
 
           </div>
+
+          <a
+            href={project.repositoryUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-8 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 font-semibold text-white transition hover:scale-105"
+          >
+
+            <FiGithub />
+
+            View on GitHub →
+
+          </a>
+
+        </div>
 
         ))}
 
@@ -126,4 +139,17 @@ export default function ProjectsCard() {
 
     </section>
   );
+}
+
+function formatDate(date: string) {
+
+  return new Date(date).toLocaleDateString(
+    "en-US",
+    {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }
+  );
+
 }

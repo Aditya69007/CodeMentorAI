@@ -1,6 +1,7 @@
 
 
-
+import FeaturedProjectsSection
+from "../github-sections/FeaturedProjectsSection";
 import type { Dispatch, SetStateAction } from "react";
 import type { GitHubDashboard } from "../../../../types/github";
 
@@ -148,7 +149,7 @@ export default function GitHubContent({
 
     const analytics = dashboard.analytics;
 
-    const repositories = dashboard.topRepositories;
+    const repositories = dashboard.repositories;
 
 
     return (
@@ -500,6 +501,10 @@ export default function GitHubContent({
             </div>
 
         </div>
+
+        <FeaturedProjectsSection
+            repositories={repositories}
+        />
 
         {/* AI Strengths */}
 

@@ -27,9 +27,7 @@ public class GitHubServiceImpl implements GitHubService {
         @Override
         public List<GitHubRepositoryResponse> getRepositories(String username) {
 
-        return List.of(
-                gitHubClient.getRepositories(username)
-        );
+        return gitHubClient.getRepositories(username);
 
         }
 

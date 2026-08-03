@@ -7,6 +7,7 @@ import com.codementor.backend.dto.github.GitHubDashboardResponse;
 import com.codementor.backend.mapper.GitHubDashboardMapper;
 import com.codementor.backend.service.GitHubAnalyticsService;
 import com.codementor.backend.service.GitHubDashboardService;
+import com.codementor.backend.service.GitHubRepositoryRankingService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,9 @@ public class GitHubDashboardServiceImpl
 
     private final GitHubAnalyticsService gitHubAnalyticsService;
 
+    private final GitHubRepositoryRankingService
+        gitHubRepositoryRankingService;
+
     @Override
     public GitHubDashboardResponse getDashboard(
             String username
@@ -33,9 +37,11 @@ public class GitHubDashboardServiceImpl
                 gitHubClient.getUserProfile(username);
 
         List<GitHubRepositoryResponse> repositories =
-                List.of(
-                        gitHubClient.getRepositories(username)
-                );
+                gitHubClient.getRepositories(username);
+
+        List<GitHubRepositoryResponse> rankedRepositories =
+                gitHubRepositoryRankingService
+                        .rankRepositories(repositories);
 
         return GitHubDashboardResponse.builder()
 
@@ -46,17 +52,21 @@ public class GitHubDashboardServiceImpl
                 )
 
                 .languages(
-                        mapper.mapLanguages(repositories)
+                        mapper.mapLanguages(rankedRepositories)
                 )
 
                 .topRepositories(
-                        mapper.mapTopRepositories(repositories)
+                        mapper.mapTopRepositories(rankedRepositories)
                 )
 
                 .analytics(
                         gitHubAnalyticsService.calculate(
-                                repositories
+                                rankedRepositories
                         )
+                )
+
+                .repositories(
+                        mapper.mapRepositories(rankedRepositories)
                 )
 
                 .build();

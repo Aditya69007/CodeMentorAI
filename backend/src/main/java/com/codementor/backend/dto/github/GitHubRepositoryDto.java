@@ -1,13 +1,17 @@
-package com.codementor.backend.dto;
+package com.codementor.backend.dto.github;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.util.List;
 
-@Getter
+@Data
+@Builder
 @NoArgsConstructor
-public class GitHubRepositoryResponse {
+@AllArgsConstructor
+public class GitHubRepositoryDto {
 
     private String name;
 
@@ -15,24 +19,18 @@ public class GitHubRepositoryResponse {
 
     private String language;
 
-    @JsonProperty("stargazers_count")
     private Integer stars;
 
     private Integer forks;
 
-    @JsonProperty("html_url")
     private String repositoryUrl;
 
-    @JsonProperty("watchers_count")
     private Integer watchers;
 
-    @JsonProperty("open_issues_count")
     private Integer openIssues;
 
-    @JsonProperty("updated_at")
     private String updatedAt;
 
-    @JsonProperty("private")
     private Boolean isPrivate;
 
     private List<String> topics;

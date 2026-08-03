@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.server.ResponseStatusException;
+import java.util.Arrays;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -50,14 +52,23 @@ public class GitHubClient {
 
     }
 
-    public GitHubRepositoryResponse[] getRepositories(String username) {
+    public List<GitHubRepositoryResponse> getRepositories(String username) {
 
         try {
 
-            return restClient.get()
-                    .uri(GITHUB_API + "/users/" + username + "/repos")
-                    .retrieve()
-                    .body(GitHubRepositoryResponse[].class);
+            GitHubRepositoryResponse[] repositories =
+                    restClient.get()
+                            .uri(GITHUB_API + "/users/" + username + "/repos")
+                            .header(
+                                "Accept",
+                                "application/vnd.github+json"
+                            )
+                            .retrieve()
+                            .body(GitHubRepositoryResponse[].class);
+
+            return repositories == null
+                    ? List.of()
+                    : Arrays.asList(repositories);
 
         } catch (ResponseStatusException ex) {
 

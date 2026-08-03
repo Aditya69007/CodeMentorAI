@@ -35,6 +35,22 @@ public class LeetCodeMapper {
         this.calendarCalculator = calendarCalculator;
     }
 
+        private String getBadgeIcon(String icon) {
+
+        if (icon == null || icon.isBlank()) {
+                return null;
+        }
+
+        // Already a complete URL
+        if (icon.startsWith("http://") || icon.startsWith("https://")) {
+                return icon;
+        }
+
+        // LeetCode sometimes returns relative paths
+        return "https://leetcode.com" + icon;
+        }
+
+
     public ContestInfo mapContest(ContestResponse response) {
 
         if (response == null
@@ -76,7 +92,7 @@ public class LeetCodeMapper {
                 .map(badge -> BadgeInfo.builder()
                         .id(badge.getId())
                         .displayName(badge.getDisplayName())
-                        .icon(badge.getIcon())
+                        .icon(getBadgeIcon(badge.getIcon()))
                         .creationDate(badge.getCreationDate())
                         .category(badge.getCategory())
                         .build())

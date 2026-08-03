@@ -73,6 +73,16 @@ public class GitHubDashboardMapper {
 
                                 .repositoryUrl(repo.getRepositoryUrl())
 
+                                .watchers(repo.getWatchers())
+
+                                .openIssues(repo.getOpenIssues())
+
+                                .updatedAt(repo.getUpdatedAt())
+
+                                .isPrivate(repo.getIsPrivate())
+
+                                .topics(repo.getTopics())
+
                                 .build()
 
                 )
@@ -140,4 +150,45 @@ public class GitHubDashboardMapper {
 
     }
 
+        public List<GitHubRepositoryDto> mapRepositories(
+                List<GitHubRepositoryResponse> repositories
+        ) {
+
+        return repositories.stream()
+
+                .map(repo ->
+
+                        GitHubRepositoryDto.builder()
+
+                                .name(repo.getName())
+
+                                .description(repo.getDescription())
+
+                                .language(repo.getLanguage())
+
+                                .stars(repo.getStars())
+
+                                .forks(repo.getForks())
+
+                                .repositoryUrl(repo.getRepositoryUrl())
+
+                                .watchers(repo.getWatchers())
+
+                                .openIssues(repo.getOpenIssues())
+
+                                .updatedAt(repo.getUpdatedAt())
+
+                                .isPrivate(repo.getIsPrivate())
+
+                                .topics(repo.getTopics())
+
+                                .build()
+
+                )
+
+                .toList();
+
+        }
+
+    
 }

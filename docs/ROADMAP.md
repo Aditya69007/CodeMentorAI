@@ -376,14 +376,6 @@ STEP 12 ✅ Change Password
 ⬜ Recruiter Profile
 ⬜ Portfolio Generator
 
-✅ Notification backend (Entity → Repository → Service → Controller)
-✅ Notification APIs
-✅ Bell UI + notification drawer
-✅ Unread badge
-✅ Connect existing modules
-✅ Notification settings integration
-✅ Real-time updates
-✅ Final UI polish
 
 ✅ Session management (almost complete)
 🔄 Improve device/browser/OS/IP detection

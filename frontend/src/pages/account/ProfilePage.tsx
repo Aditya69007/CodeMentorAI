@@ -1,107 +1,109 @@
-import { useState } from "react";
-import { useAuth } from "../../hooks/useAuth";
-import ProfileHero from "../../components/account/ProfileHero";
-import PersonalInformationCard from "../../components/account/PersonalInformationCard";
-import DeveloperInformationCard from "../../components/account/DeveloperInformationCard";
-import StatisticsSection from "../../components/account/StatisticsSection";
-import EditProfileModal from "../../components/account/EditProfileModal";
+import { useEffect, useState } from "react";
 
-import { updateProfile } from "../../services/userService";
+import PortfolioHero from "../../components/portfolio/PortfolioHero";
+import PortfolioStats from "../../components/portfolio/PortfolioStats";
+import SkillsCard from "../../components/portfolio/SkillsCard";
+import AISummaryCard from "../../components/portfolio/AISummaryCard";
+import CodingProfilesCard from "../../components/portfolio/CodingProfilesCard";
+import LeetCodePerformanceCard from "../../components/portfolio/LeetCodePerformanceCard";
+import ProjectsCard from "../../components/portfolio/ProjectsCard";
+import { getConnectedAccounts, getGitHubDashboard } from "../../services/connectedAccountsService";
+import { getFeaturedProjects } from "../../services/featuredProjectService";
+
+import type { GitHubRepository } from "../../types/github";
 
 
-export default function ProfilePage() {
-  
-  const handleSave = async () => {
+import {
+  getGrowthReport,
+  type GrowthReportResponse,
+} from "../../services/portfolioService";
+
+export default function PortfolioPage() {
+  const [growthReport, setGrowthReport] =
+    useState<GrowthReportResponse | null>(null);
+
+  const [featuredRepositories, setFeaturedRepositories] = useState<
+    GitHubRepository[]
+  >([]);
+
+  useEffect(() => {
+    async function loadPortfolio() {
+      try {
+        const growth = await getGrowthReport();
+        setGrowthReport(growth);
     
-    try {
-      
-      await updateProfile({
-        firstName,
-        lastName,
-      });
-      
-      await refreshUser();
-
-      setIsEditOpen(false);
-
-    } catch (error) {
-
-      console.error(error);
-      
+        const accounts = await getConnectedAccounts();
+    
+        if (
+          !accounts.githubConnected ||
+          !accounts.githubUsername
+        ) {
+          setFeaturedRepositories([]);
+          return;
+        }
+    
+        const [dashboard, featured] = await Promise.all([
+          getGitHubDashboard(accounts.githubUsername),
+          getFeaturedProjects(),
+        ]);
+    
+        const repositories = featured
+          .map((item) =>
+            dashboard.repositories.find(
+              (repo) => repo.name === item.repositoryName
+            )
+          )
+          .filter(
+            (repo): repo is GitHubRepository => repo !== undefined
+          );
+    
+        setFeaturedRepositories(repositories);
+    
+      } catch (error) {
+        console.error(error);
+      }
     }
-    
-  };
-  
-  const { user, refreshUser } = useAuth();
-  const [isEditOpen, setIsEditOpen] = useState(false);
-
-  const [firstName, setFirstName] = useState(user?.firstName ?? "");
-  const [lastName, setLastName] = useState(user?.lastName ?? "");
-
-  if (!user) {
-    return null;
-  }
-
-  const fullName = `${user.firstName} ${user.lastName}`;
-
-  const initials =
-    `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`;
+    loadPortfolio();
+  }, []);
 
 
   return (
-
     <div className="space-y-8">
 
-      <div>
+      <PortfolioHero />
 
-        <h1 className="text-3xl font-bold">
+      <PortfolioStats />
 
-          My Profile
-
-        </h1>
-
-        <p className="app-text-secondary mt-2">
-
-          Manage your account information and developer profile.
-
-        </p>
-
-      </div>
-
-      <ProfileHero
-        user={user}
-        fullName={fullName}
-        initials={initials}
-        onEdit={() => setIsEditOpen(true)}
-      />
+      {/* Developer Intelligence */}
 
       <div className="grid gap-6 lg:grid-cols-2">
 
-        <PersonalInformationCard
-            user={user}
-        />
-        
-        <DeveloperInformationCard />
+        <SkillsCard />
+
+        {growthReport && (
+          <AISummaryCard
+            growthSummary={growthReport.growthSummary}
+            recommendedNextAction={growthReport.recommendedNextAction}
+            achievements={growthReport.achievements}
+          />
+        )}
 
       </div>
 
-      <EditProfileModal
-        open={isEditOpen}
-        user={user}
-        firstName={firstName}
-        lastName={lastName}
-        onFirstNameChange={setFirstName}
-        onLastNameChange={setLastName}
-        onCancel={() => setIsEditOpen(false)}
-        onSave={handleSave}
+      {/* Coding Profiles */}
+
+      <CodingProfilesCard />
+
+      {/* LeetCode */}
+
+      <LeetCodePerformanceCard />
+
+      {/* Featured Projects */}
+
+      <ProjectsCard
+        projects={featuredRepositories}
       />
 
-      <StatisticsSection />
-
-
-
     </div>
-
   );
-
 }
