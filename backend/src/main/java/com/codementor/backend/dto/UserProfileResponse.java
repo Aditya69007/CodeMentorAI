@@ -23,4 +23,9 @@ public class UserProfileResponse {
 
     private String profilePicture;
 
+    private String githubUsername;
+
+    private String leetcodeUsername;
+
+    private String username;
 }

@@ -10,10 +10,8 @@ import {
   TriangleAlert,
 } from "lucide-react";
 
-import {
-  getMyGrowthReport,
-  type GrowthReportResponse,
-} from "../../services/aiMentorService";
+import {getMyGrowthReport} from "../../services/aiMentorService";
+import type { GrowthReportResponse } from "../../services/aiMentorService";
 
 const GrowthReportPage = () => {
   const [report, setReport] = useState<GrowthReportResponse | null>(null);

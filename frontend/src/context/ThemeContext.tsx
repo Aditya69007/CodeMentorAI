@@ -24,7 +24,11 @@ export function ThemeProvider({
 
   const [theme, setThemeState] =
     useState<Theme>("DARK");
+
   const { isAuthenticated } = useAuth();
+
+const isPublicPortfolio =
+  window.location.pathname.startsWith("/portfolio/");
     
     useEffect(() => {
       
@@ -37,44 +41,37 @@ export function ThemeProvider({
   
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated || isPublicPortfolio) {
       return;
     }
 
-    const loadTheme = async () => {
-      try {
-        const savedTheme = await getThemePreference();
-        setThemeState(savedTheme);
-      } catch (error) {
-        console.error("Failed to load theme", error);
-      }
-    };
+  const loadTheme = async () => {
+    try {
+      const savedTheme = await getThemePreference();
+      setThemeState(savedTheme);
+    } catch (error) {
+      console.error("Failed to load theme", error);
+    }
+  };
 
-    loadTheme();
-  }, [isAuthenticated]);
+  void loadTheme();
+}, [isAuthenticated, isPublicPortfolio]);
 
 
-  const setTheme = async (
-    newTheme: Theme
-  ) => {
-
+  const setTheme = async (newTheme: Theme) => {
     setThemeState(newTheme);
 
-    try {
+    if (!isAuthenticated || isPublicPortfolio) {
+      return;
+    }
 
+    try {
       await updateThemePreference({
         themePreference: newTheme,
       });
-
     } catch (error) {
-
-      console.error(
-        "Failed to save theme",
-        error
-      );
-
+      console.error("Failed to save theme", error);
     }
-
   };
 
   const toggleTheme = async () => {

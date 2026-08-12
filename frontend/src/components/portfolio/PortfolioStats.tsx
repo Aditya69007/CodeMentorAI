@@ -5,10 +5,8 @@ import {
   FiHelpCircle,
   FiTarget,
 } from "react-icons/fi";
-import {
-  getGrowthReport,
-  type GrowthReportResponse,
-} from "../../services/portfolioService";
+import { getGrowthReport } from "../../services/portfolioService";
+import type { GrowthReportResponse } from "../../services/aiMentorService";
 
 interface KpiCardProps {
   icon: React.ReactNode;
@@ -28,19 +26,25 @@ function KpiCard({
   color,
 }: KpiCardProps) {
   return (
-    <div className="app-surface app-border rounded-2xl p-6">
+    <div className="app-surface app-border rounded-2xl p-4.5">
 
-      <div className="mb-4 flex items-center justify-between">
+  <div className="mb-4 flex items-start justify-between gap-4">
 
-        <div className={`rounded-xl p-3 ${color}`}>
-          {icon}
-        </div>
+    <div className={`rounded-xl p-3 ${color} shrink-0`}>
+      {icon}
+    </div>
 
-        <span className="text-3xl font-bold">
-          {value}
-        </span>
+    <div className="flex-1 text-right">
+
+      <div className="text-2xl font-bold leading-tight break-words whitespace-normal">
+
+        {value}
 
       </div>
+
+    </div>
+
+  </div>
 
       <h3 className="font-semibold">
         {title}
@@ -63,25 +67,44 @@ function KpiCard({
   );
 }
 
-export default function PortfolioStats() {
+interface PortfolioStatsProps {
+  report?: GrowthReportResponse;
+}
+
+export default function PortfolioStats({
+  report: publicReport,
+}: PortfolioStatsProps) {
 
   const [report, setReport] =
-    useState<GrowthReportResponse | null>(null);
+    useState<GrowthReportResponse | null>(
+      publicReport ?? null
+    );
 
   useEffect(() => {
 
+    if (publicReport) {
+      return;
+    }
+
     const load = async () => {
+
       try {
+
         const data = await getGrowthReport();
+
         setReport(data);
+
       } catch (error) {
+
         console.error(error);
+
       }
+
     };
 
     load();
 
-  }, []);
+  }, [publicReport]);
 
   if (!report) {
     return (

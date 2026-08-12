@@ -20,4 +20,10 @@ public interface UserRepository
     List<User> findByRoleOrderByCreatedAtDesc(Role role);
 
     Optional<User> findByPasswordResetToken(String passwordResetToken);
+
+    Optional<User> findByUsername(String username);
+
+    boolean existsByUsername(String username);
+
+    Optional<User> findByEmailOrUsername(String email, String username);
 }

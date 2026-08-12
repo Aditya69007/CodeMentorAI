@@ -28,49 +28,62 @@ public class GitHubDashboardServiceImpl
     private final GitHubRepositoryRankingService
         gitHubRepositoryRankingService;
 
-    @Override
-    public GitHubDashboardResponse getDashboard(
-            String username
-    ) {
+@Override
+public GitHubDashboardResponse getDashboard(String username) {
 
-        GitHubProfileResponse profile =
-                gitHubClient.getUserProfile(username);
+    System.out.println("STEP 1");
 
-        List<GitHubRepositoryResponse> repositories =
-                gitHubClient.getRepositories(username);
+    GitHubProfileResponse profile =
+            gitHubClient.getUserProfile(username);
 
-        List<GitHubRepositoryResponse> rankedRepositories =
-                gitHubRepositoryRankingService
-                        .rankRepositories(repositories);
+    System.out.println("STEP 2");
 
-        return GitHubDashboardResponse.builder()
+    List<GitHubRepositoryResponse> repositories =
+            gitHubClient.getRepositories(username);
 
-                .profile(profile)
+    System.out.println("STEP 3");
 
-                .statistics(
-                        mapper.mapStatistics(profile)
-                )
+    List<GitHubRepositoryResponse> rankedRepositories =
+            gitHubRepositoryRankingService
+                    .rankRepositories(repositories);
 
-                .languages(
-                        mapper.mapLanguages(rankedRepositories)
-                )
+    System.out.println("STEP 4");
 
-                .topRepositories(
-                        mapper.mapTopRepositories(rankedRepositories)
-                )
+    var statistics =
+            mapper.mapStatistics(profile);
 
-                .analytics(
-                        gitHubAnalyticsService.calculate(
-                                rankedRepositories
-                        )
-                )
+    System.out.println("STEP 5");
 
-                .repositories(
-                        mapper.mapRepositories(rankedRepositories)
-                )
+    var languages =
+            mapper.mapLanguages(rankedRepositories);
 
-                .build();
+    System.out.println("STEP 6");
 
-    }
+    var topRepositories =
+            mapper.mapTopRepositories(rankedRepositories);
+
+    System.out.println("STEP 7");
+
+    var analytics =
+            gitHubAnalyticsService.calculate(
+                    rankedRepositories
+            );
+
+    System.out.println("STEP 8");
+
+    var repositoryDtos =
+            mapper.mapRepositories(rankedRepositories);
+
+    System.out.println("STEP 9");
+
+    return GitHubDashboardResponse.builder()
+            .profile(profile)
+            .statistics(statistics)
+            .languages(languages)
+            .topRepositories(topRepositories)
+            .analytics(analytics)
+            .repositories(repositoryDtos)
+            .build();
+}
 
 }

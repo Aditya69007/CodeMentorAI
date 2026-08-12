@@ -75,12 +75,12 @@ export default function LoginPage() {
 
           <div>
             <label className="mb-2 block text-sm text-slate-300">
-              Email
+              Email or Username
             </label>
 
             <input
-              type="email"
-              placeholder="Email"
+              type="text"
+              placeholder="Email or Username"
               value={email}
               onChange={(event) =>
                 setEmail(event.target.value)

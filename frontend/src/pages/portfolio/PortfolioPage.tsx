@@ -13,12 +13,20 @@ import GitHubAnalyticsCard from "../../components/portfolio/GitHubAnalyticsCard"
 import ViewAllRepositoriesModal from "../../components/portfolio/ViewAllRepositoriesModal";
 import type { GitHubDashboard } from "../../types/github";
 import type { GitHubRepository } from "../../types/github";
+import { getAiDeveloperSummary } from "../../services/portfolioAiService";
+import type { AiDeveloperSummary } from "../../types/portfolioAi";
+import AIDeveloperSummaryCard from "../../components/portfolio/AIDeveloperSummaryCard";
+import { getSkillsSummary } from "../../services/portfolioSkillsService";
+import type { AiSkillsSummary } from "../../types/portfolioSkills";
+import AISkillsSummaryCard from "../../components/portfolio/AISkillsSummaryCard";
+import CardSkeleton from "../../components/common/CardSkeleton";
+import PortfolioScoreCard from "../../components/portfolio/PortfolioScoreCard";
+import { getPortfolioScore } from "../../services/portfolioScoreService";
+import type { PortfolioScore } from "../../types/portfolioScore";
 
 
-import {
-  getGrowthReport,
-  type GrowthReportResponse,
-} from "../../services/portfolioService";
+import { getGrowthReport } from "../../services/portfolioService";
+import type { GrowthReportResponse } from "../../services/aiMentorService";
 
 export default function PortfolioPage() {
   const [growthReport, setGrowthReport] =
@@ -28,55 +36,248 @@ export default function PortfolioPage() {
     GitHubRepository[]
   >([]);
 
+  const [developerSummary, setDeveloperSummary] =
+    useState<AiDeveloperSummary | null>(null);
+
 const [githubDashboard, setGithubDashboard] =
   useState<GitHubDashboard | null>(null);
 
   const [showRepositoriesModal, setShowRepositoriesModal] =
     useState(false);
 
+  const [skillsSummary, setSkillsSummary] =
+  useState<AiSkillsSummary | null>(null);
+
+  const [loadingDeveloperSummary, setLoadingDeveloperSummary] =
+    useState(true);
+
+  const [loadingSkillsSummary, setLoadingSkillsSummary] =
+    useState(true);
+
+  const [loadingGithub, setLoadingGithub] =
+    useState(true);
+
+  const [loadingLeetCode, setLoadingLeetCode] =
+    useState(true);
+
+  const [portfolioScore, setPortfolioScore] =
+    useState<PortfolioScore | null>(null);
+
+  const [loadingPortfolioScore, setLoadingPortfolioScore] =
+    useState(true);
+
+
 
   useEffect(() => {
-    async function loadPortfolio() {
+
+    async function loadGrowthReport() {
+
       try {
-        const growth = await getGrowthReport();
+
+        const growth =
+          await getGrowthReport();
+
         setGrowthReport(growth);
-    
-        const accounts = await getConnectedAccounts();
-    
+
+      } catch (error) {
+
+        console.error(error);
+
+      }
+
+    }
+
+    loadGrowthReport();
+
+  }, []);
+
+  useEffect(() => {
+
+    async function loadDeveloperSummary() {
+
+      try {
+
+        const summary =
+          await getAiDeveloperSummary();
+
+        setDeveloperSummary(summary);
+
+      } catch (error) {
+
+        console.error(error);
+
+      } finally {
+
+        setLoadingDeveloperSummary(false);
+
+      }
+
+    }
+
+    loadDeveloperSummary();
+
+  }, []);
+
+  useEffect(() => {
+
+    async function loadSkillsSummary() {
+
+      try {
+
+        const summary =
+          await getSkillsSummary();
+
+        setSkillsSummary(summary);
+
+      } catch (error) {
+
+        console.error(error);
+
+      } finally {
+
+        setLoadingSkillsSummary(false);
+
+      }
+
+    }
+
+    loadSkillsSummary();
+
+  }, []);
+
+  useEffect(() => {
+
+    async function loadGitHub() {
+
+      try {
+
+        const accounts =
+          await getConnectedAccounts();
+
         if (
           !accounts.githubConnected ||
           !accounts.githubUsername
         ) {
-          setFeaturedRepositories([]);
+
+          setLoadingGithub(false);
           return;
+
         }
-    
-        const [dashboard, featured] = await Promise.all([
-          getGitHubDashboard(accounts.githubUsername),
-          getFeaturedProjects(),
-        ]);
+
+        const dashboard =
+          await getGitHubDashboard(
+            accounts.githubUsername
+          );
 
         setGithubDashboard(dashboard);
-    
+
+        const featured =
+          await getFeaturedProjects();
+
         const repositories = featured
           .map((item) =>
             dashboard.repositories.find(
-              (repo) => repo.name === item.repositoryName
+              (repo) =>
+                repo.name === item.repositoryName
             )
           )
           .filter(
-            (repo): repo is GitHubRepository => repo !== undefined
+            (repo): repo is GitHubRepository =>
+              repo !== undefined
           );
-    
+
         setFeaturedRepositories(repositories);
-    
+
       } catch (error) {
+
         console.error(error);
+
+      } finally {
+
+        setLoadingGithub(false);
+
       }
+
     }
-    loadPortfolio();
+
+    loadGitHub();
+
   }, []);
 
+  useEffect(() => {
+
+    async function loadLeetCode() {
+
+      try {
+
+        /*
+        * Nothing to fetch here.
+        *
+        * LeetCodePerformanceCard
+        * already loads its own data.
+        */
+
+      } finally {
+
+        setLoadingLeetCode(false);
+
+      }
+
+    }
+
+    loadLeetCode();
+
+  }, []);
+
+  useEffect(() => {
+
+    async function loadPortfolioScore() {
+
+      try {
+
+        const score =
+          await getPortfolioScore();
+
+        setPortfolioScore(score);
+
+      } catch (error) {
+
+        console.error(error);
+
+      } finally {
+
+        setLoadingPortfolioScore(false);
+
+      }
+
+    }
+
+    loadPortfolioScore();
+
+  }, []);
+
+
+  const handleRegenerateDeveloperSummary = async () => {
+
+    setLoadingDeveloperSummary(true);
+
+    try {
+
+      const summary = await getAiDeveloperSummary();
+
+      setDeveloperSummary(summary);
+
+    } catch (error) {
+
+      console.error(error);
+
+    } finally {
+
+      setLoadingDeveloperSummary(false);
+
+    }
+
+  };
 
   return (
     <div className="space-y-8">
@@ -101,37 +302,85 @@ const [githubDashboard, setGithubDashboard] =
 
       </div>
 
+      {loadingDeveloperSummary ? (
+        <CardSkeleton />
+      ) : (
+        developerSummary && (
+        <AIDeveloperSummaryCard
+          data={developerSummary}
+          onRegenerate={handleRegenerateDeveloperSummary}
+        />
+        )
+      )}
+
+      {loadingPortfolioScore ? (
+
+        <CardSkeleton />
+
+      ) : (
+
+        portfolioScore && (
+          <PortfolioScoreCard
+            score={portfolioScore}
+          />
+        )
+
+      )}
+
       {/* Coding Profiles */}
 
       <CodingProfilesCard />
 
-      {/* LeetCode */}
+      {loadingSkillsSummary ? (
+        <CardSkeleton />
+      ) : (
+        skillsSummary && (
+          <AISkillsSummaryCard
+            data={skillsSummary}
+          />
+        )
+      )}
 
-      <GitHubAnalyticsCard />
-
-      <LeetCodePerformanceCard />
+      {loadingLeetCode ? (
+        <CardSkeleton />
+      ) : (
+        <LeetCodePerformanceCard />
+      )}
 
       {/* Featured Projects */}
 
-      <ProjectsCard
-        projects={featuredRepositories}
-      />
+      {loadingGithub ? (
 
-      {githubDashboard && (
+        <CardSkeleton />
+
+      ) : (
+
         <>
-        <TopRepositoriesCard
-          repositories={githubDashboard.topRepositories}
-          featuredRepositories={featuredRepositories}
-          onBrowseAll={() => setShowRepositoriesModal(true)}
-        />
+          <GitHubAnalyticsCard />
 
-      <ViewAllRepositoriesModal
-        open={showRepositoriesModal}
-        onClose={() => setShowRepositoriesModal(false)}
-        repositories={githubDashboard.repositories}
-        featuredRepositories={featuredRepositories}
-        />
-      </>
+          <ProjectsCard
+            projects={featuredRepositories}
+          />
+
+          {githubDashboard && (
+            <>
+              <TopRepositoriesCard
+                repositories={githubDashboard.topRepositories}
+                featuredRepositories={featuredRepositories}
+                onBrowseAll={() => setShowRepositoriesModal(true)}
+              />
+
+              <ViewAllRepositoriesModal
+                open={showRepositoriesModal}
+                onClose={() => setShowRepositoriesModal(false)}
+                repositories={githubDashboard.repositories}
+                featuredRepositories={featuredRepositories}
+              />
+            </>
+          )}
+
+        </>
+
       )}
 
     </div>

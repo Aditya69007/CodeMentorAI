@@ -1,5 +1,5 @@
 import api from "./api";
-
+import type { GrowthReportResponse } from "./aiMentorService";
 // ==================================================
 // TYPES
 // ==================================================
@@ -104,14 +104,3 @@ export const getRecentSubmissions = async (
 
 };
 
-export interface GrowthReportResponse {
-  overallGrowthScore: number;
-  developerLevel: string;
-  hintDependencyScore: number;
-  independentSolveRate: number;
-  totalCompletedIndependentSessions: number;
-  independentlySolvedProblems: number;
-  achievements: string[];
-  growthSummary: string;
-  recommendedNextAction: string;
-}

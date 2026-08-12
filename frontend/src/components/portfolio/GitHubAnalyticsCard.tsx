@@ -5,53 +5,66 @@ import {
 } from "../../services/connectedAccountsService";
 import type { GitHubDashboard } from "../../types/github";
 
-export default function GitHubAnalyticsCard() {
+interface GitHubAnalyticsCardProps {
+  dashboard?: GitHubDashboard | null;
+}
 
-  const [dashboard, setDashboard] =
-    useState<GitHubDashboard | null>(null);
+export default function GitHubAnalyticsCard({
+  dashboard: publicDashboard,
+}: GitHubAnalyticsCardProps) {
 
-  useEffect(() => {
+const [dashboard, setDashboard] =
+  useState<GitHubDashboard | null>(null);
 
-    async function load() {
+useEffect(() => {
 
-      try {
+  if (publicDashboard) {
+    return;
+  }
 
-        const accounts =
-          await getConnectedAccounts();
+  async function load() {
 
-        if (
-          !accounts.githubConnected ||
-          !accounts.githubUsername
-        ) {
-          return;
-        }
+    try {
 
-        const data =
-          await getGitHubDashboard(
-            accounts.githubUsername
-          );
+      const accounts =
+        await getConnectedAccounts();
 
-        setDashboard(data);
-
-      } catch (error) {
-
-        console.error(error);
-
+      if (
+        !accounts.githubConnected ||
+        !accounts.githubUsername
+      ) {
+        return;
       }
+
+      const data =
+        await getGitHubDashboard(
+          accounts.githubUsername
+        );
+
+      setDashboard(data);
+
+    } catch (error) {
+
+      console.error(error);
 
     }
 
-    load();
+  }
 
-  }, []);
+  load();
 
-  if (!dashboard) {
+}, [publicDashboard]);
+
+const currentDashboard =
+  publicDashboard ?? dashboard;
+
+  if (!currentDashboard) {
     return null;
   }
 
   return (
 
-    <section className="app-surface app-border rounded-2xl p-6">
+    <section className="app-surface app-border rounded-3xl p-6 sm:p-8">
 
     <div className="mb-8">
 
@@ -69,32 +82,32 @@ export default function GitHubAnalyticsCard() {
 
         <MetricCard
         title="Developer Score"
-        value={dashboard.statistics.developerScore}
+        value={currentDashboard.statistics.developerScore}
         />
 
         <MetricCard
         title="Repositories"
-        value={dashboard.statistics.repositories}
+        value={currentDashboard.statistics.repositories}
         />
 
         <MetricCard
         title="Followers"
-        value={dashboard.statistics.followers}
+        value={currentDashboard.statistics.followers}
         />
 
         <MetricCard
         title="Repository Score"
-        value={dashboard.analytics.repositoryScore}
+        value={currentDashboard.analytics.repositoryScore}
         />
 
         <MetricCard
         title="Technology Score"
-        value={dashboard.analytics.technologyScore}
+        value={currentDashboard.analytics.technologyScore}
         />
 
         <MetricCard
         title="Account Age"
-        value={`${dashboard.statistics.accountAgeYears} Years`}
+        value={`${currentDashboard.statistics.accountAgeYears} Years`}
         />
 
     </div>
@@ -111,7 +124,7 @@ export default function GitHubAnalyticsCard() {
 
     <div className="mt-6 space-y-5">
 
-        {dashboard.languages.map((language) => (
+        {currentDashboard.languages.map((language) => (
 
         <div key={language.language}>
 
@@ -131,7 +144,7 @@ export default function GitHubAnalyticsCard() {
 
             </div>
 
-            <div className="h-3 overflow-hidden rounded-full bg-slate-700">
+            <div className="h-3 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
 
             <div
                 className="h-full rounded-full bg-blue-500 transition-all duration-700"
@@ -162,7 +175,7 @@ export default function GitHubAnalyticsCard() {
 
         <div className="space-y-3">
 
-        {dashboard.analytics.strengths.map((strength) => (
+        {currentDashboard.analytics.strengths.map((strength) => (
 
             <div
             key={strength}
@@ -193,7 +206,7 @@ export default function GitHubAnalyticsCard() {
 
         <div className="space-y-3">
 
-        {dashboard.analytics.improvements.map((item) => (
+        {currentDashboard.analytics.improvements.map((item) => (
 
             <div
             key={item}
@@ -224,7 +237,7 @@ export default function GitHubAnalyticsCard() {
 
     <div className="mt-5 flex flex-wrap gap-3">
 
-        {dashboard.analytics.strongestTechnologies.map((tech) => (
+        {currentDashboard.analytics.strongestTechnologies.map((tech) => (
 
         <span
             key={tech}
@@ -249,7 +262,7 @@ export default function GitHubAnalyticsCard() {
 
     <div className="mt-5 flex flex-wrap gap-3">
 
-        {dashboard.analytics.recommendedTechnologies.map((tech) => (
+        {currentDashboard.analytics.recommendedTechnologies.map((tech) => (
 
         <span
             key={tech}
@@ -284,7 +297,7 @@ function MetricCard({
 
   return (
 
-    <div className="rounded-2xl border border-slate-700/40 bg-slate-900/40 p-5 transition hover:border-blue-500">
+    <div className="rounded-2xl border app-border app-surface-secondary p-5 transition hover:border-blue-500/50">
 
       <p className="text-sm app-text-secondary">
 

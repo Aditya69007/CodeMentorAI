@@ -46,10 +46,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         System.out.println("Login method called");
 
-        User user = userRepository.findByEmail(request.getEmail())
+        User user = userRepository
+                .findByEmailOrUsername(
+                        request.getEmail(),
+                        request.getEmail()
+                )
                 .orElseThrow(() ->
-                        new RuntimeException("Invalid email or password")
+                        new RuntimeException(
+                                "Invalid email or password"
+                        )
                 );
+
 
         if (!passwordEncoder.matches(
                 request.getPassword(),
@@ -60,6 +67,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     "Invalid email or password"
             );
         }
+
 
         if (!Boolean.TRUE.equals(user.getEnabled())) {
 
@@ -90,6 +98,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .userId(user.getId())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
+                .username(user.getUsername())
                 .email(user.getEmail())
                 .role(user.getRole())
                 .profilePicture(user.getProfilePicture())

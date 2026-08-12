@@ -2,6 +2,7 @@ import {
   Route,
   Routes,
 } from "react-router-dom";
+import PublicPortfolioPage from "./components/portfolio/PublicPortfolioPage";
 import SessionsPage from "./pages/settings/SessionsPage";
 import { NotificationProvider } from "./context/NotificationContext";
 import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
@@ -102,6 +103,11 @@ export default function App() {
         <Route
             path="/oauth-success"
             element={<OAuthSuccess />}
+        />
+
+        <Route
+          path="/portfolio/:username"
+          element={<PublicPortfolioPage />}
         />
 
         {/* ==========================================

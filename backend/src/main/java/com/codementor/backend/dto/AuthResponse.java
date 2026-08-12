@@ -20,6 +20,7 @@ public class AuthResponse {
     private Long userId;
     private String firstName;
     private String lastName;
+    private String username;
     private String email;
     private Role role;
     private String profilePicture;

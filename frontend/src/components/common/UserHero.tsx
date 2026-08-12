@@ -12,7 +12,6 @@ interface UserHeroProps {
 export default function UserHero({
   user,
   title,
-  badges,
   actions,
 }: UserHeroProps) {
 
@@ -24,9 +23,9 @@ const fullName =
 
     <section className="app-surface app-border rounded-3xl p-8">
 
-      <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+      <div className="grid grid-cols-[1fr_430px] gap-12">
 
-        <div className="flex items-center gap-6">
+        <div className="flex flex-1 items-center gap-8">
 
             <UserAvatar
                 user={user}
@@ -65,44 +64,30 @@ const fullName =
 
               </div>
 
-              <div className="flex items-center gap-2">
-
+              <div className="flex items-center space-between gap-2 ">
                 <FiShield className="text-blue-500" />
 
-                {user.role}
+                <span>{user.role}</span>
 
+                {user.username && (
+                  <span className="text-sm font-medium text-blue-400/80">
+                    @{user.username}
+                  </span>
+                )}
               </div>
 
             </div>
 
-            <div className="mt-5 flex flex-wrap gap-2">
-
-            {badges
-            .filter(Boolean)
-            .map((badge, index) => (
-                <span
-                key={`${badge}-${index}`}
-                className="rounded-full bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-500"
-                >
-                {badge}
-                </span>
-            ))}
-
-            </div>
 
           </div>
 
         </div>
 
-        {actions && (
+      <div className="flex flex-col gap-6">
 
-          <div className="flex flex-wrap gap-3">
+        {actions}
 
-            {actions}
-
-          </div>
-
-        )}
+      </div>
 
       </div>
 

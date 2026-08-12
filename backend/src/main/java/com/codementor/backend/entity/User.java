@@ -34,6 +34,9 @@ public class User {
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
+    @Column(unique = true, length = 30)
+    private String username;
+
     @JsonIgnore
     private String password;
 

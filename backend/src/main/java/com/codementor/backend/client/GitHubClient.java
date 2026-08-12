@@ -2,20 +2,23 @@ package com.codementor.backend.client;
 
 import com.codementor.backend.dto.GitHubProfileResponse;
 import com.codementor.backend.dto.GitHubRepositoryResponse;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.server.ResponseStatusException;
+
 import java.util.Arrays;
 import java.util.List;
 
 @Component
-@RequiredArgsConstructor
 public class GitHubClient {
 
     private static final String GITHUB_API =
             "https://api.github.com";
+
+    @Value("${GITHUB_TOKEN}")
+    private String githubToken;
 
     private final RestClient restClient = RestClient.create();
 
@@ -25,6 +28,8 @@ public class GitHubClient {
 
             return restClient.get()
                     .uri(GITHUB_API + "/users/" + username)
+                    .header("Authorization", "Bearer " + githubToken)
+                    .header("Accept", "application/vnd.github+json")
                     .retrieve()
                     .onStatus(
                             HttpStatusCode::isError,
@@ -49,22 +54,34 @@ public class GitHubClient {
             );
 
         }
-
     }
 
-    public List<GitHubRepositoryResponse> getRepositories(String username) {
+    public List<GitHubRepositoryResponse> getRepositories(
+            String username
+    ) {
 
         try {
 
             GitHubRepositoryResponse[] repositories =
                     restClient.get()
-                            .uri(GITHUB_API + "/users/" + username + "/repos")
+                            .uri(
+                                    GITHUB_API
+                                            + "/users/"
+                                            + username
+                                            + "/repos"
+                            )
                             .header(
-                                "Accept",
-                                "application/vnd.github+json"
+                                    "Authorization",
+                                    "Bearer " + githubToken
+                            )
+                            .header(
+                                    "Accept",
+                                    "application/vnd.github+json"
                             )
                             .retrieve()
-                            .body(GitHubRepositoryResponse[].class);
+                            .body(
+                                    GitHubRepositoryResponse[].class
+                            );
 
             return repositories == null
                     ? List.of()
@@ -82,7 +99,5 @@ public class GitHubClient {
             );
 
         }
-
     }
-
 }

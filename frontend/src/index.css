@@ -9,21 +9,23 @@
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 
-  --app-bg: #f6f8fa;
+  /* Light Theme */
+  --app-bg: #f8fafc;
   --surface: #ffffff;
-  --surface-secondary: #f6f8fa;
-  --surface-hover: #f3f4f6;
+  --surface-secondary: #f8fafc;
+  --surface-hover: #f1f5f9;
 
-  --border: #d8dee4;
+  --border: #e2e8f0;
 
-  --text-primary: #1f2328;
-  --text-secondary: #656d76;
-  --text-muted: #8c959f;
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
 
   --accent: #2563eb;
 }
 
 html.dark {
+  /* Dark Theme */
   --app-bg: #0d1117;
   --surface: #161b22;
   --surface-secondary: #0d1117;
@@ -184,4 +186,64 @@ button:disabled {
   border-color: var(--accent);
   background-color: var(--surface);
   box-shadow: 0 0 0 3px rgb(59 130 246 / 0.12);
+}
+
+/* ==================================================
+PROFILE / ACCOUNT FORM
+================================================== */
+
+.app-input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background-color: var(--surface-secondary);
+  color: var(--text-primary);
+  padding: 0.875rem 1rem;
+  outline: none;
+
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    background-color 150ms ease;
+}
+
+.app-input:hover {
+  border-color: var(--text-muted);
+}
+
+.app-input:focus {
+  border-color: var(--accent);
+  background-color: var(--surface);
+  box-shadow: 0 0 0 3px rgb(59 130 246 / 0.12);
+}
+
+.app-input::placeholder {
+  color: var(--text-muted);
+}
+
+.app-input:disabled {
+  cursor: not-allowed;
+  background-color: var(--surface-secondary);
+  color: var(--text-secondary);
+  opacity: 1;
+}
+
+
+/* Connected account cards */
+
+.app-account-card {
+  border: 1px solid var(--border);
+  background-color: var(--surface-secondary);
+  color: var(--text-primary);
+
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    transform 150ms ease;
+}
+
+.app-account-card:hover {
+  border-color: rgb(59 130 246 / 0.35);
+  background-color: var(--surface-hover);
+  transform: translateY(-2px);
 }

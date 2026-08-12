@@ -31,7 +31,7 @@ export default function ProjectsCard({
 
         <div
           key={project.name}
-          className="group rounded-3xl border border-slate-700/40 bg-slate-900/40 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-blue-500 hover:shadow-xl hover:shadow-blue-500/10"
+          className="group rounded-3xl border border-slate-700/40 app-surface-secondary p-6 transition-all duration-300 hover:-translate-y-1 hover:border-blue-500 hover:shadow-xl hover:shadow-blue-500/10"
         >
 
           <div className="flex items-start justify-between">
@@ -65,7 +65,7 @@ export default function ProjectsCard({
             </div>
 
             <FiGithub
-              className="text-3xl text-slate-500 transition group-hover:text-white"
+              className="text-3xl app-text-secondary transition group-hover:text-blue-500"
             />
 
           </div>
@@ -87,7 +87,7 @@ export default function ProjectsCard({
 
                 <span
                   key={topic}
-                  className="rounded-full bg-slate-800 px-3 py-1 text-xs text-blue-300"
+                  className="rounded-full bg-blue-500/10 px-3 py-1 text-xs text-blue-600 dark:text-blue-300"
                 >
                   #{topic}
                 </span>
@@ -98,7 +98,7 @@ export default function ProjectsCard({
 
           )}
 
-          <div className="mt-8 flex flex-wrap items-center gap-6 rounded-2xl border border-slate-700/40 bg-slate-800/40 px-5 py-4">
+          <div className="mt-8 flex flex-wrap items-center gap-6 rounded-2xl border app-border app-surface-secondary px-5 py-4">
 
             <span className="font-medium">
               ⭐ {project.stars} Stars

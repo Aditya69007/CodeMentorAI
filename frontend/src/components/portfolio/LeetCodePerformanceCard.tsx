@@ -13,17 +13,35 @@ import leetcodeService from "../../services/leetcodeService";
 import { getConnectedAccounts } from "../../services/connectedAccountsService";
 import type { LeetCodeProfile } from "../../types/leetcode";
 
-export default function LeetCodePerformanceCard() {
-  const [profile, setProfile] = useState<LeetCodeProfile | null>(null);
+interface LeetCodePerformanceCardProps {
+  profile?: LeetCodeProfile | null;
+}
+
+export default function LeetCodePerformanceCard({
+  profile: publicProfile,
+}: LeetCodePerformanceCardProps) {
+
+  const [profile, setProfile] =
+    useState<LeetCodeProfile | null>(
+      publicProfile ?? null
+    );
+
   const [loading, setLoading] = useState(true);
   const [showAchievements, setShowAchievements] = useState(false);
 
   useEffect(() => {
-    const loadProfile = async () => {
+    if (publicProfile !== undefined) {
+      return;
+    }
+
+    async function loadProfile() {
       try {
         const accounts = await getConnectedAccounts();
 
-        if (!accounts.leetcodeConnected || !accounts.leetcodeUsername) {
+        if (
+          !accounts.leetcodeConnected ||
+          !accounts.leetcodeUsername
+        ) {
           setLoading(false);
           return;
         }
@@ -38,34 +56,39 @@ export default function LeetCodePerformanceCard() {
       } finally {
         setLoading(false);
       }
-    };
+    }
 
-    loadProfile();
-  }, []);
+    void loadProfile();
+  }, [publicProfile]);
+
+const displayProfile =
+  publicProfile !== undefined
+    ? publicProfile
+    : profile;
 
   const topSkills = useMemo(() => {
-    if (!profile) return [];
+    if (!displayProfile) return [];
 
     return [
-      ...profile.skills.advanced,
-      ...profile.skills.intermediate,
-      ...profile.skills.fundamental,
+      ...displayProfile.skills.advanced,
+      ...displayProfile.skills.intermediate,
+      ...displayProfile.skills.fundamental,
     ]
       .sort((a, b) => b.problemsSolved - a.problemsSolved)
       .slice(0, 5);
-  }, [profile]);
+  }, [displayProfile]);
 
-  if (loading) {
+  if (publicProfile === undefined && loading) {
     return (
       <section className="app-surface app-border rounded-2xl p-6">
         <p className="app-text-secondary">
-          Loading LeetCode profile...
+          Loading LeetCode displayProfile?...
         </p>
       </section>
     );
   }
 
-  if (!profile) {
+  if (!displayProfile) {
     return (
       <section className="app-surface app-border rounded-2xl p-6">
         <div className="flex items-center gap-3">
@@ -88,37 +111,37 @@ export default function LeetCodePerformanceCard() {
   const metrics = [
     {
       label: "Contest Rating",
-      value: Math.round(profile.contest.rating),
+      value: Math.round(displayProfile?.contest.rating),
       icon: FiTrendingUp,
     },
     {
       label: "Problems Solved",
-      value: profile.problems.totalSolved,
+      value: displayProfile?.problems.totalSolved,
       icon: FiTarget,
     },
     {
       label: "Acceptance Rate",
-      value: `${profile.problems.acceptanceRate.toFixed(1)}%`,
+      value: `${displayProfile?.problems.acceptanceRate.toFixed(1)}%`,
       icon: FiBarChart2,
     },
     {
     label: "Current Streak",
-    value: `${profile.calendar.currentStreak} Days`,
+    value: `${displayProfile?.calendar.currentStreak} Days`,
     icon: FiAward,
     },
     {
     label: "Global Rank",
-    value: profile.contest.globalRanking.toLocaleString(),
+    value: displayProfile?.contest.globalRanking.toLocaleString(),
     icon: FiTrendingUp,
     },
     {
     label: "Top %",
-    value: `${profile.contest.topPercentage.toFixed(2)}%`,
+    value: `${displayProfile?.contest.topPercentage.toFixed(2)}%`,
     icon: FiAward,
     },
     {
     label: "Contests",
-    value: profile.contest.attendedContestsCount,
+    value: displayProfile?.contest.attendedContestsCount,
     icon: FiBarChart2,
     },
   ];
@@ -126,22 +149,22 @@ export default function LeetCodePerformanceCard() {
     const difficulty = [
     {
         label: "Easy",
-        solved: profile.problems.easySolved,
-        total: profile.problems.easySubmissions,
+        solved: displayProfile?.problems.easySolved,
+        total: displayProfile?.problems.easySubmissions,
         color: "bg-emerald-500",
         text: "text-emerald-400",
     },
     {
         label: "Medium",
-        solved: profile.problems.mediumSolved,
-        total: profile.problems.mediumSubmissions,
+        solved: displayProfile?.problems.mediumSolved,
+        total: displayProfile?.problems.mediumSubmissions,
         color: "bg-yellow-500",
         text: "text-yellow-400",
     },
     {
         label: "Hard",
-        solved: profile.problems.hardSolved,
-        total: profile.problems.hardSubmissions,
+        solved: displayProfile?.problems.hardSolved,
+        total: displayProfile?.problems.hardSubmissions,
         color: "bg-red-500",
         text: "text-red-400",
     },
@@ -163,7 +186,7 @@ export default function LeetCodePerformanceCard() {
             </h2>
 
             <p className="app-text-secondary">
-              @{profile.username}
+              @{displayProfile?.username}
             </p>
 
           </div>
@@ -173,7 +196,7 @@ export default function LeetCodePerformanceCard() {
         <button
           onClick={() =>
             window.open(
-              `https://leetcode.com/u/${profile.username}/`,
+              `https://leetcode.com/u/${displayProfile?.username}/`,
               "_blank"
             )
           }
@@ -307,7 +330,7 @@ export default function LeetCodePerformanceCard() {
         </span>
 
         <span className="text-lg font-bold text-blue-400">
-            {profile.analytics.developerScore}
+            {displayProfile?.analytics.developerScore}
         </span>
 
         </div>
@@ -319,7 +342,7 @@ export default function LeetCodePerformanceCard() {
         </span>
 
         <span className="text-lg font-bold text-orange-400">
-            {profile.analytics.contestScore}
+            {displayProfile?.analytics.contestScore}
         </span>
 
         </div>
@@ -331,7 +354,7 @@ export default function LeetCodePerformanceCard() {
         </span>
 
         <span className="text-lg font-bold text-emerald-400">
-            {profile.analytics.skillScore}
+            {displayProfile?.analytics.skillScore}
         </span>
 
         </div>
@@ -343,7 +366,7 @@ export default function LeetCodePerformanceCard() {
         </span>
 
         <span className="text-lg font-bold text-purple-400">
-            {profile.analytics.consistencyScore}
+            {displayProfile?.analytics.consistencyScore}
         </span>
 
         </div>
@@ -355,7 +378,7 @@ export default function LeetCodePerformanceCard() {
         </span>
 
         <span className="text-lg font-bold text-red-400">
-            {profile.analytics.difficultyScore}
+            {displayProfile?.analytics.difficultyScore}
         </span>
 
         </div>
@@ -396,7 +419,7 @@ export default function LeetCodePerformanceCard() {
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
 
-            {profile.badges
+            {displayProfile?.badges
                 .slice(0, 4)
                 .map((badge) => (
 
@@ -425,7 +448,7 @@ export default function LeetCodePerformanceCard() {
 
         </div>
 
-        {profile.badges.length > 4 && (
+        {displayProfile?.badges.length > 4 && (
 
             <div className="mt-6 text-center">
 
@@ -433,7 +456,7 @@ export default function LeetCodePerformanceCard() {
                     onClick={() => setShowAchievements(true)}
                     className="text-lg font-semibold text-orange-500 hover:underline"
                 >
-                    +{profile.badges.length - 4} More Achievements
+                    +{displayProfile?.badges.length - 4} More Achievements
                 </button>
 
             </div>
@@ -445,7 +468,7 @@ export default function LeetCodePerformanceCard() {
     <LeetCodeAchievementsModal
         open={showAchievements}
         onClose={() => setShowAchievements(false)}
-        badges={profile.badges}
+        badges={displayProfile?.badges}
     />
 
     </section>

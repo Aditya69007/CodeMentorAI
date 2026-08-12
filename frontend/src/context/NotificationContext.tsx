@@ -9,16 +9,16 @@ import {
 import type { ReactNode } from "react";
 
 import {
-    getNotifications,
-    getNotificationSummary,
-    markAsRead as markNotificationRead,
-    markAllAsRead as markAllNotificationsRead,
-    deleteNotification as deleteNotificationApi,
-    deleteAllNotifications as deleteAllNotificationsApi,
+  getNotifications,
+  getNotificationSummary,
+  markAsRead as markNotificationRead,
+  markAllAsRead as markAllNotificationsRead,
+  deleteNotification as deleteNotificationApi,
+  deleteAllNotifications as deleteAllNotificationsApi,
 } from "../services/notificationCenterService";
 
 import type {
-    Notification,
+  Notification,
 } from "../services/notificationCenterService";
 
 interface NotificationContextType {
@@ -33,7 +33,7 @@ interface NotificationContextType {
   deleteAllNotifications: () => Promise<void>;
 }
 
- export const NotificationContext =
+export const NotificationContext =
   createContext<NotificationContextType | undefined>(undefined);
 
 export function NotificationProvider({
@@ -41,26 +41,42 @@ export function NotificationProvider({
 }: {
   children: ReactNode;
 }) {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const isPublicPortfolio =
+    window.location.pathname.startsWith("/portfolio/");
+
+  const [notifications, setNotifications] =
+    useState<Notification[]>([]);
+
+  const [unreadCount, setUnreadCount] =
+    useState(0);
+
+  const [loading, setLoading] =
+    useState(!isPublicPortfolio);
 
   const refreshNotifications = useCallback(async () => {
+    // Public portfolio does not need notifications
+    if (isPublicPortfolio) {
+      return;
+    }
+
     try {
-      const [notificationData, summary] = await Promise.all([
-        getNotifications(),
-        getNotificationSummary(),
-      ]);
+      const [notificationData, summary] =
+        await Promise.all([
+          getNotifications(),
+          getNotificationSummary(),
+        ]);
 
       setNotifications(notificationData);
-      setUnreadCount(summary.unreadNotifications);
+      setUnreadCount(
+        summary.unreadNotifications
+      );
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isPublicPortfolio]);
 
   useEffect(() => {
-    refreshNotifications();
+    void refreshNotifications();
   }, [refreshNotifications]);
 
   const markAsRead = async (id: number) => {
@@ -86,14 +102,14 @@ export function NotificationProvider({
   return (
     <NotificationContext.Provider
       value={{
-          notifications,
-          unreadCount,
-          loading,
-          refreshNotifications,
-          markAsRead,
-          markAllAsRead,
-          deleteNotification,
-          deleteAllNotifications,
+        notifications,
+        unreadCount,
+        loading,
+        refreshNotifications,
+        markAsRead,
+        markAllAsRead,
+        deleteNotification,
+        deleteAllNotifications,
       }}
     >
       {children}

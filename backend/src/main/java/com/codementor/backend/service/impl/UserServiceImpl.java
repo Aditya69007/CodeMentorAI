@@ -40,6 +40,32 @@ public class UserServiceImpl implements UserService {
 
     private final UserSessionRepository userSessionRepository;
 
+    private String generateUniqueUsername(
+            String firstName,
+            String lastName
+    ) {
+
+        String baseUsername =
+                (firstName + lastName)
+                        .toLowerCase()
+                        .replaceAll("[^a-z0-9]", "");
+
+        String username = baseUsername;
+
+        int count = 1;
+
+        while (userRepository.existsByUsername(username)) {
+
+            username = baseUsername + count;
+
+            count++;
+
+        }
+
+        return username;
+
+    }
+        
 
     @Override
     public void registerUser(RegisterRequest request) {
@@ -48,9 +74,16 @@ public class UserServiceImpl implements UserService {
             throw new ResourceAlreadyExistsException("Email already registered.");
         }
 
+        String username =
+                generateUniqueUsername(
+                        request.getFirstName(),
+                        request.getLastName()
+                );
+
         User user = User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
+                .username(username)
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
@@ -71,11 +104,11 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    @Override
-    public UserProfileResponse updateCurrentUser(
-            String email,
-            UpdateProfileRequest request
-    ) {
+        @Override
+        public UserProfileResponse updateCurrentUser(
+                String email,
+                UpdateProfileRequest request
+        ) {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -83,11 +116,25 @@ public class UserServiceImpl implements UserService {
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
 
+        if (request.getUsername() != null &&
+                !request.getUsername().trim().equalsIgnoreCase(user.getUsername())) {
+
+                String username = request.getUsername().trim().toLowerCase();
+
+                if (userRepository.existsByUsername(username)) {
+                throw new ResourceAlreadyExistsException(
+                        "Username already exists."
+                );
+                }
+
+                user.setUsername(username);
+        }
+
         userRepository.save(user);
 
         return mapToUserProfile(user);
 
-    }
+        }
 
     @Override
     public ConnectedAccountsResponse getConnectedAccounts(String email) {
@@ -170,10 +217,13 @@ public class UserServiceImpl implements UserService {
                 .userId(user.getId())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
+                .username(user.getUsername())
                 .email(user.getEmail())
                 .role(user.getRole())
                 .provider(user.getProvider())
                 .profilePicture(user.getProfilePicture())
+                .githubUsername(user.getGithubUsername())
+                .leetcodeUsername(user.getLeetcodeUsername())
                 .build();
 
     }

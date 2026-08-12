@@ -52,7 +52,7 @@ export default function TopRepositoriesCard({
 
     <div
       key={repo.name}
-      className="flex items-center justify-between rounded-2xl border border-slate-700/40 bg-slate-900/40 p-6 transition hover:border-blue-500 hover:bg-slate-900/70"
+      className="flex items-center justify-between rounded-2xl border app-border app-surface-secondary p-6 transition hover:border-blue-500/50"
     >
 
       <div className="flex items-start gap-5">
@@ -94,7 +94,7 @@ export default function TopRepositoriesCard({
         href={repo.repositoryUrl}
         target="_blank"
         rel="noreferrer"
-        className="rounded-xl border border-slate-700 px-5 py-3 transition hover:border-blue-500"
+        className="rounded-xl border app-border px-5 py-3 transition hover:border-blue-500 hover:text-blue-500"
       >
         <FiGithub />
       </a>

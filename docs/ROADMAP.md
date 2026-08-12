@@ -391,3 +391,34 @@ STEP 12 ✅ Change Password
 ☐ PDF Generator
 ☐ Controller
 ☐ Frontend
+
+So our roadmap now is:
+
+✅ Profile Header
+
+✅ Personal Information
+
+✅ Connected Accounts
+
+✅ Account Status
+
+⬜ Recent Activity
+
+⬜ Quick Actions
+
+⬜ Better animations
+
+⬜ Loading skeletons
+
+⬜ Empty states
+
+⬜ Toast messages
+
+⬜ Mobile responsiveness
+
+1. ✅ Finish Portfolio
+2. ✅ Public Portfolio (/u/:username)
+3. ✅ Share button
+4. ✅ Public PDF
+5. ✅ Back to Profile Page
+6. ✅ Final UI polish across the app

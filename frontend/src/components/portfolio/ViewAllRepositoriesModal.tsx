@@ -25,7 +25,7 @@ export default function ViewAllRepositoriesModal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
       <div className="app-surface app-border flex h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-3xl">
 
         {/* Header */}
@@ -46,7 +46,7 @@ export default function ViewAllRepositoriesModal({
 
           <button
             onClick={onClose}
-            className="rounded-xl border border-slate-700 p-3 transition hover:border-blue-500 hover:bg-slate-800"
+            className="rounded-xl border app-border p-3 transition hover:border-blue-500 hover:bg-slate-100 dark:hover:bg-slate-800"
           >
             <FiX className="text-2xl" />
           </button>
@@ -63,7 +63,7 @@ export default function ViewAllRepositoriesModal({
 
               <div
                 key={repo.name}
-                className="rounded-2xl border border-slate-700/40 bg-slate-900/40 p-6 transition hover:border-blue-500"
+                className="rounded-2xl border app-border app-surface-secondary p-6 transition hover:border-blue-500/50"
               >
 
                 <div className="flex items-start justify-between">
