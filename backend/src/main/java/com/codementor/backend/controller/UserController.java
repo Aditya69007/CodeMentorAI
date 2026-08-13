@@ -13,6 +13,7 @@ import com.codementor.backend.dto.NotificationSettingsResponse;
 import com.codementor.backend.dto.UpdateConnectedAccountsRequest;
 import com.codementor.backend.dto.UpdateNotificationSettingsRequest;
 import com.codementor.backend.dto.DeleteAccountRequest;
+import com.codementor.backend.dto.ChangePasswordRequest;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -48,6 +49,20 @@ public class UserController {
         );
 
     }
+
+        @PostMapping("/change-password")
+        public ResponseEntity<Void> changePassword(
+                Authentication authentication,
+                @Valid @RequestBody ChangePasswordRequest request
+        ) {
+
+        userService.changePassword(
+                authentication.getName(),
+                request
+        );
+
+        return ResponseEntity.noContent().build();
+        }
 
         @GetMapping("/connected-accounts")
         public ResponseEntity<ConnectedAccountsResponse> getConnectedAccounts(

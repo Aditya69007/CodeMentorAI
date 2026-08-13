@@ -44,13 +44,26 @@ public class AdminDataInitializer implements CommandLineRunner {
             return;
         }
 
-        if (userRepository.findByEmail(adminEmail).isPresent()) {
+        var existingAdmin = userRepository.findByEmail(adminEmail);
 
-            System.out.println(
-                    "ADMIN INITIALIZER: Admin account already exists."
-            );
+        if (existingAdmin.isPresent()) {
 
-            return;
+        User admin = existingAdmin.get();
+
+        if (admin.getRole() != Role.SUPER_ADMIN) {
+                admin.setRole(Role.SUPER_ADMIN);
+                userRepository.save(admin);
+
+                System.out.println(
+                        "ADMIN INITIALIZER: Existing configured admin promoted to SUPER_ADMIN."
+                );
+        } else {
+                System.out.println(
+                        "ADMIN INITIALIZER: SUPER_ADMIN account already exists."
+                );
+        }
+
+        return;
         }
 
         User admin = User.builder()
@@ -58,7 +71,7 @@ public class AdminDataInitializer implements CommandLineRunner {
                 .lastName(adminLastName)
                 .email(adminEmail)
                 .password(passwordEncoder.encode(adminPassword))
-                .role(Role.ADMIN)
+                .role(Role.SUPER_ADMIN)
                 .provider(AuthProvider.LOCAL)
                 .enabled(true)
                 .build();

@@ -6,7 +6,9 @@ import com.codementor.backend.dto.AdminPlatformAnalyticsResponse;
 import com.codementor.backend.dto.AdminUserDetailResponse;
 import com.codementor.backend.dto.AdminUserSummaryResponse;
 import com.codementor.backend.dto.ProblemResponse;
-
+import com.codementor.backend.dto.AdminSettingsResponse;
+import com.codementor.backend.dto.UpdateAdminSettingsRequest;
+import com.codementor.backend.service.AdminSettingsService;
 import com.codementor.backend.entity.Difficulty;
 
 import com.codementor.backend.service.AdminDashboardService;
@@ -41,6 +43,7 @@ public class AdminController {
 
     private final ProblemService problemService;
 
+    private final AdminSettingsService adminSettingsService;
 
 
     // ==================================================
@@ -185,4 +188,28 @@ public class AdminController {
                 )
         );
     }
+
+        // ==================================================
+        // ADMIN SETTINGS
+        // ==================================================
+
+        @GetMapping("/settings")
+        public ResponseEntity<AdminSettingsResponse> getAdminSettings() {
+
+        return ResponseEntity.ok(
+                adminSettingsService.getSettings()
+        );
+        }
+
+        @org.springframework.web.bind.annotation.PutMapping("/settings")
+        public ResponseEntity<AdminSettingsResponse> updateAdminSettings(
+                @org.springframework.web.bind.annotation.RequestBody
+                UpdateAdminSettingsRequest request
+        ) {
+
+        return ResponseEntity.ok(
+                adminSettingsService.updateSettings(request)
+        );
+        }
+
 }

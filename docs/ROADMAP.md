@@ -422,3 +422,98 @@ So our roadmap now is:
 4. ✅ Public PDF
 5. ✅ Back to Profile Page
 6. ✅ Final UI polish across the app
+
+Our order will be:
+
+✅ Admin Profile
+🔄 Admin Settings API
+⏳ Connect Settings switches to API
+⏳ Super Admin authorization
+⏳ Super Admin Center
+⏳ Create Admin
+⏳ USER → ADMIN
+⏳ ADMIN → USER
+⏳ Delete USER
+⏳ Delete ADMIN
+⏳ Protect admin@codementor.local from deletion/demotion
+
+
+🛡️ Admin — Final Build TODO
+1. /admin/profile — Admin Profile
+Admin profile header
+Profile picture/avatar
+First name / Last name
+Username
+Email
+ADMIN role badge
+Edit own profile
+Save changes
+Connected GitHub / LeetCode / Google accounts
+Admin account status
+Public developer portfolio link
+Profile completion
+2. /admin/settings — Admin Settings
+Administrator Preferences
+Compact Dashboard
+Admin Notifications
+Platform Alerts
+Security
+Change password
+Active sessions
+Logout from all devices
+Admin Tools
+Download/export admin reports
+Platform/system information
+Admin Settings API
+GET settings
+PUT/update settings
+3. 🛡️ Super Admin Center
+
+Visible/functioning only for:
+
+admin@codementor.local
+
+Features:
+
+Create new admin
+USER → ADMIN
+ADMIN → USER
+Delete any user
+Delete any admin
+View all administrators
+Manage administrator roles
+Protect the master admin from accidental deletion/demotion
+Full platform management access
+Edit own profile
+4. Normal Admin Restrictions
+
+Normal ADMIN users can:
+
+View platform analytics
+Manage problems
+Manage topics
+Manage submissions
+View/manage users according to existing admin permissions
+Manage their own profile/settings
+
+But cannot:
+
+Create admins
+Promote users to admin
+Demote admins
+Delete other admins
+Delete the master admin
+Access Super Admin controls
+5. Admin UI
+
+Admin sidebar/header should include:
+
+Dashboard
+Problems
+Topics
+Users
+Submissions
+AI Analytics
+Platform Analytics
+Profile
+Settings

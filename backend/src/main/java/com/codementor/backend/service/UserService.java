@@ -8,7 +8,7 @@ import com.codementor.backend.dto.UpdateNotificationSettingsRequest;
 import com.codementor.backend.dto.UpdateProfileRequest;
 import com.codementor.backend.dto.UserProfileResponse;
 import com.codementor.backend.dto.DeleteAccountRequest;
-
+import com.codementor.backend.dto.ChangePasswordRequest;
 
 public interface UserService {
 
@@ -23,8 +23,13 @@ public interface UserService {
     UserProfileResponse updateCurrentUser(
             String email,
             UpdateProfileRequest request
-    );
-
+        );
+        
+        void changePassword(
+                String email,
+                ChangePasswordRequest request
+        );
+        
     ConnectedAccountsResponse getConnectedAccounts(String email);
 
     ConnectedAccountsResponse updateConnectedAccounts(
@@ -38,6 +43,5 @@ public interface UserService {
             String email,
             UpdateNotificationSettingsRequest request
     );
-
 
 }

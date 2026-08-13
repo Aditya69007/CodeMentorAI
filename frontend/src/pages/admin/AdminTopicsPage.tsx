@@ -593,55 +593,77 @@ const loadTopics = useCallback(
 
       {/* FILTERS */}
 
-      <section className="app-surface app-border mt-6 rounded-xl border p-4">
+      <section className="app-surface app-border mt-6 rounded-2xl border p-4">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center">
 
-        <div className="flex flex-col gap-4 md:flex-row">
-
+          {/* Search */}
           <div className="relative flex-1">
-
-            <FiSearch className="app-text-muted absolute left-3 top-1/2 -translate-y-1/2" />
-
-            <input
-              value={search}
-              onChange={(event) =>
-                setSearch(
-                  event.target.value
-                )
-              }
-              placeholder="Search topics..."
-              className="admin-input pl-10"
+            <FiSearch
+              size={18}
+              className="app-text-muted pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2"
             />
 
+            <input
+              type="text"
+              value={search}
+              onChange={(event) =>
+                setSearch(event.target.value)
+              }
+              placeholder="Search topics..."
+              className="
+                admin-input
+                h-12
+                w-full
+                rounded-xl
+                !pl-11
+                !pr-4
+                outline-none
+                transition
+                focus:border-blue-500
+                focus:ring-2
+                focus:ring-blue-500/20
+              "
+            />
           </div>
 
+          {/* Status Filter */}
+          <div className="relative md:w-52">
+            <select
+              value={statusFilter}
+              onChange={(event) =>
+                setStatusFilter(
+                  event.target.value as StatusFilter
+                )
+              }
+              className="
+                admin-input
+                h-12
+                w-full
+                cursor-pointer
+                rounded-xl
+                px-4
+                outline-none
+                transition
+                focus:border-blue-500
+                focus:ring-2
+                focus:ring-blue-500/20
+              "
+            >
+              <option value="ALL">
+                All Topics
+              </option>
 
-          <select
-            value={statusFilter}
-            onChange={(event) =>
-              setStatusFilter(
-                event.target
-                  .value as StatusFilter
-              )
-            }
-            className="admin-input md:w-52"
-          >
+              <option value="ACTIVE">
+                Active
+              </option>
 
-            <option value="ALL">
-              All Topics
-            </option>
-
-            <option value="ACTIVE">
-              Active
-            </option>
-
-            <option value="INACTIVE">
-              Inactive
-            </option>
-
-          </select>
+              <option value="INACTIVE">
+                Inactive
+              </option>
+            </select>
+          </div>
 
         </div>
-
       </section>
 
 

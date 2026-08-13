@@ -21,10 +21,10 @@ import com.codementor.backend.dto.NotificationSettingsResponse;
 import com.codementor.backend.dto.UpdateConnectedAccountsRequest;
 import com.codementor.backend.dto.UpdateNotificationSettingsRequest;
 import com.codementor.backend.dto.DeleteAccountRequest;
+import com.codementor.backend.dto.ChangePasswordRequest;
 import com.codementor.backend.export.dto.ProfileExport;
 import java.time.LocalDateTime;
 import jakarta.transaction.Transactional;
-
 
 @Service
 @RequiredArgsConstructor
@@ -134,6 +134,68 @@ public class UserServiceImpl implements UserService {
 
         return mapToUserProfile(user);
 
+        }
+
+        @Override
+        @Transactional
+        public void changePassword(
+                String email,
+                ChangePasswordRequest request
+        ) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found")
+                );
+
+        // Admin password changes are only supported for LOCAL accounts
+        if (user.getProvider() != AuthProvider.LOCAL) {
+                throw new RuntimeException(
+                        "Password cannot be changed for accounts using external authentication."
+                );
+        }
+
+        // Verify current password
+        if (request.getCurrentPassword() == null ||
+                !passwordEncoder.matches(
+                        request.getCurrentPassword(),
+                        user.getPassword()
+                )) {
+
+                throw new RuntimeException(
+                        "Current password is incorrect."
+                );
+        }
+
+        // Confirm new password
+        if (!request.getNewPassword().equals(
+                request.getConfirmPassword()
+        )) {
+
+                throw new RuntimeException(
+                        "New passwords do not match."
+                );
+        }
+
+        // Prevent reusing the same password
+        if (passwordEncoder.matches(
+                request.getNewPassword(),
+                user.getPassword()
+        )) {
+
+                throw new RuntimeException(
+                        "New password must be different from your current password."
+                );
+        }
+
+        // Save encoded password
+        user.setPassword(
+                passwordEncoder.encode(
+                        request.getNewPassword()
+                )
+        );
+
+        userRepository.save(user);
         }
 
     @Override

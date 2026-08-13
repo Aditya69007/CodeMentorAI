@@ -64,4 +64,6 @@ public interface IndependentSolveSessionRepository
                 Long problemId
         );
 
+        void deleteByUserId(Long userId);
+
 }

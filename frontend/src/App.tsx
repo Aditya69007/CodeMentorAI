@@ -27,11 +27,12 @@ import AdminSubmissionsPage from "./pages/admin/AdminSubmissionsPage";
 import ProfilePage from "./pages/account/ProfilePage";
 import SettingsPage from "./pages/account/SettingsPage";
 import PortfolioPage from "./pages/portfolio/PortfolioPage";
-
+import AdminProfilePage from "./pages/admin/AdminProfilePage";
+import AdminSettingsPage from "./pages/admin/AdminSettingsPage";
 import UserRoute from "./routes/UserRoute";
 import AdminRoute from "./routes/AdminRoute";
 import RoleBasedRedirect from "./routes/RoleBasedRedirect";
-
+import SuperAdminRoute from "./routes/SuperAdminRoute";
 import AppLayout from "./components/layout/AppLayout";
 
 import GrowthReportPage
@@ -57,6 +58,7 @@ import PersonalizedInterviewPage
 
 import UserDashboardPage
   from "./pages/user/UserDashboardPage";
+import SuperAdminCenterPage from "./pages/admin/SuperAdminCenterPage";
 
 
 export default function App() {
@@ -255,6 +257,24 @@ export default function App() {
 
           <Route element={<AdminLayout />}>
 
+          <Route element={<SuperAdminRoute />}>
+            <Route
+              path="/admin/super-admin"
+              element={<SuperAdminCenterPage />}
+            />
+          </Route>
+          
+            {/* ADMIN PROFILE */}
+
+            <Route
+              path="/admin/profile"
+              element={<AdminProfilePage />}
+            />
+
+            <Route
+              path="/admin/settings"
+              element={<AdminSettingsPage />}
+            />
 
             {/* PLATFORM ANALYTICS */}
 

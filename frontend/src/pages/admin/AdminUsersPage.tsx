@@ -3,9 +3,9 @@ import {
   useState,
   type ReactNode,
 } from "react";
-
+import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-
+import { getAdminSettings } from "../../services/adminSettingsService";
 import {
   FiActivity,
   FiAlertTriangle,
@@ -54,6 +54,9 @@ export default function AdminUsersPage() {
   const [deleteError, setDeleteError] =
     useState("");
 
+  const [pageSize, setPageSize] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [confirmBeforeDelete, setConfirmBeforeDelete] = useState(true);
 
   useEffect(() => {
 
@@ -69,6 +72,11 @@ export default function AdminUsersPage() {
           await getAdminUsers();
 
         setUsers(data);
+
+        const settings = await getAdminSettings();
+
+        setPageSize(settings.defaultPageSize || 10);
+        setConfirmBeforeDelete(settings.confirmBeforeDelete ?? true);
 
       } catch {
 
@@ -89,45 +97,34 @@ export default function AdminUsersPage() {
   }, []);
 
 
-  const handleDeleteUser = async () => {
+  const handleDeleteUser = async (userId?: number) => {
+    const targetUserId = userId ?? userToDelete?.id;
 
-    if (!userToDelete) {
+    if (!targetUserId) {
       return;
     }
 
-
     try {
-
       setDeleting(true);
-
       setDeleteError("");
 
-
-      await deleteAdminUser(
-        userToDelete.id
-      );
-
+      await deleteAdminUser(targetUserId);
 
       setUsers((currentUsers) =>
-        currentUsers.filter(
-          (user) =>
-            user.id !== userToDelete.id
-        )
+        currentUsers.filter((user) => user.id !== targetUserId)
       );
-
 
       setUserToDelete(null);
 
-    } catch {
+      toast.success("User deleted successfully");
+    } catch (error) {
+      console.error("Failed to delete user", error);
 
-      setDeleteError(
-        "Unable to permanently delete this user."
-      );
+      setDeleteError("Unable to permanently delete this user.");
 
+      toast.error("Failed to delete user");
     } finally {
-
       setDeleting(false);
-
     }
   };
 
@@ -153,6 +150,17 @@ export default function AdminUsersPage() {
       );
 
     });
+
+
+const totalPages = Math.max(
+  1,
+  Math.ceil(filteredUsers.length / pageSize)
+);
+
+const paginatedUsers = filteredUsers.slice(
+  (currentPage - 1) * pageSize,
+  currentPage * pageSize
+);
 
 
   const totalSubmissions =
@@ -289,9 +297,10 @@ export default function AdminUsersPage() {
               <input
                 type="text"
                 value={search}
-                onChange={(event) =>
-                  setSearch(event.target.value)
-                }
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setCurrentPage(1);
+                }}
                 placeholder="Search users..."
                 className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-sm text-slate-900 outline-none transition focus:border-blue-500 dark:border-slate-800 dark:bg-slate-950 dark:text-white"
               />
@@ -403,7 +412,7 @@ export default function AdminUsersPage() {
 
                   <tbody>
 
-                    {filteredUsers.map(
+                    {paginatedUsers.map(
                       (user) => {
 
                         const fullName =
@@ -587,11 +596,14 @@ export default function AdminUsersPage() {
                                 <button
                                   type="button"
                                   onClick={() => {
-
                                     setDeleteError("");
 
-                                    setUserToDelete(user);
+                                    if (confirmBeforeDelete) {
+                                      setUserToDelete(user);
+                                      return;
+                                    }
 
+                                    void handleDeleteUser(user.id);
                                   }}
                                   title="Delete user"
                                   className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-500 dark:border-slate-800"
@@ -615,6 +627,52 @@ export default function AdminUsersPage() {
                   </tbody>
 
                 </table>
+
+                <div className="flex flex-col gap-3 border-t border-slate-200 px-6 py-4 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800">
+
+                  <p className="text-sm text-slate-500">
+                    Showing{" "}
+                    {filteredUsers.length === 0
+                      ? 0
+                      : (currentPage - 1) * pageSize + 1}
+                    {" "}–{" "}
+                    {Math.min(currentPage * pageSize, filteredUsers.length)}
+                    {" "}of {filteredUsers.length} users
+                  </p>
+
+                  <div className="flex items-center gap-2">
+
+                    <button
+                      type="button"
+                      disabled={currentPage === 1}
+                      onClick={() =>
+                        setCurrentPage((page) => Math.max(1, page - 1))
+                      }
+                      className="rounded-lg border border-slate-200 px-3 py-2 text-sm disabled:opacity-40 dark:border-slate-800"
+                    >
+                      Previous
+                    </button>
+
+                    <span className="px-3 text-sm font-medium">
+                      {currentPage} / {totalPages}
+                    </span>
+
+                    <button
+                      type="button"
+                      disabled={currentPage === totalPages}
+                      onClick={() =>
+                        setCurrentPage((page) =>
+                          Math.min(totalPages, page + 1)
+                        )
+                      }
+                      className="rounded-lg border border-slate-200 px-3 py-2 text-sm disabled:opacity-40 dark:border-slate-800"
+                    >
+                      Next
+                    </button>
+
+                  </div>
+
+                </div>
 
               </div>
 

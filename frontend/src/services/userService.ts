@@ -58,3 +58,18 @@ export async function deleteAccount(
   );
 
 }
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+export async function changePassword(
+  data: ChangePasswordRequest
+): Promise<void> {
+  await api.post(
+    "/users/change-password",
+    data
+  );
+}

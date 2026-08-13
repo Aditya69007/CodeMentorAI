@@ -1,5 +1,4 @@
-import { NavLink } from "react-router-dom";
-
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   FiActivity,
   FiBarChart2,
@@ -12,7 +11,11 @@ import {
   FiMessageSquare,
   FiUsers,
   FiX,
+  FiLogOut,
+  FiShield,
 } from "react-icons/fi";
+import { useAuth } from "../../../hooks/useAuth";
+import { useState } from "react";
 
 interface AdminSidebarProps {
   collapsed: boolean;
@@ -65,6 +68,20 @@ export default function AdminSidebar({
   onToggleCollapse,
   onCloseMobile,
 }: AdminSidebarProps) {
+
+  const navigate = useNavigate();
+  const { isSuperAdmin, logout } = useAuth();
+
+  const [showRestrictedModal, setShowRestrictedModal] = useState(false);
+
+  function handleLogout() {
+    logout();
+
+    navigate("/login", {
+      replace: true,
+    });
+  }
+
   return (
     <>
       {mobileOpen && (
@@ -403,81 +420,239 @@ export default function AdminSidebar({
         </nav>
 
         {/* ==========================================
-            SYSTEM STATUS
+            ADMIN ACTIONS
         ========================================== */}
 
         <div className="app-border shrink-0 border-t p-3">
-          {collapsed ? (
-            <div
-              title="System Online"
-              className="
-                hidden
+          <div className="space-y-2">
+
+            {/* SUPER ADMIN */}
+
+            <NavLink
+              to="/admin/super-admin"
+              onClick={(event) => {
+                if (!isSuperAdmin) {
+                  event.preventDefault();
+                  setShowRestrictedModal(true);
+                }
+
+                onCloseMobile();
+              }}
+              className={({ isActive }) =>
+                `
+                group
+                relative
+                flex
                 h-11
                 items-center
-                justify-center
-
-                lg:flex
-              "
-            >
-              <span
-                className="
-                  h-2.5
-                  w-2.5
-
-                  rounded-full
-
-                  bg-emerald-500
-
-                  shadow-[0_0_10px_rgba(16,185,129,0.5)]
-                "
-              />
-            </div>
-          ) : (
-            <div
-              className="
-                app-surface-secondary
-                app-border
-
                 rounded-xl
-                border
+                text-sm
+                font-medium
+                transition-all
+                duration-200
 
-                px-4
-                py-3
-              "
+                ${
+                  collapsed
+                    ? "lg:justify-center lg:px-0"
+                    : "gap-3 px-3"
+                }
+
+                ${
+                  isActive
+                    ? "bg-red-500/10 text-red-400"
+                    : "app-text-secondary hover:!bg-red-500/10 hover:!text-red-400"
+                }
+                `
+              }
             >
-              <div className="flex items-center gap-2">
-                <span
+              <FiShield className="shrink-0 text-[19px]" />
+
+              <span
+                className={`
+                  whitespace-nowrap
+                  ${
+                    collapsed
+                      ? "lg:hidden"
+                      : "block"
+                  }
+                `}
+              >
+                Super Admin
+              </span>
+
+              {collapsed && (
+                <div
                   className="
-                    h-2
-                    w-2
-
-                    rounded-full
-
-                    bg-emerald-500
+                    app-surface-secondary
+                    app-border
+                    pointer-events-none
+                    absolute
+                    left-[calc(100%+12px)]
+                    top-1/2
+                    z-[100]
+                    hidden
+                    -translate-y-1/2
+                    whitespace-nowrap
+                    rounded-lg
+                    border
+                    px-3
+                    py-2
+                    text-xs
+                    font-medium
+                    opacity-0
+                    shadow-xl
+                    transition-opacity
+                    group-hover:opacity-100
+                    lg:block
                   "
-                />
+                >
+                  Super Admin
+                </div>
+              )}
+            </NavLink>
 
-                <p className="text-sm font-semibold">
-                  System Online
-                </p>
+
+            {/* LOGOUT */}
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              className={`
+                group
+                relative
+                flex
+                h-11
+                w-full
+                items-center
+                rounded-xl
+                text-sm
+                font-medium
+                text-red-400
+                transition-all
+                duration-200
+                hover:!bg-red-500/10
+                hover:!text-red-400
+
+                ${
+                  collapsed
+                    ? "lg:justify-center lg:px-0"
+                    : "gap-3 px-3"
+                }
+              `}
+            >
+              <FiLogOut className="shrink-0 text-[19px]" />
+
+              <span
+                className={`
+                  whitespace-nowrap
+                  ${
+                    collapsed
+                      ? "lg:hidden"
+                      : "block"
+                  }
+                `}
+              >
+                Logout
+              </span>
+
+              {collapsed && (
+                <div
+                  className="
+                    app-surface-secondary
+                    app-border
+                    pointer-events-none
+                    absolute
+                    left-[calc(100%+12px)]
+                    top-1/2
+                    z-[100]
+                    hidden
+                    -translate-y-1/2
+                    whitespace-nowrap
+                    rounded-lg
+                    border
+                    px-3
+                    py-2
+                    text-xs
+                    font-medium
+                    opacity-0
+                    shadow-xl
+                    transition-opacity
+                    group-hover:opacity-100
+                    lg:block
+                  "
+                >
+                  Logout
+                </div>
+              )}
+            </button>
+
+          </div>
+        </div>
+        
+      </aside>
+
+      {showRestrictedModal && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+
+          <div className="app-surface app-border w-full max-w-md rounded-3xl border p-6 shadow-2xl">
+
+            <div className="flex items-start justify-between gap-4">
+
+              <div className="flex items-center gap-4">
+
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-red-500/10">
+                  <FiShield className="text-xl text-red-400" />
+                </div>
+
+                <div>
+                  <h2 className="text-xl font-bold">
+                    Access Restricted
+                  </h2>
+
+                  <p className="mt-1 text-sm app-text-secondary">
+                    Super Admin only
+                  </p>
+                </div>
+
               </div>
 
-              <p
-                className="
-                  app-text-secondary
-
-                  mt-2
-
-                  text-xs
-                  leading-5
-                "
+              <button
+                type="button"
+                onClick={() => setShowRestrictedModal(false)}
+                className="rounded-xl p-2 app-text-secondary transition hover:bg-slate-500/10 hover:text-white"
+                aria-label="Close"
               >
-                All services operational
-              </p>
+                <FiX className="text-xl" />
+              </button>
+
             </div>
-          )}
+
+            <div className="mt-6 rounded-2xl border border-red-500/20 bg-red-500/5 p-4">
+
+              <p className="text-sm leading-6 app-text-secondary">
+                This section is restricted to the Creator and Super Admin.
+                You do not have permission to manage administrators.
+              </p>
+
+            </div>
+
+            <div className="mt-6 flex justify-end">
+
+              <button
+                type="button"
+                onClick={() => setShowRestrictedModal(false)}
+                className="rounded-xl bg-blue-600 px-5 py-2.5 font-semibold text-white transition hover:bg-blue-700"
+              >
+                Close
+              </button>
+
+            </div>
+
+          </div>
+
         </div>
-      </aside>
+      )}
+    
     </>
   );
 }

@@ -10,7 +10,7 @@ export interface RegisterRequest {
   password: string;
 }
 
-export type UserRole = "USER" | "ADMIN";
+export type UserRole = "USER" | "ADMIN" | "SUPER_ADMIN";
 
 export interface AuthUser {
   userId: number;

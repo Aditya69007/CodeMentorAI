@@ -14,7 +14,7 @@ import {
   getAdminDashboardAnalytics,
   getAdminDashboardStats,
 } from "../../services/adminService";
-
+import { getAdminSettings } from "../../services/adminSettingsService";
 import AdminSubmissionActivityChart from "../../components/admin/dashboard/AdminSubmissionActivityChart";
 import AdminDifficultyChart from "../../components/admin/dashboard/AdminDifficultyChart";
 import AdminStatusDistribution from "../../components/admin/dashboard/AdminStatusDistribution";
@@ -36,9 +36,16 @@ export default function AdminDashboardPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const loadDashboardData = async () => {
+    let refreshTimer: ReturnType<typeof setInterval> | undefined;
+
+    const loadDashboardData = async (
+      showLoading = true
+    ) => {
       try {
-        setLoading(true);
+        if (showLoading) {
+          setLoading(true);
+        }
+
         setError("");
 
         const [
@@ -51,6 +58,18 @@ export default function AdminDashboardPage() {
 
         setStats(dashboardStats);
         setAnalytics(dashboardAnalytics);
+
+        const settings = await getAdminSettings();
+
+        if (
+          settings.autoRefreshDashboard &&
+          settings.autoRefreshInterval > 0
+        ) {
+          refreshTimer = setInterval(() => {
+            void loadDashboardData(false);
+          }, settings.autoRefreshInterval * 1000);
+        }
+
       } catch {
         setError(
           "Unable to load admin dashboard data."
@@ -61,6 +80,12 @@ export default function AdminDashboardPage() {
     };
 
     void loadDashboardData();
+
+    return () => {
+      if (refreshTimer) {
+        clearInterval(refreshTimer);
+      }
+    };
   }, []);
 
   const dashboardCards = [

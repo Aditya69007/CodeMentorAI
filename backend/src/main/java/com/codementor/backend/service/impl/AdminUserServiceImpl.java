@@ -19,7 +19,7 @@ import com.codementor.backend.repository.SubmissionRepository;
 import com.codementor.backend.repository.UserRepository;
 
 import com.codementor.backend.service.AdminUserService;
-
+import com.codementor.backend.repository.IndependentSolveSessionRepository;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
@@ -49,6 +49,7 @@ public class AdminUserServiceImpl
 
     private final AiMistakeRepository aiMistakeRepository;
 
+    private final IndependentSolveSessionRepository independentSolveSessionRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -630,6 +631,8 @@ public class AdminUserServiceImpl
         aiMistakeRepository.deleteByUserId(userId);
 
         aiAnalysisRepository.deleteBySubmissionUserId(userId);
+
+        independentSolveSessionRepository.deleteByUserId(userId);
 
         submissionRepository.deleteByUserId(userId);
 

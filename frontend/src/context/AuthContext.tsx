@@ -173,7 +173,11 @@ export function AuthProvider({
     Boolean(token && user);
 
   const isAdmin =
-    user?.role === "ADMIN";
+    user?.role === "ADMIN" ||
+    user?.role === "SUPER_ADMIN";
+
+  const isSuperAdmin =
+    user?.role === "SUPER_ADMIN";
 
   return (
     <AuthContext.Provider
@@ -182,6 +186,7 @@ export function AuthProvider({
         user,
         isAuthenticated,
         isAdmin,
+        isSuperAdmin,
         login,
         logout,
         refreshUser,

@@ -132,7 +132,7 @@ export default function AdminTopbar({
 
             transition
 
-            hover:text-blue-500
+            hover:!text-blue-500
 
             lg:hidden
           "
@@ -190,7 +190,7 @@ export default function AdminTopbar({
           onClick={toggleTheme}
           aria-label="Toggle theme"
           title={
-            theme === "dark"
+            theme === "DARK"
               ? "Switch to light mode"
               : "Switch to dark mode"
           }
@@ -210,10 +210,10 @@ export default function AdminTopbar({
 
             transition
 
-            hover:text-blue-500
+            hover:!text-blue-500
           "
         >
-          {theme === "dark" ? (
+          {theme === "DARK" ? (
             <FiSun />
           ) : (
             <FiMoon />
@@ -243,7 +243,7 @@ export default function AdminTopbar({
 
             transition
 
-            hover:text-blue-500
+            hover:!text-blue-500
           "
         >
           <FiBell />
@@ -424,29 +424,27 @@ export default function AdminTopbar({
               </div>
 
               <div className="p-2">
-                <button
-                  type="button"
-                  className="
-                    app-text-secondary
-
-                    flex
-                    w-full
-                    items-center
-                    gap-3
-
-                    rounded-lg
-
-                    px-3
-                    py-2.5
-
-                    text-sm
-
-                    transition
-
-                    hover:bg-slate-500/10
-                    hover:text-blue-500
-                  "
-                >
+              <button
+                type="button"
+                onClick={() => {
+                  setProfileOpen(false);
+                  navigate("/admin/profile");
+                }}
+                className="
+                  app-text-secondary
+                  flex
+                  w-full
+                  items-center
+                  gap-3
+                  rounded-lg
+                  px-3
+                  py-2.5
+                  text-sm
+                  transition
+                  hover:bg-slate-500/10
+                  hover:!text-blue-500
+                "
+              >
                   <FiUser />
 
                   Profile
@@ -454,29 +452,26 @@ export default function AdminTopbar({
 
                 <button
                   type="button"
+                  onClick={() => {
+                    setProfileOpen(false);
+                    navigate("/admin/settings");
+                  }}
                   className="
                     app-text-secondary
-
                     flex
                     w-full
                     items-center
                     gap-3
-
                     rounded-lg
-
                     px-3
                     py-2.5
-
                     text-sm
-
                     transition
-
                     hover:bg-slate-500/10
-                    hover:text-blue-500
+                    hover:!text-blue-500
                   "
                 >
                   <FiSettings />
-
                   Settings
                 </button>
               </div>
