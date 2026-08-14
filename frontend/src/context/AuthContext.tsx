@@ -102,29 +102,39 @@ export function AuthProvider({
       password,
     });
 
-  const authenticatedUser: AuthUser = {
-    userId: response.userId,
-    firstName: response.firstName,
-    lastName: response.lastName,
-    username: response.username,
-    email: response.email,
-    role: response.role,
-    profilePicture: response.profilePicture,
-    provider: response.provider,
-    sessionId: response.sessionId,
-  };
-
+    // Store token first so /users/me can authenticate
     localStorage.setItem(
       TOKEN_STORAGE_KEY,
       response.token
     );
+
+    setToken(response.token);
+
+    // Get the complete/current user profile
+    const currentUser = await getCurrentUser();
+
+    const authenticatedUser: AuthUser = {
+      userId: currentUser.userId,
+      firstName: currentUser.firstName,
+      lastName: currentUser.lastName,
+      username: currentUser.username,
+      email: currentUser.email,
+      role: currentUser.role,
+      provider: currentUser.provider,
+      profilePicture: currentUser.profilePicture,
+
+      createdAt: currentUser.createdAt,
+      githubUsername: currentUser.githubUsername,
+      leetcodeUsername: currentUser.leetcodeUsername,
+
+      sessionId: response.sessionId,
+    };
 
     localStorage.setItem(
       USER_STORAGE_KEY,
       JSON.stringify(authenticatedUser)
     );
 
-    setToken(response.token);
     setUser(authenticatedUser);
 
     return authenticatedUser;
@@ -134,22 +144,22 @@ export function AuthProvider({
 
     const currentUser = await getCurrentUser();
 
-  const authenticatedUser: AuthUser = {
-    userId: currentUser.id,
-    firstName: currentUser.firstName,
-    lastName: currentUser.lastName,
-    username: currentUser.username,
-    email: currentUser.email,
-    role: currentUser.role,
-    profilePicture: currentUser.profilePicture,
-    provider: currentUser.provider,
+    const authenticatedUser: AuthUser = {
+      userId: currentUser.userId,
+      firstName: currentUser.firstName,
+      lastName: currentUser.lastName,
+      username: currentUser.username,
+      email: currentUser.email,
+      role: currentUser.role,
+      profilePicture: currentUser.profilePicture,
+      provider: currentUser.provider,
 
-    /*
-    * Temporary fallback.
-    * /auth/me doesn't return sessionId yet.
-    */
-    sessionId: user?.sessionId ?? 0,
-  };
+      createdAt: currentUser.createdAt,
+      githubUsername: currentUser.githubUsername,
+      leetcodeUsername: currentUser.leetcodeUsername,
+
+      sessionId: user?.sessionId ?? 0,
+    };
 
     localStorage.setItem(
       USER_STORAGE_KEY,
@@ -157,7 +167,6 @@ export function AuthProvider({
     );
 
     setUser(authenticatedUser);
-
   };
 
   const logout = () => {

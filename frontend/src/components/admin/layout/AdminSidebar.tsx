@@ -8,7 +8,6 @@ import {
   FiCpu,
   FiGrid,
   FiLayers,
-  FiMessageSquare,
   FiUsers,
   FiX,
   FiLogOut,
@@ -160,27 +159,12 @@ export default function AdminSidebar({
           `}
         >
           <div className="flex min-w-0 items-center gap-3">
-            <div
-              className="
-                flex
-                h-11
-                w-11
-                shrink-0
-                items-center
-                justify-center
-
-                rounded-xl
-
-                bg-blue-600
-
-                text-xl
-                text-white
-
-                shadow-lg
-                shadow-blue-600/20
-              "
-            >
-              <FiMessageSquare />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl overflow-hidden">
+              <img
+                src="/brain-logo.png"
+                alt="CodeMentorAI"
+                className="h-full w-full object-contain"
+              />
             </div>
 
             <div

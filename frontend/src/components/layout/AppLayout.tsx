@@ -14,7 +14,6 @@ import {
   FiBookOpen,
   FiChevronLeft,
   FiChevronRight,
-  FiCode,
   FiHome,
   FiList,
   FiLogOut,
@@ -270,10 +269,12 @@ export default function AppLayout() {
           >
 
 
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm shadow-blue-600/30">
-
-              <FiCode size={20} />
-
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl overflow-hidden">
+              <img
+                src="/brain-logo.png"
+                alt="CodeMentorAI"
+                className="h-full w-full object-contain"
+              />
             </div>
 
 
@@ -463,7 +464,7 @@ export default function AppLayout() {
             `}
 
             title={
-              theme === "dark"
+              theme === "DARK"
                 ? "Switch to light mode"
                 : "Switch to dark mode"
             }
@@ -472,7 +473,7 @@ export default function AppLayout() {
 
 
             {
-              theme === "dark"
+              theme === "DARK"
                 ? (
                   <FiSun
                     className="shrink-0"
@@ -494,7 +495,7 @@ export default function AppLayout() {
                 <span className="text-sm font-medium">
 
                   {
-                    theme === "dark"
+                    theme === "DARK"
                       ? "Light Mode"
                       : "Dark Mode"
                   }
@@ -584,11 +585,13 @@ export default function AppLayout() {
         >
 
 
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white">
-
-            <FiCode size={19} />
-
-          </div>
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg overflow-hidden">
+          <img
+            src="/brain-logo.png"
+            alt="CodeMentorAI"
+            className="h-full w-full object-contain"
+          />
+        </div>
 
 
           <span className="text-lg font-bold tracking-tight">
@@ -700,12 +703,13 @@ export default function AppLayout() {
 
           >
 
-
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white">
-
-              <FiCode size={19} />
-
-            </div>
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg overflow-hidden">
+            <img
+              src="/brain-logo.png"
+              alt="CodeMentorAI"
+              className="h-full w-full object-contain"
+            />
+          </div>
 
 
             <span className="text-lg font-bold">
@@ -838,7 +842,7 @@ export default function AppLayout() {
 
 
             {
-              theme === "dark"
+              theme === "DARK"
                 ? (
                   <FiSun size={19} />
                 )
@@ -849,7 +853,7 @@ export default function AppLayout() {
 
 
             {
-              theme === "dark"
+              theme === "DARK"
                 ? "Light Mode"
                 : "Dark Mode"
             }

@@ -37,15 +37,18 @@ api.interceptors.request.use(
       localStorage.getItem("token");
 
 
-    if (token) {
+  if (token) {
+    config.headers.Authorization =
+      `Bearer ${token}`;
+  }
 
-      config.headers.Authorization =
-        `Bearer ${token}`;
+  // Let the browser/Axios set the correct
+  // multipart/form-data Content-Type + boundary
+  if (config.data instanceof FormData) {
+    delete config.headers["Content-Type"];
+  }
 
-    }
-
-
-    return config;
+  return config;
 
   },
 

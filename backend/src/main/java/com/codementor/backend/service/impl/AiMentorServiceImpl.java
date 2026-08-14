@@ -17,7 +17,8 @@ import com.codementor.backend.dto.PracticeRecommendationResponse;
 import com.codementor.backend.dto.DeveloperSkillResponse;
 import com.codementor.backend.dto.GrowthReportResponse;
 import com.codementor.backend.dto.HintDependencyScoreResponse;
-
+import com.codementor.backend.notification.service.NotificationService;
+import com.codementor.backend.notification.enums.NotificationType;
 import com.codementor.backend.dto.PersonalizedInterviewProfileResponse;
 import com.codementor.backend.entity.AiAnalysis;
 import com.codementor.backend.entity.AiChatMessage;
@@ -91,6 +92,8 @@ public class AiMentorServiceImpl implements AiMentorService {
     private final ObjectMapper objectMapper;
 
     private final UserRepository userRepository;
+
+    private final NotificationService notificationService;
 
 
     // =========================================================
@@ -202,6 +205,18 @@ public class AiMentorServiceImpl implements AiMentorService {
                         aiAnalysis
                 );
 
+                User user = submission.getUser();
+
+                notificationService.createNotification(
+                        user,
+                        "AI Mentor Analysis Ready",
+                        "Your submission for "
+                                + submission.getProblem().getTitle()
+                                + " has been analyzed by AI Mentor.",
+                        NotificationType.AI,
+                        "cpu",
+                        "/problems/" + submission.getProblem().getId()
+                );
 
                 return mapToResponse(aiAnalysis);
 

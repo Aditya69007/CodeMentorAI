@@ -17,11 +17,14 @@ export interface AuthUser {
   firstName: string;
   lastName: string;
   username: string;
+  createdAt?: string | null;
   email: string;
   role: string;
   provider: string;
   profilePicture?: string | null;
   sessionId: number;
+  leetcodeUsername?: string | null;
+  githubUsername?: string | null;
 }
 
 export interface AuthResponse extends AuthUser {

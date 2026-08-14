@@ -19,7 +19,7 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Builder.Default
-    private ThemePreference themePreference = ThemePreference.SYSTEM;
+    private ThemePreference themePreference = ThemePreference.DARK;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,6 +52,7 @@ public class User {
     @Column(unique = true)
     private String leetcodeUsername;
 
+    @Column(columnDefinition = "TEXT")
     private String profilePicture;
 
     @Column(unique = true)

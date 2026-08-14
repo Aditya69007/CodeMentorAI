@@ -77,6 +77,14 @@ export function NotificationProvider({
 
   useEffect(() => {
     void refreshNotifications();
+
+    const interval = window.setInterval(() => {
+      void refreshNotifications();
+    }, 30000);
+
+    return () => {
+      window.clearInterval(interval);
+    };
   }, [refreshNotifications]);
 
   const markAsRead = async (id: number) => {

@@ -7,6 +7,8 @@ import com.codementor.backend.execution.CodeExecutionService;
 import com.codementor.backend.repository.*;
 import com.codementor.backend.service.IndependentSolveSessionService;
 import com.codementor.backend.service.SubmissionService;
+import com.codementor.backend.notification.enums.NotificationType;
+import com.codementor.backend.notification.service.NotificationService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -39,6 +41,8 @@ public class SubmissionServiceImpl
     private final CodeExecutionService codeExecutionService;
 
     private final IndependentSolveSessionService independentSolveSessionService;
+
+    private final NotificationService notificationService;
 
 
     // ==================================================
@@ -177,6 +181,19 @@ public class SubmissionServiceImpl
         submission =
                 submissionRepository.save(submission);
 
+        if (submission.getStatus() == SubmissionStatus.ACCEPTED) {
+
+        notificationService.createNotification(
+                user,
+                "Problem Solved",
+                "Congratulations! You solved "
+                        + problem.getTitle()
+                        + " successfully.",
+                NotificationType.LEARNING,
+                "check-circle",
+                "/problems/" + problem.getId()
+        );
+        }
 
         // ==================================================
         // TRACK INDEPENDENT SOLVE SESSION SUBMISSION

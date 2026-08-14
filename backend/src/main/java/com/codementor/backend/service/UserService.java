@@ -9,10 +9,11 @@ import com.codementor.backend.dto.UpdateProfileRequest;
 import com.codementor.backend.dto.UserProfileResponse;
 import com.codementor.backend.dto.DeleteAccountRequest;
 import com.codementor.backend.dto.ChangePasswordRequest;
-
+import org.springframework.web.multipart.MultipartFile;
 public interface UserService {
 
     void registerUser(RegisterRequest request);
+    void removeProfilePicture(String email);
     void deleteAccount(
             String email,
             DeleteAccountRequest request
@@ -23,6 +24,11 @@ public interface UserService {
     UserProfileResponse updateCurrentUser(
             String email,
             UpdateProfileRequest request
+        );
+
+        String updateProfilePicture(
+                String email,
+                MultipartFile file
         );
         
         void changePassword(
@@ -43,5 +49,6 @@ public interface UserService {
             String email,
             UpdateNotificationSettingsRequest request
     );
+
 
 }

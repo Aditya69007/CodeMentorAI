@@ -14,6 +14,7 @@ import com.codementor.backend.dto.UpdateConnectedAccountsRequest;
 import com.codementor.backend.dto.UpdateNotificationSettingsRequest;
 import com.codementor.backend.dto.DeleteAccountRequest;
 import com.codementor.backend.dto.ChangePasswordRequest;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -134,5 +135,34 @@ public class UserController {
         return ResponseEntity.noContent().build();
 
         }
+
+        @PostMapping(
+                value = "/me/profile-picture",
+                consumes = "multipart/form-data"
+        )
+        public ResponseEntity<String> updateProfilePicture(
+                Authentication authentication,
+                @RequestParam("file") MultipartFile file
+        ) {
+
+        return ResponseEntity.ok(
+                userService.updateProfilePicture(
+                        authentication.getName(),
+                        file
+                )
+        );
+        }
+
+@DeleteMapping("/me/profile-picture")
+public ResponseEntity<Void> removeProfilePicture(
+        Authentication authentication
+) {
+
+    userService.removeProfilePicture(
+            authentication.getName()
+    );
+
+    return ResponseEntity.noContent().build();
+}
 
 }

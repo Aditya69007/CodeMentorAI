@@ -3,11 +3,10 @@ import {
   useRef,
   useState,
 } from "react";
-
+import NotificationBell from "../../notifications/NotificationBell";
 import { useNavigate } from "react-router-dom";
 
 import {
-  FiBell,
   FiChevronDown,
   FiLogOut,
   FiMenu,
@@ -220,49 +219,7 @@ export default function AdminTopbar({
           )}
         </button>
 
-        {/* NOTIFICATIONS */}
-
-        <button
-          type="button"
-          aria-label="Notifications"
-          className="
-            app-surface-secondary
-            app-border
-            app-text-secondary
-
-            relative
-
-            flex
-            h-10
-            w-10
-            items-center
-            justify-center
-
-            rounded-lg
-            border
-
-            transition
-
-            hover:!text-blue-500
-          "
-        >
-          <FiBell />
-
-          <span
-            className="
-              absolute
-              right-2
-              top-2
-
-              h-1.5
-              w-1.5
-
-              rounded-full
-
-              bg-blue-500
-            "
-          />
-        </button>
+      <NotificationBell />
 
         {/* PROFILE */}
 

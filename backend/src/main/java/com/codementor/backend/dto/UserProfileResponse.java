@@ -1,5 +1,6 @@
 package com.codementor.backend.dto;
 
+import java.time.LocalDateTime;
 import com.codementor.backend.entity.AuthProvider;
 import com.codementor.backend.entity.Role;
 import lombok.Builder;
@@ -28,4 +29,8 @@ public class UserProfileResponse {
     private String leetcodeUsername;
 
     private String username;
+
+    private LocalDateTime createdAt;
+
+    private Long problemsSolved;
 }

@@ -11,7 +11,7 @@ import com.codementor.backend.repository.SubmissionRepository;
 import com.codementor.backend.repository.UserRepository;
 import com.codementor.backend.service.ProblemService;
 import com.codementor.backend.entity.ProblemExample;
-
+import com.codementor.backend.notification.builder.NotificationBuilder;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
@@ -32,6 +32,8 @@ public class ProblemServiceImpl implements ProblemService {
     private final SubmissionRepository submissionRepository;
 
     private final UserRepository userRepository;
+
+    private final NotificationBuilder notificationBuilder;
 
 
     // ==================================================
@@ -359,9 +361,12 @@ public class ProblemServiceImpl implements ProblemService {
                 problem.getExamples().addAll(examples);
         }
 
-
         Problem savedProblem =
                 problemRepository.save(problem);
+
+        notificationBuilder.problemCreated(
+                savedProblem
+        );
 
         return mapToResponse(savedProblem);
         }
@@ -626,6 +631,10 @@ public class ProblemServiceImpl implements ProblemService {
         Problem savedProblem =
                 problemRepository.save(problem);
 
+        notificationBuilder.problemUpdated(
+                savedProblem
+        );
+
         return mapToResponse(savedProblem);
         }
 
@@ -642,6 +651,10 @@ public class ProblemServiceImpl implements ProblemService {
         Problem problem =
                 findProblemById(id);
 
+
+        notificationBuilder.problemDeleted(
+                problem
+        );
 
         problemRepository.delete(
                 problem

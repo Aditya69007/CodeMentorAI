@@ -54,8 +54,16 @@ export default function LoginPage() {
 
       <div className="w-full max-w-md rounded-xl border border-slate-800 bg-slate-900 p-8 shadow-xl">
 
+        <div className="mb-5 flex justify-center">
+          <img
+            src="/brain-logo.png"
+            alt="CodeMentorAI"
+            className="h-16 w-16 object-contain"
+          />
+        </div>
+
         <h1 className="text-center text-3xl font-bold text-white">
-          CodeMentor AI
+          CodeMentorAI
         </h1>
 
         <p className="mt-2 text-center text-slate-400">

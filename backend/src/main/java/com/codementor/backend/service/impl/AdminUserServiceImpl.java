@@ -12,7 +12,9 @@ import com.codementor.backend.entity.SubmissionStatus;
 import com.codementor.backend.entity.User;
 
 import com.codementor.backend.exception.ResourceNotFoundException;
-
+import com.codementor.backend.notification.builder.NotificationBuilder;
+import com.codementor.backend.notification.service.NotificationService;
+import com.codementor.backend.security.SecurityUtils;
 import com.codementor.backend.repository.AiAnalysisRepository;
 import com.codementor.backend.repository.AiMistakeRepository;
 import com.codementor.backend.repository.SubmissionRepository;
@@ -50,6 +52,12 @@ public class AdminUserServiceImpl
     private final AiMistakeRepository aiMistakeRepository;
 
     private final IndependentSolveSessionRepository independentSolveSessionRepository;
+
+    private final NotificationBuilder notificationBuilder;
+
+    private final NotificationService notificationService;
+
+        private final SecurityUtils securityUtils;
 
     @Override
     @Transactional(readOnly = true)
@@ -635,6 +643,15 @@ public class AdminUserServiceImpl
         independentSolveSessionRepository.deleteByUserId(userId);
 
         submissionRepository.deleteByUserId(userId);
+
+        User admin = securityUtils.getCurrentUser();
+
+        notificationBuilder.userDeleted(
+                admin,
+                user
+        );
+
+        notificationService.deleteAllNotifications(user);
 
         userRepository.delete(user);
         }

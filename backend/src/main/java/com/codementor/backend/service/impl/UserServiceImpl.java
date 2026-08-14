@@ -4,11 +4,12 @@ import com.codementor.backend.client.GitHubClient;
 import com.codementor.backend.dto.RegisterRequest;
 import com.codementor.backend.entity.User;
 import com.codementor.backend.exception.ResourceAlreadyExistsException;
+import com.codementor.backend.exception.ResourceNotFoundException;
 import com.codementor.backend.notification.repository.NotificationRepository;
 import com.codementor.backend.repository.UserRepository;
 import com.codementor.backend.service.UserService;
 import com.codementor.backend.session.repository.UserSessionRepository;
-
+import com.codementor.backend.notification.builder.NotificationBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,8 +24,14 @@ import com.codementor.backend.dto.UpdateNotificationSettingsRequest;
 import com.codementor.backend.dto.DeleteAccountRequest;
 import com.codementor.backend.dto.ChangePasswordRequest;
 import com.codementor.backend.export.dto.ProfileExport;
+import com.codementor.backend.notification.enums.NotificationType;
+import com.codementor.backend.notification.service.NotificationService;
+import org.springframework.web.multipart.MultipartFile;
+import com.codementor.backend.repository.SubmissionRepository;
 import java.time.LocalDateTime;
 import jakarta.transaction.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -37,8 +44,14 @@ public class UserServiceImpl implements UserService {
     private final GitHubClient gitHubClient;
 
     private final NotificationRepository notificationRepository;
+    
+    private final NotificationService notificationService;
 
+    private final NotificationBuilder notificationBuilder;
+    
     private final UserSessionRepository userSessionRepository;
+
+    private final SubmissionRepository submissionRepository;
 
     private String generateUniqueUsername(
             String firstName,
@@ -91,7 +104,9 @@ public class UserServiceImpl implements UserService {
                 .enabled(true)
                 .build();
 
-        userRepository.save(user);
+                userRepository.save(user);
+
+                notificationBuilder.userRegistered(user);
     }
 
     @Override
@@ -135,6 +150,75 @@ public class UserServiceImpl implements UserService {
         return mapToUserProfile(user);
 
         }
+
+        @Override
+        @Transactional
+        public String updateProfilePicture(
+        String email,
+        MultipartFile file
+) {
+
+    if (file == null || file.isEmpty()) {
+        throw new IllegalArgumentException(
+                "Please select an image."
+        );
+    }
+
+    String contentType = file.getContentType();
+
+    if (!"image/jpeg".equals(contentType)
+            && !"image/png".equals(contentType)
+            && !"image/webp".equals(contentType)) {
+
+        throw new IllegalArgumentException(
+                "Only JPG, PNG, and WebP images are allowed."
+        );
+    }
+
+    if (file.getSize() > 5 * 1024 * 1024) {
+        throw new IllegalArgumentException(
+                "Image must be smaller than 5 MB."
+        );
+    }
+
+    try {
+
+        User user =
+                userRepository
+                        .findByEmail(email)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "User not found."
+                                )
+                        );
+
+        byte[] imageBytes = file.getBytes();
+
+        String base64Image =
+                java.util.Base64
+                        .getEncoder()
+                        .encodeToString(imageBytes);
+
+        String profilePicture =
+                "data:"
+                        + contentType
+                        + ";base64,"
+                        + base64Image;
+
+        user.setProfilePicture(profilePicture);
+
+        userRepository.save(user);
+
+        return profilePicture;
+
+    } catch (Exception exception) {
+
+        throw new RuntimeException(
+                "Failed to upload profile picture.",
+                exception
+        );
+    }
+}
 
         @Override
         @Transactional
@@ -196,6 +280,16 @@ public class UserServiceImpl implements UserService {
         );
 
         userRepository.save(user);
+
+        notificationService.createNotification(
+                user,
+                "Password Changed",
+                "Your password was successfully changed.",
+                NotificationType.SECURITY,
+                "shield",
+                "/account/profile"
+        );
+
         }
 
     @Override
@@ -273,22 +367,29 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    private UserProfileResponse mapToUserProfile(User user) {
+        private UserProfileResponse mapToUserProfile(User user) {
+
+        Long problemsSolved =
+                submissionRepository
+                        .countDistinctSolvedProblemsByUserId(
+                                user.getId()
+                        );
 
         return UserProfileResponse.builder()
                 .userId(user.getId())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .username(user.getUsername())
+                .createdAt(user.getCreatedAt())
                 .email(user.getEmail())
                 .role(user.getRole())
                 .provider(user.getProvider())
                 .profilePicture(user.getProfilePicture())
                 .githubUsername(user.getGithubUsername())
                 .leetcodeUsername(user.getLeetcodeUsername())
+                .problemsSolved(problemsSolved)
                 .build();
-
-    }
+        }
 
     private ConnectedAccountsResponse mapToConnectedAccounts(User user) {
 
@@ -381,5 +482,20 @@ public class UserServiceImpl implements UserService {
         userRepository.delete(user);
 
     }
+
+        @Override
+        @Transactional
+        public void removeProfilePicture(String email) {
+
+        User user = userRepository
+                .findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found")
+                );
+
+        user.setProfilePicture(null);
+
+        userRepository.save(user);
+        }
 
 }

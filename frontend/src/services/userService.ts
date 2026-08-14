@@ -5,12 +5,14 @@ export interface UserProfile {
   firstName: string;
   lastName: string;
   username: string;
+  createdAt?: string | null;
   email: string;
   role: string;
   provider: string;
   profilePicture?: string | null;
   githubUsername?: string | null;
   leetcodeUsername?: string | null;
+  problemsSolved?: number | null;
 }
 
 export interface UpdateProfileRequest {
@@ -73,3 +75,26 @@ export async function changePassword(
     data
   );
 }
+export const updateProfilePicture = async (
+  file: File
+): Promise<string> => {
+
+  const formData = new FormData();
+
+  formData.append("file", file);
+
+  const response = await api.post<string>(
+    "/users/me/profile-picture",
+    formData
+  );
+
+  return response.data;
+};
+
+export const removeProfilePicture = async (): Promise<void> => {
+
+  await api.delete(
+    "/users/me/profile-picture"
+  );
+
+};
