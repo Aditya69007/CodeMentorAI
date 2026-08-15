@@ -24,16 +24,32 @@ public class DockerCodeExecutionService implements CodeExecutionService {
             List<TestCase> testCases) {
 
         Path tempDirectory = null;
+        String volumeName = "codementor-execution-" + UUID.randomUUID();
 
         try {
+
+            // ==================================================
+            // CREATE TEMP DIRECTORY
+            // ==================================================
 
             tempDirectory = Files.createTempDirectory(
                     "codementor-" + UUID.randomUUID()
             );
 
+            // ==================================================
+            // CREATE DOCKER VOLUME
+            // ==================================================
+
+            createDockerVolume(volumeName);
+
+            // ==================================================
+            // PREPARE SOURCE CODE
+            // ==================================================
+
             ExecutionResult preparationResult =
                     prepareCode(
                             tempDirectory,
+                            volumeName,
                             sourceCode,
                             language
                     );
@@ -42,8 +58,13 @@ public class DockerCodeExecutionService implements CodeExecutionService {
                 return preparationResult;
             }
 
+            // ==================================================
+            // RUN TEST CASES
+            // ==================================================
+
             return runTestCases(
                     tempDirectory,
+                    volumeName,
                     language,
                     testCases
             );
@@ -66,6 +87,16 @@ public class DockerCodeExecutionService implements CodeExecutionService {
 
         } finally {
 
+            // ==================================================
+            // REMOVE DOCKER VOLUME
+            // ==================================================
+
+            removeDockerVolume(volumeName);
+
+            // ==================================================
+            // REMOVE TEMP DIRECTORY
+            // ==================================================
+
             if (tempDirectory != null) {
                 deleteDirectory(tempDirectory);
             }
@@ -79,6 +110,7 @@ public class DockerCodeExecutionService implements CodeExecutionService {
 
     private ExecutionResult prepareCode(
             Path tempDirectory,
+            String volumeName,
             String sourceCode,
             Language language)
             throws IOException, InterruptedException {
@@ -87,14 +119,23 @@ public class DockerCodeExecutionService implements CodeExecutionService {
 
             case CPP -> {
 
+                Path sourceFile =
+                        tempDirectory.resolve("main.cpp");
+
                 Files.writeString(
-                        tempDirectory.resolve("main.cpp"),
+                        sourceFile,
                         sourceCode,
                         StandardCharsets.UTF_8
                 );
 
+                copyFileToDockerVolume(
+                        volumeName,
+                        sourceFile,
+                        "main.cpp"
+                );
+
                 return compileCode(
-                        tempDirectory,
+                        volumeName,
                         "gcc:14",
                         "g++ -std=c++20 /workspace/main.cpp -o /workspace/main"
                 );
@@ -103,14 +144,23 @@ public class DockerCodeExecutionService implements CodeExecutionService {
 
             case JAVA -> {
 
+                Path sourceFile =
+                        tempDirectory.resolve("Main.java");
+
                 Files.writeString(
-                        tempDirectory.resolve("Main.java"),
+                        sourceFile,
                         sourceCode,
                         StandardCharsets.UTF_8
                 );
 
+                copyFileToDockerVolume(
+                        volumeName,
+                        sourceFile,
+                        "Main.java"
+                );
+
                 return compileCode(
-                        tempDirectory,
+                        volumeName,
                         "eclipse-temurin:21-jdk",
                         "javac /workspace/Main.java"
                 );
@@ -119,10 +169,19 @@ public class DockerCodeExecutionService implements CodeExecutionService {
 
             case PYTHON -> {
 
+                Path sourceFile =
+                        tempDirectory.resolve("main.py");
+
                 Files.writeString(
-                        tempDirectory.resolve("main.py"),
+                        sourceFile,
                         sourceCode,
                         StandardCharsets.UTF_8
+                );
+
+                copyFileToDockerVolume(
+                        volumeName,
+                        sourceFile,
+                        "main.py"
                 );
 
                 // Python does not require compilation
@@ -149,21 +208,22 @@ public class DockerCodeExecutionService implements CodeExecutionService {
     // ==================================================
 
     private ExecutionResult compileCode(
-            Path tempDirectory,
+            String volumeName,
             String dockerImage,
             String compileCommand)
             throws IOException, InterruptedException {
 
         ProcessBuilder processBuilder =
                 createDockerProcess(
-                        tempDirectory,
+                        volumeName,
                         dockerImage,
                         compileCommand,
                         "256m",
                         "1"
                 );
 
-        Process process = processBuilder.start();
+        Process process =
+                processBuilder.start();
 
         boolean finished =
                 process.waitFor(
@@ -188,7 +248,6 @@ public class DockerCodeExecutionService implements CodeExecutionService {
                     .build();
         }
 
-
         String error =
                 new String(
                         process
@@ -196,7 +255,6 @@ public class DockerCodeExecutionService implements CodeExecutionService {
                                 .readAllBytes(),
                         StandardCharsets.UTF_8
                 ).trim();
-
 
         if (process.exitValue() != 0) {
 
@@ -211,7 +269,6 @@ public class DockerCodeExecutionService implements CodeExecutionService {
                     .build();
         }
 
-
         return null;
     }
 
@@ -222,29 +279,44 @@ public class DockerCodeExecutionService implements CodeExecutionService {
 
     private ExecutionResult runTestCases(
             Path tempDirectory,
+            String volumeName,
             Language language,
             List<TestCase> testCases)
             throws IOException, InterruptedException {
-
 
         int totalExecutionTime = 0;
 
         int passedTestCases = 0;
 
-        int totalTestCases = testCases.size();
+        int totalTestCases =
+                testCases.size();
 
 
-        for (int i = 0; i < testCases.size(); i++) {
-
+        for (int i = 0;
+             i < testCases.size();
+             i++) {
 
             TestCase testCase =
                     testCases.get(i);
 
 
+            // ==================================================
+            // WRITE INPUT FILE
+            // ==================================================
+
+            Path inputFile =
+                    tempDirectory.resolve("input.txt");
+
             Files.writeString(
-                    tempDirectory.resolve("input.txt"),
+                    inputFile,
                     testCase.getInput(),
                     StandardCharsets.UTF_8
+            );
+
+            copyFileToDockerVolume(
+                    volumeName,
+                    inputFile,
+                    "input.txt"
             );
 
 
@@ -262,7 +334,7 @@ public class DockerCodeExecutionService implements CodeExecutionService {
 
             ProcessBuilder processBuilder =
                     createDockerProcess(
-                            tempDirectory,
+                            volumeName,
                             dockerImage,
                             runCommand,
                             "128m",
@@ -294,38 +366,29 @@ public class DockerCodeExecutionService implements CodeExecutionService {
                                 testCase.getHidden()
                         );
 
-
                 return ExecutionResult.builder()
-
                         .status(
                                 SubmissionStatus.TIME_LIMIT_EXCEEDED
                         )
-
                         .errorMessage(
                                 hidden
                                         ? "Time limit exceeded on hidden test case"
                                         : "Time limit exceeded on test case "
                                         + (i + 1)
                         )
-
                         .executionTime(
                                 totalExecutionTime
                         )
-
                         .memoryUsed(0)
-
                         .passedTestCases(
                                 passedTestCases
                         )
-
                         .totalTestCases(
                                 totalTestCases
                         )
-
                         .failedOnHiddenTest(
                                 hidden
                         )
-
                         .build();
             }
 
@@ -376,36 +439,28 @@ public class DockerCodeExecutionService implements CodeExecutionService {
             if (exitCode == 124) {
 
                 return ExecutionResult.builder()
-
                         .status(
                                 SubmissionStatus.TIME_LIMIT_EXCEEDED
                         )
-
                         .errorMessage(
                                 hidden
                                         ? "Time limit exceeded on hidden test case"
                                         : "Time limit exceeded on test case "
                                         + (i + 1)
                         )
-
                         .executionTime(
                                 totalExecutionTime
                         )
-
                         .memoryUsed(0)
-
                         .passedTestCases(
                                 passedTestCases
                         )
-
                         .totalTestCases(
                                 totalTestCases
                         )
-
                         .failedOnHiddenTest(
                                 hidden
                         )
-
                         .build();
             }
 
@@ -417,36 +472,27 @@ public class DockerCodeExecutionService implements CodeExecutionService {
             if (exitCode != 0) {
 
                 return ExecutionResult.builder()
-
                         .status(
                                 SubmissionStatus.RUNTIME_ERROR
                         )
-
-                        // Do not expose hidden test error
                         .errorMessage(
                                 hidden
                                         ? "Runtime error on hidden test case"
                                         : error
                         )
-
                         .executionTime(
                                 totalExecutionTime
                         )
-
                         .memoryUsed(0)
-
                         .passedTestCases(
                                 passedTestCases
                         )
-
                         .totalTestCases(
                                 totalTestCases
                         )
-
                         .failedOnHiddenTest(
                                 hidden
                         )
-
                         .build();
             }
 
@@ -463,50 +509,42 @@ public class DockerCodeExecutionService implements CodeExecutionService {
 
             if (!output.equals(expectedOutput)) {
 
-
                 return ExecutionResult.builder()
-
                         .status(
                                 SubmissionStatus.WRONG_ANSWER
                         )
-
-                        // Never expose output for hidden test
                         .output(
                                 hidden
                                         ? null
                                         : output
                         )
-
                         .errorMessage(
                                 hidden
                                         ? "Wrong answer on hidden test case"
                                         : "Wrong answer on test case "
                                         + (i + 1)
                         )
-
                         .executionTime(
                                 totalExecutionTime
                         )
-
                         .memoryUsed(0)
-
                         .passedTestCases(
                                 passedTestCases
                         )
-
                         .totalTestCases(
                                 totalTestCases
                         )
-
                         .failedOnHiddenTest(
                                 hidden
                         )
-
                         .build();
             }
 
 
-            // Current test passed
+            // ==================================================
+            // CURRENT TEST PASSED
+            // ==================================================
+
             passedTestCases++;
         }
 
@@ -516,28 +554,136 @@ public class DockerCodeExecutionService implements CodeExecutionService {
         // ==================================================
 
         return ExecutionResult.builder()
-
                 .status(
                         SubmissionStatus.ACCEPTED
                 )
-
                 .executionTime(
                         totalExecutionTime
                 )
-
                 .memoryUsed(0)
-
                 .passedTestCases(
                         passedTestCases
                 )
-
                 .totalTestCases(
                         totalTestCases
                 )
-
                 .failedOnHiddenTest(false)
-
                 .build();
+    }
+
+
+    // ==================================================
+    // CREATE DOCKER VOLUME
+    // ==================================================
+
+    private void createDockerVolume(
+            String volumeName)
+            throws IOException, InterruptedException {
+
+        Process process =
+                new ProcessBuilder(
+                        "docker",
+                        "volume",
+                        "create",
+                        volumeName
+                ).start();
+
+        boolean finished =
+                process.waitFor(
+                        15,
+                        TimeUnit.SECONDS
+                );
+
+        if (!finished) {
+
+            process.destroyForcibly();
+
+            throw new IOException(
+                    "Docker volume creation timed out"
+            );
+        }
+
+        if (process.exitValue() != 0) {
+
+            String error =
+                    new String(
+                            process
+                                    .getErrorStream()
+                                    .readAllBytes(),
+                            StandardCharsets.UTF_8
+                    ).trim();
+
+            throw new IOException(
+                    "Failed to create Docker volume: "
+                            + error
+            );
+        }
+    }
+
+
+    // ==================================================
+    // COPY FILE INTO DOCKER VOLUME
+    // ==================================================
+
+    private void copyFileToDockerVolume(
+            String volumeName,
+            Path sourceFile,
+            String targetFile)
+            throws IOException, InterruptedException {
+
+        ProcessBuilder processBuilder =
+                new ProcessBuilder(
+                        "docker",
+                        "run",
+                        "--rm",
+                        "-i",
+                        "-v",
+                        volumeName + ":/workspace",
+                        "alpine:3.20",
+                        "sh",
+                        "-c",
+                        "cat > /workspace/" + targetFile
+                );
+
+        Process process =
+                processBuilder.start();
+
+        byte[] content =
+                Files.readAllBytes(sourceFile);
+
+        process.getOutputStream().write(content);
+        process.getOutputStream().close();
+
+        boolean finished =
+                process.waitFor(
+                        15,
+                        TimeUnit.SECONDS
+                );
+
+        if (!finished) {
+
+            process.destroyForcibly();
+
+            throw new IOException(
+                    "Copying file to Docker volume timed out"
+            );
+        }
+
+        if (process.exitValue() != 0) {
+
+            String error =
+                    new String(
+                            process
+                                    .getErrorStream()
+                                    .readAllBytes(),
+                            StandardCharsets.UTF_8
+                    ).trim();
+
+            throw new IOException(
+                    "Failed to copy file to Docker volume: "
+                            + error
+            );
+        }
     }
 
 
@@ -546,44 +692,57 @@ public class DockerCodeExecutionService implements CodeExecutionService {
     // ==================================================
 
     private ProcessBuilder createDockerProcess(
-            Path tempDirectory,
+            String volumeName,
             String dockerImage,
             String command,
             String memory,
             String cpus) {
 
-
         return new ProcessBuilder(
-
                 "docker",
-
                 "run",
-
                 "--rm",
-
                 "--network",
                 "none",
-
                 "--memory",
                 memory,
-
                 "--cpus",
                 cpus,
-
                 "-v",
-
-                tempDirectory
-                        .toAbsolutePath()
-                        + ":/workspace",
-
+                volumeName + ":/workspace",
                 dockerImage,
-
                 "sh",
-
                 "-c",
-
                 command
         );
+    }
+
+
+    // ==================================================
+    // REMOVE DOCKER VOLUME
+    // ==================================================
+
+    private void removeDockerVolume(
+            String volumeName) {
+
+        try {
+
+            Process process =
+                    new ProcessBuilder(
+                            "docker",
+                            "volume",
+                            "rm",
+                            "-f",
+                            volumeName
+                    ).start();
+
+            process.waitFor(
+                    15,
+                    TimeUnit.SECONDS
+            );
+
+        } catch (Exception ignored) {
+        }
     }
 
 
@@ -594,27 +753,18 @@ public class DockerCodeExecutionService implements CodeExecutionService {
     private String getDockerImage(
             Language language) {
 
-
         return switch (language) {
 
-
             case CPP ->
-
                     "gcc:14";
 
-
             case JAVA ->
-
                     "eclipse-temurin:21-jdk";
 
-
             case PYTHON ->
-
                     "python:3.13-slim";
 
-
             default ->
-
                     throw new IllegalArgumentException(
                             "Unsupported language"
                     );
@@ -629,27 +779,18 @@ public class DockerCodeExecutionService implements CodeExecutionService {
     private String getRunCommand(
             Language language) {
 
-
         return switch (language) {
 
-
             case CPP ->
-
                     "timeout 5s /workspace/main < /workspace/input.txt";
 
-
             case JAVA ->
-
                     "timeout 5s java -cp /workspace Main < /workspace/input.txt";
 
-
             case PYTHON ->
-
                     "timeout 5s python /workspace/main.py < /workspace/input.txt";
 
-
             default ->
-
                     throw new IllegalArgumentException(
                             "Unsupported language"
                     );
@@ -664,33 +805,25 @@ public class DockerCodeExecutionService implements CodeExecutionService {
     private void deleteDirectory(
             Path directory) {
 
-
         try (var paths =
                      Files.walk(directory)) {
-
 
             paths.sorted(
                             (first, second) ->
                                     second.compareTo(first)
                     )
-
                     .forEach(path -> {
-
 
                         try {
 
                             Files.deleteIfExists(path);
 
-
                         } catch (IOException ignored) {
-
                         }
 
                     });
 
-
         } catch (IOException ignored) {
-
         }
     }
 }

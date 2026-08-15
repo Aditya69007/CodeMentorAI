@@ -438,3 +438,53 @@ So our roadmap now is:
 logo of code mentor ai email will see our image
 
 ============================================================
+
+Step 1 — Audit current project
+
+Docker Compose
+Backend Dockerfile
+frontend configuration
+application.properties/yml
+environment/secrets
+CORS
+OAuth
+database/Redis configuration
+
+Step 2 — Prepare backend for production
+
+Step 3 — Create cloud PostgreSQL
+
+Step 4 — Deploy Spring Boot backend
+
+Step 5 — Test the online backend + Swagger
+
+Step 6 — Deploy React frontend
+
+Step 7 — Connect frontend → production backend
+
+Step 8 — Configure Google OAuth
+
+Step 9 — Configure password-reset/email URLs
+
+Step 10 — Verify Redis, Gemini, GitHub/LeetCode integrations
+
+Step 11 — Test the complete application
+
+Step 12 — Optional custom domain + final production polish
+
+
+1. Render PostgreSQL       ✅ DONE
+2. Verify database data    ✅ DONE
+3. Backend Maven build     ✅ DONE
+4. Create Dockerfile       ← NOW
+5. Commit + push backend
+6. Create Render Backend
+7. Configure backend ENV
+8. Deploy backend
+9. Test Swagger/API
+10. Get backend URL
+11. Configure Google OAuth production URL
+12. Update frontend API URL
+13. Deploy frontend
+14. Test complete application
+15. Final security check
