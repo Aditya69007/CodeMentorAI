@@ -1,3 +1,5 @@
+# Database backup
+codementorai_backup.dump
 backend/.env
 backend/src/main/resources/application-secrets.propertiesbackend/.env
 frontend/.env
