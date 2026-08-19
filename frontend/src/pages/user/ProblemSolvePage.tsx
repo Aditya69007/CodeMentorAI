@@ -382,10 +382,15 @@ const [leftTab, setLeftTab] =
 
     const updateTimer = () => {
 
-      const startedAt =
-        new Date(
-          independentSession.startedAt
-        ).getTime();
+    const rawStartedAt =
+      independentSession.startedAt;
+
+    const startedAt =
+      new Date(
+        rawStartedAt.endsWith("Z")
+          ? rawStartedAt
+          : `${rawStartedAt}Z`
+      ).getTime();
 
       const currentTime =
         new Date().getTime();

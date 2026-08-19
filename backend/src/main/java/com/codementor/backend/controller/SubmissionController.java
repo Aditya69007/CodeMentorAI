@@ -117,7 +117,7 @@ public class SubmissionController {
         // FILTER SUBMISSIONS - ADMIN ONLY
         // ==================================================
 
-        @PreAuthorize("hasRole('ADMIN')")
+        @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
         @GetMapping("/admin")
         public ResponseEntity<Page<AdminSubmissionResponse>>
         filterSubmissionsForAdmin(

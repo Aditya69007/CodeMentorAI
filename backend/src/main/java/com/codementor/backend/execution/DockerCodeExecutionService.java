@@ -1,5 +1,6 @@
 package com.codementor.backend.execution;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.codementor.backend.dto.ExecutionResult;
 import com.codementor.backend.entity.Language;
 import com.codementor.backend.entity.SubmissionStatus;
@@ -14,8 +15,14 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-@Service
-public class DockerCodeExecutionService implements CodeExecutionService {
+//@Service
+@ConditionalOnProperty(
+        name = "execution.provider",
+        havingValue = "docker",
+        matchIfMissing = true
+)
+public class DockerCodeExecutionService
+        implements CodeExecutionService {
 
     @Override
     public ExecutionResult execute(

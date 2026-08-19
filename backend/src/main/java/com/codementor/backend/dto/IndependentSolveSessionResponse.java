@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Getter
 @Builder
@@ -17,9 +17,9 @@ public class IndependentSolveSessionResponse {
 
     private Boolean active;
 
-    private LocalDateTime startedAt;
+    private Instant startedAt;
 
-    private LocalDateTime endedAt;
+    private Instant endedAt;
 
     private Long durationSeconds;
 

@@ -3,7 +3,7 @@ package com.codementor.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "independent_solve_sessions")
@@ -55,11 +55,11 @@ public class IndependentSolveSession {
             name = "started_at",
             nullable = false
     )
-    private LocalDateTime startedAt;
+    private Instant startedAt;
 
 
     @Column(name = "ended_at")
-    private LocalDateTime endedAt;
+    private Instant endedAt;
 
 
     // ==================================================
@@ -93,7 +93,7 @@ public class IndependentSolveSession {
             nullable = false,
             updatable = false
     )
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
 
     @PrePersist
@@ -112,11 +112,11 @@ public class IndependentSolveSession {
         }
 
         if (startedAt == null) {
-            startedAt = LocalDateTime.now();
+            startedAt = Instant.now();
         }
 
         if (createdAt == null) {
-            createdAt = LocalDateTime.now();
+            createdAt = Instant.now();
         }
     }
 }

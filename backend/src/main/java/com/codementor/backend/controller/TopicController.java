@@ -38,7 +38,7 @@ public class TopicController {
         );
     }
     
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     @GetMapping("/admin/all")
     public ResponseEntity<List<AdminTopicResponse>>
     getAllTopicsForAdmin() {
@@ -48,7 +48,7 @@ public class TopicController {
     );
     }
 
-        @PreAuthorize("hasRole('ADMIN')")
+        @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
         @PostMapping("/admin")
         public ResponseEntity<AdminTopicResponse>
         createTopic(
@@ -63,7 +63,7 @@ public class TopicController {
                 );
         }
 
-        @PreAuthorize("hasRole('ADMIN')")
+        @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
         @PutMapping("/admin/{id}")
         public ResponseEntity<AdminTopicResponse>
         updateTopic(
@@ -79,7 +79,7 @@ public class TopicController {
         );
         }
         
-        @PreAuthorize("hasRole('ADMIN')")
+        @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
         @PatchMapping("/admin/{id}/status")
         public ResponseEntity<AdminTopicResponse>
         toggleTopicStatus(
@@ -91,7 +91,7 @@ public class TopicController {
         );
         }
 
-        @PreAuthorize("hasRole('ADMIN')")
+        @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
         @DeleteMapping("/admin/{id}")
         public ResponseEntity<Void> deleteTopic(
                 @PathVariable Long id

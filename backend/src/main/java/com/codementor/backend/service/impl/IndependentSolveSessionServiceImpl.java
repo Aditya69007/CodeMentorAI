@@ -8,7 +8,7 @@ import com.codementor.backend.entity.Submission;
 import com.codementor.backend.entity.User;
 
 import com.codementor.backend.exception.ResourceNotFoundException;
-
+import java.time.ZoneOffset;
 import com.codementor.backend.repository.IndependentSolveSessionRepository;
 import com.codementor.backend.repository.ProblemRepository;
 import com.codementor.backend.repository.SubmissionRepository;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -93,7 +93,7 @@ public class IndependentSolveSessionServiceImpl
                         .active(true)
 
                         .startedAt(
-                                LocalDateTime.now()
+                                Instant.now()
                         )
 
                         .submissionsDuringSession(0L)
@@ -174,8 +174,8 @@ public class IndependentSolveSessionServiceImpl
                                 )
                         );
 
-        LocalDateTime endedAt =
-                LocalDateTime.now();
+        Instant endedAt =
+                Instant.now();
 
 
         long durationSeconds =
@@ -209,29 +209,33 @@ public class IndependentSolveSessionServiceImpl
                                         .equals(problemId)
                         )
 
-                        .filter(submission ->
-                                submission
-                                        .getCreatedAt()
-                                        .isAfter(
-                                                session.getStartedAt()
-                                        )
-                                ||
-                                submission
-                                        .getCreatedAt()
-                                        .isEqual(
-                                                session.getStartedAt()
-                                        )
-                        )
+                .filter(submission -> {
 
-                        .filter(submission ->
-                                submission
-                                        .getCreatedAt()
-                                        .isBefore(endedAt)
-                                ||
-                                submission
-                                        .getCreatedAt()
-                                        .isEqual(endedAt)
-                        )
+                Instant submissionCreatedAt =
+                        submission
+                                .getCreatedAt()
+                                .atOffset(ZoneOffset.UTC)
+                                .toInstant();
+
+                return !submissionCreatedAt.isBefore(
+                        session.getStartedAt()
+                );
+
+                })
+
+                .filter(submission -> {
+
+                Instant submissionCreatedAt =
+                        submission
+                                .getCreatedAt()
+                                .atOffset(ZoneOffset.UTC)
+                                .toInstant();
+
+                return !submissionCreatedAt.isAfter(
+                        endedAt
+                );
+
+                })
 
                         .toList();
 
